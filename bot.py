@@ -16,7 +16,7 @@ from random import randint
 seed(randint(1, 1000))
 
 PREFIX = "$"
-VERSION = "Beta 0.8"
+VERSION = "Beta 1.0"
 
 thelist = {
     "1": "1",
