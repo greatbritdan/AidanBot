@@ -369,7 +369,11 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
             return
 
     await MSG.delete()
-    await FightNewgame(ctx, v1, v2, int(answers[0]))
+    if int(answers[0]) < 1:
+        emb = getErrorEmbed(ctx, "Missing un-optional argument for command.")
+        await ctx.send(embed=emb)
+    else:
+        await FightNewgame(ctx, v1, v2, int(answers[0]))
 
 COMMANDS.append(["General", "fight", "Fight a user or bot to the death.", False])
 @client.command()
