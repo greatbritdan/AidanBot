@@ -343,8 +343,8 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
         v1 = user1
         v2 = user2
     
-    questions = ["Max & Starter health? (Default: 100)"]
-    answers = ["100"]
+    questions = ["Max & Starter health? (Default: 100)", "Max energy? (default: 10)"]
+    answers = ["100", "10"]
 
     emb = getEmbed(ctx, "fight+ > setup", "N/A", "Type your awnser or `none` to keep default!")
     MSG = await ctx.send(embed=emb)
@@ -369,11 +369,11 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
             return
 
     await MSG.delete()
-    if int(answers[0]) < 1:
+    if int(answers[0]) < 1 or int(answers[1]) < 1:
         emb = getErrorEmbed(ctx, "Missing un-optional argument for command.")
         await ctx.send(embed=emb)
     else:
-        await FightNewgame(ctx, v1, v2, int(answers[0]))
+        await FightNewgame(ctx, v1, v2, int(answers[0]), int(answers[1]))
 
 COMMANDS.append(["General", "fight", "Fight a user or bot to the death.", False])
 @client.command()
@@ -387,9 +387,10 @@ async def fight(ctx, user1:discord.User=None, user2:discord.User=None):
 
     await FightNewgame(ctx, v1, v2)
 
-async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100):
+async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100, menergy:int=10):
     # setup vars and lists
     maxhealth = mhealth
+    maxenergy = menergy
     player = {
         "p1": {
             "name": p1.name,
@@ -426,8 +427,8 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100):
     # embed for the fight command
     def getFightEmbed(ctx, action):
         emb = getEmbed(ctx, "Fight", player["p1"]["name"] + " VS " + player["p2"]["name"])
-        addField(emb, player["p1"]["name"] + " Stats:", "`Health:` " + getHealthBar(player["p1"]["health"], maxhealth, 10, True) + " (" + str(player["p1"]["health"]) + ")\n`Energy:` " + getHealthBar(player["p1"]["energy"], 10, 5, True) + " (" + str(player["p1"]["energy"]) + ")")
-        addField(emb, player["p2"]["name"] + " Stats:", "`Health:` " + getHealthBar(player["p2"]["health"], maxhealth, 10, True) + " (" + str(player["p2"]["health"]) + ")\n`Energy:` " + getHealthBar(player["p2"]["energy"], 10, 5, True) + " (" + str(player["p2"]["energy"]) + ")")
+        addField(emb, player["p1"]["name"] + " Stats:", "`Health:` " + getHealthBar(player["p1"]["health"], maxhealth, 10, True) + " (" + str(player["p1"]["health"]) + ")\n`Energy:` " + getHealthBar(player["p1"]["energy"], menergy, 5, True) + " (" + str(player["p1"]["energy"]) + ")")
+        addField(emb, player["p2"]["name"] + " Stats:", "`Health:` " + getHealthBar(player["p2"]["health"], maxhealth, 10, True) + " (" + str(player["p2"]["health"]) + ")\n`Energy:` " + getHealthBar(player["p2"]["energy"], menergy, 5, True) + " (" + str(player["p2"]["energy"]) + ")")
 
         if action:
             emb = addField(emb, action[0], action[1])
@@ -496,7 +497,7 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100):
                     action = "{name} decided to wait.!".format(name=player[turn]["name"]), "{name} gained **1 energy**!".format(name=player[turn]["name"])
 
                     player[turn]["energy"] += 1
-                    player[turn]["energy"] = clamp(player[turn]["energy"], 0, 10)
+                    player[turn]["energy"] = clamp(player[turn]["energy"], 0, menergy)
 
                 # if it's a bot don't remove reaction
                 if not player[turn]["bot"]:
@@ -514,7 +515,7 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100):
 
                 # gain energy
                 player[turn]["energy"] += 1
-                player[turn]["energy"] = clamp(player[turn]["energy"], 0, 10)
+                player[turn]["energy"] = clamp(player[turn]["energy"], 0, menergy)
 
                 # update embed
                 embed = getFightEmbed(ctx, action)
