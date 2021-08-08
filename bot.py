@@ -343,7 +343,7 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
         v1 = user1
         v2 = user2
     
-    questions = ["Max & Starter health? (Default: 100)", "Max energy? (default: 10)"]
+    questions = ["Max & Starter health?", "Max energy?"]
     answers = ["100", "10"]
 
     emb = getEmbed(ctx, "fight+ > setup", "N/A", "Type your awnser or `none` to keep default!")
@@ -353,7 +353,7 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
         def check(message):
             return (ctx.author == message.author)
 
-        emb = getEmbed(ctx, "fight+ > setup", questions[i], "Type your answer or `none` to keep default!")
+        emb = getEmbed(ctx, "fight+ > setup", questions[i] + " (Default: {})".format(answers[i]), "Type your answer or `none` to keep default!")
         await MSG.edit(embed=emb)
 
         try:
@@ -361,7 +361,8 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
 
             if message:
                 if message.content.lower() != "none":
-                    answers[i] = message.content
+                    answers[i] = int(message.content)
+                    answers[i] = clamp(answers[i], 5, 250)
 		
                 await message.delete()
 
@@ -371,7 +372,7 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
             return
 
     await MSG.delete()
-    if int(answers[0]) < 1 or int(answers[1]) < 1:
+    if isinstance(answers[0], int) and isinstance(answers[1], int):
         emb = getErrorEmbed(ctx, "Missing un-optional argument for command.")
         await ctx.send(embed=emb)
     else:
@@ -424,7 +425,7 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100, m
 
     # for cheking if the right user uses valid reactions on a spesific message
     def check(rec, user):
-        return (user.id == player[turn]["id"] and rec.message.id == MSG.id and (checkMove(rec, "🕓", 0) or checkMove(rec, "👊", 2) or checkMove(rec, "🍷", 0, player[turn]["heals"] > 0)))
+        return (user.id == player[turn]["id"] and rec.message.id == MSG.id and (checkMove(rec, "❌", 0) or checkMove(rec, "🕓", 0) or checkMove(rec, "👊", 2) or checkMove(rec, "🍷", 0, player[turn]["heals"] > 0)))
 
     # embed for the fight command
     def getFightEmbed(ctx, action):
@@ -449,6 +450,7 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100, m
     await MSG.add_reaction("🕓")
     await MSG.add_reaction("👊")
     await MSG.add_reaction("🍷")
+    await MSG.add_reaction("❌")
 
     # the main loop
     playing = True
@@ -469,9 +471,14 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100, m
                 if type(reaction) != str:
                     reaction = str(reaction.emoji)
                 
+                # flee (aka quit the game)
+                if reaction == "❌":
+                    await ctx.send(player[turn]["name"] + " fled!\nGG " + player[turnt]["name"] + "!!!")
+                    return
+
                 # punch
                 # more energy makes the attack stronger but attacking will half your energy
-                if reaction == "👊":
+                elif reaction == "👊":
                     num = randint((player[turn]["energy"]*5)-player[turn]["energy"], (player[turn]["energy"]*5)+player[turn]["energy"])
                     enum = math.ceil(player[turn]["energy"] / 2)
                     action = "{name1} hit {name2}!".format(name1=player[turn]["name"] , name2=player[turnt]["name"]), "{name2} lost **{num} health**!\n{name1} lost **{enum} energy**!".format(name1=player[turn]["name"], name2=player[turnt]["name"], num=num, enum=enum)
