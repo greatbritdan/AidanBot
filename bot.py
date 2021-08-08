@@ -363,7 +363,7 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
                 if message.content.lower() != "none":
                     answers[i] = message.content
 		
-		await message.delete()
+            await message.delete()
 
         except asyncio.TimeoutError:
             await MSG.delete()
