@@ -3,13 +3,11 @@ import os
 import asyncio
 import datetime
 import math
-import json
 
 from discord.ext import commands
 from discord.utils import get
 
 # generate random integer values
-import random
 from random import seed
 from random import randint
 # seed random number generator
@@ -544,6 +542,17 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100, m
         await ctx.send("Timeout.")
     else:
         await ctx.send("GG " + player[win]["name"] + "!!!")
+
+COMMANDS.append(["General", "clone", "Make someone say something stupid lol.", False])
+@client.command()
+async def clone(ctx, member:discord.User=None, *, message:str=None):
+    if member == None or message == None:
+        await ctx.send("You need to give a member id and message.")
+        return
+		
+    webhook = await ctx.channel.create_webhook(name=member.name)
+    await webhook.send(message, username=member.name + " (fake)", avatar_url=member.avatar_url)
+    await webhook.delete()
 
 #############
 ### TOKEN ###
