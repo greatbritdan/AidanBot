@@ -334,7 +334,11 @@ def getHealthBar(health, maxhealth, size, hashalf=False):
 COMMANDS.append(["General", "fightplus", "Fight a user or bot to the death. With extra options", False])
 @client.command()
 async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
-    if user2 == None:
+    if user1 == None:
+        emb = getErrorEmbed(ctx, "Missing un-optional argument for command.")
+        await ctx.send(embed=emb)
+        return
+    elif user2 == None:
         v1 = ctx.author
         v2 = user1
     else:
@@ -342,7 +346,7 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
         v2 = user2
     
     questions = ["Max & Starter health?", "Max energy?"]
-    answers = ["100", "10"]
+    answers = [100, 10]
 
     emb = getEmbed(ctx, "fight+ > setup", "N/A", "Type your awnser or `none` to keep default!")
     MSG = await ctx.send(embed=emb)
@@ -379,7 +383,11 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
 COMMANDS.append(["General", "fight", "Fight a user or bot to the death.", False])
 @client.command()
 async def fight(ctx, user1:discord.User=None, user2:discord.User=None):
-    if user2 == None:
+    if user1 == None:
+        emb = getErrorEmbed(ctx, "Missing un-optional argument for command.")
+        await ctx.send(embed=emb)
+        return
+    elif user2 == None:
         v1 = ctx.author
         v2 = user1
     else:
