@@ -12,7 +12,7 @@ from random import seed
 from random import randint
 seed(randint(1, 1000))
 
-PREFIX = "%"
+PREFIX = "$"
 VERSION = "Beta 1.0"
 
 thelist = {
