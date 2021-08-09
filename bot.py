@@ -363,14 +363,15 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
 
             if message:
                 if message.content.lower() != "none":
-                    answers[i] = int(message.content)
-                    if not isinstance(answers[i], int):
-                        emb = getErrorEmbed(ctx, message.content + " is not a valid argument.")
+                    try:
+                        answers[i] = int(message.content)
+                    except ValueError:
+                        emb = getErrorEmbed(ctx, message.content + " is not a valid argument. Needs to be an whole number!")
                         await ctx.send(embed=emb)
                         return
-                    else:
-                        answers[i] = clamp(answers[i], 5, 250)
-                        
+
+                    answers[i] = clamp(answers[i], 5, 250)
+
                 await message.delete()
 
         except asyncio.TimeoutError:
