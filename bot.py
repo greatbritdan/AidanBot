@@ -199,14 +199,14 @@ async def help(ctx):
 COMMANDS.append(["Important", "info", "Returns info about the bot.", False])
 @client.command()
 async def info(ctx):
-    emb = getEmbed(ctx, "Info", "Hey, I am AidanBot, A small discord bot created by Aidan#8883 for his server that now anyone can use!", f"[Aidan's Youtube](https://www.youtube.com/c/AidanMapper)\n[Aidan's Twitter](https://twitter.com/AidanMapper)\n[Aidan's Discord Server](https://discord.gg/xBnBEpHdb6)\n[Invite me to your server!](https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=189515820112&scope=bot)\n\nIf you find a bug or he has made a typo <:AidanSmug:837001740947161168>, you can report it to Aidan on his server in one of the bot chats. You can also suggest features in the suggestion channel on his server.\n\nNote: If you are a server admin and want to setup a feature (e.g. if server invites are deleted automaticaly) use {PREFIX}config!")
+    emb = getEmbed(ctx, "Info", "Hey, I am AidanBot, A small discord bot created by Aidan#8883 for his server that now anyone can use!", f"[Aidan's Youtube](https://www.youtube.com/c/AidanMapper)\n[Aidan's Twitter](https://twitter.com/AidanMapper)\n[Aidan's Discord Server](https://discord.gg/xBnBEpHdb6)\n[Invite me to your server!](https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot)\n\nIf you find a bug or he has made a typo <:AidanSmug:837001740947161168>, you can report it to Aidan on his server in one of the bot chats. You can also suggest features in the suggestion channel on his server.\n\nNote: If you are a server admin and want to setup a feature (e.g. if server invites are deleted automaticaly) use {PREFIX}config!")
     emb = addField(emb, "Version:", VERSION)
     await ctx.send(embed=emb)
 
 COMMANDS.append(["Important", "invite", "Add the bot to your server.", False])
 @client.command()
 async def invite(ctx):
-    await ctx.send("Y- you want me on your server??? I'd love too!!! https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=189515820112&scope=bot")
+    await ctx.send("Y- you want me on your server??? I'd love too!!! https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot")
 
 #   DATA   #
 
