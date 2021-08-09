@@ -3,7 +3,6 @@ import os
 import asyncio
 import datetime
 import math
-import json
 
 from discord.ext import commands
 from discord.utils import get
@@ -11,10 +10,9 @@ from discord.utils import get
 # generate random integer values
 from random import seed
 from random import randint
-# seed random number generator
 seed(randint(1, 1000))
 
-PREFIX = "$"
+PREFIX = "%"
 VERSION = "Beta 1.0"
 
 thelist = {
@@ -140,11 +138,13 @@ async def on_message(message):
         await message.channel.send("Not available outside of guilds (servers)")
         return
     
-    if message.guild.id == 836936601824788520: # pip0n palace stuff
-        if "discord.gg" in message.content.lower():
-            if message.channel.name != "advertising-chat" and userHasPermission(message.author, "kick_members") == False:
+    if "discord.gg" in message.content.lower():
+        delete_invites = await GETDATA(message, "delete_invites")
+        if delete_invites and userHasPermission(message.author, "kick_members") == False:
+            invite_allow_channel = await GETDATA(message, "invite_allow_channel")
+            if message.channel.name != invite_allow_channel:
                 await message.delete()
-                await message.channel.send(f"No invites outside of advertising-chat! >:(")
+                await message.channel.send(f"No invites outside of {invite_allow_channel}! >:(")
 
     await client.process_commands(message)
 
@@ -183,10 +183,12 @@ async def help(ctx):
         txt = ""
         for i in range(len(COMMANDS)):
             if COMMANDS[i][0] == sect:
-                if COMMANDS[i][3] == False or userHasPermission(ctx.author, "kick_members") == True:
+                if COMMANDS[i][3] == False or (COMMANDS[i][3] == "mods" and userHasPermission(ctx.author, "kick_members") == True) or (COMMANDS[i][3] == "admin" and userHasPermission(ctx.author, "administrator") == True):
                     txt = txt + f"`{PREFIX}{COMMANDS[i][1]}`: {COMMANDS[i][2]}"
-                    if COMMANDS[i][3] == True:
+                    if COMMANDS[i][3] == "mods":
                         txt = txt + " (Mods Only)"
+                    elif COMMANDS[i][3] == "admin":
+                        txt = txt + " (Admins Only)"
                     txt = txt + "\n"
                 
         emb = addField(emb, f"{sect}.", txt)
@@ -204,6 +206,103 @@ COMMANDS.append(["Important", "invite", "Add the bot to your server.", False])
 @client.command()
 async def invite(ctx):
     await ctx.send("Y- you want me on your server??? I'd love too!!! https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=388160&scope=bot")
+
+#   DATA   #
+
+COMMANDS.append(["Values", "setup", "Sets up channel that hold server values and sets up default values.", "admin"])
+@client.command()
+@commands.has_permissions(administrator=True)
+async def setup(ctx):
+    overwrites = {
+        ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
+    }
+    channel = await ctx.guild.create_text_channel('aidanbot-serverdata', topic="**DON'T TALK HERE**, For AidanBot's per server data!", overwrites=overwrites)
+    await channel.send("delete_invites=false\ninvite_allow_channel=false")
+    
+# val = await GETDATA(ctx, "teststring")
+# suc = await SETDATA(ctx, "teststring", val)
+
+COMMANDS.append(["Values", "config", "Get value or set value.", "admin"])
+@client.command()
+@commands.has_permissions(administrator=True)
+async def config(ctx, action=None, name=None, val=None):
+    if action == "get" and name:
+        val = await GETDATA(ctx, name)
+        await ctx.send(f"{name} is currently set to {val}!")
+    elif action == "set" and name and val:
+        suc = await SETDATA(ctx, name, val)
+        if suc:
+            await ctx.send(f"{name} was set to {val}!")
+        else:
+            await ctx.send(f"{name} was not found!")
+
+#   SAVE AND LOAD   #
+
+async def GETMSG(ctx):
+    channel = get(ctx.guild.text_channels, name="aidanbot-serverdata")
+    if channel == None:
+        await ctx.send(f"You need to run {PREFIX}setup first!")
+        return False
+
+    message = await channel.fetch_message(channel.last_message_id)
+    if message == None:
+        await ctx.send(f"Check the data, see if a message is there. if not, delete the channel and rerun {PREFIX}setup!")
+        return False
+
+    return message
+
+async def GETDATA(ctx, name):
+    message = await GETMSG(ctx)
+    if message == False:
+        return
+
+    messcont = message.content
+
+    data = messcont.splitlines()
+    for var in data:
+        dat = var.split('=')
+        if dat[0] == name:
+            val = dat[1]
+            if dat[1] == "true":
+                val = True
+            elif dat[1] == "false":
+                val = False
+            else:
+                try:
+                    val = int(val)
+                except ValueError:
+                    kwlksdwlksw = 1
+
+            return val
+
+    return False
+
+async def SETDATA(ctx, name, val):
+    message = await GETMSG(ctx)
+    if message == False:
+        return
+
+    messcont = message.content
+
+    data = messcont.splitlines()
+    suc = False
+    newdata = []
+    for var in data:
+        dat = var.split('=')
+        if dat[0] == name:
+            dat[1] = val
+            suc = True
+
+        newdata.append(dat[0] + "=" + dat[1])
+
+    stringdata = ""
+    for var in newdata:
+        stringdata = stringdata + "\n" + var
+    stringdata = stringdata.strip()
+
+    await message.edit(content=stringdata)
+
+    return suc
 
 #   GENERAL   #
 
