@@ -348,7 +348,7 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
     questions = ["Max & Starter health?", "Max energy?"]
     answers = [100, 10]
 
-    emb = getEmbed(ctx, "fight+ > setup", "N/A", "Type your awnser or `none` to keep default!")
+    emb = getEmbed(ctx, "fight+ > setup", "N/A", "Type your awnser or `none` to keep default!\nmin is 5, max is 250!")
     MSG = await ctx.send(embed=emb)
 
     for i in range(0, len(questions)):
@@ -364,8 +364,13 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
             if message:
                 if message.content.lower() != "none":
                     answers[i] = int(message.content)
-                    answers[i] = clamp(answers[i], 5, 250)
-		
+                    if not isinstance(answers[i], int):
+                        emb = getErrorEmbed(ctx, message.content + " is not a valid argument.")
+                        await ctx.send(embed=emb)
+                        return
+                    else:
+                        answers[i] = clamp(answers[i], 5, 250)
+                        
                 await message.delete()
 
         except asyncio.TimeoutError:
@@ -374,11 +379,7 @@ async def fightplus(ctx, user1:discord.User=None, user2:discord.User=None):
             return
 
     await MSG.delete()
-    if isinstance(answers[0], int) and isinstance(answers[1], int):
-        emb = getErrorEmbed(ctx, "Missing un-optional argument for command.")
-        await ctx.send(embed=emb)
-    else:
-        await FightNewgame(ctx, v1, v2, int(answers[0]), int(answers[1]))
+    await FightNewgame(ctx, v1, v2, answers[0], answers[1])
 
 COMMANDS.append(["General", "fight", "Fight a user or bot to the death.", False])
 @client.command()
