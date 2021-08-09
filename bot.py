@@ -205,42 +205,6 @@ COMMANDS.append(["Important", "invite", "Add the bot to your server.", False])
 async def invite(ctx):
     await ctx.send("Y- you want me on your server??? I'd love too!!! https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=388160&scope=bot")
 
-#   TESTING   #
-
-@client.command()
-async def test(ctx):
-    gildat = LOAD(ctx)
-    await ctx.send(gildat["teststr"])
-
-@client.command()
-async def settest(ctx, *, strg):
-    gildat = LOAD(ctx)
-    gildat["teststr"] = strg
-    SAVE(ctx, gildat)
-
-#   SAVE AND LOAD   #
-
-def SAVE(ctx, gildat):
-    with open('botdata.json', 'r') as f:
-        data = json.load(f)
-
-    data[str(ctx.guild.id)] = gildat
-
-    with open('botdata.json', 'w') as f:
-        json.dump(data, f, indent=2)
-
-def LOAD(ctx):
-    with open('botdata.json', 'r') as f:
-        data = json.load(f)
-
-    if not data[str(ctx.guild.id)]:
-        data[str(ctx.guild.id)] = {
-            "teststr": "test"
-        }
-        SAVE()
-    
-    return data[str(ctx.guild.id)]
-
 #   GENERAL   #
 
 COMMANDS.append(["General", "echo", "Says what is passed into it.", False])
