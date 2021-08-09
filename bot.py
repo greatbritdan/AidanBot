@@ -13,6 +13,7 @@ from random import randint
 # seed random number generator
 seed(randint(1, 1000))
 
+#wow
 PREFIX = "$"
 VERSION = "Beta 1.0"
 
