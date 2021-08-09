@@ -211,7 +211,7 @@ async def invite(ctx):
 
 COMMANDS.append(["Values", "setup", "Sets up channel that hold server values and sets up default values.", "admin"])
 @client.command()
-@commands.has_permissions(administrator=True)
+@client.has_permissions(administrator=True)
 async def setup(ctx):
     overwrites = {
         ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
@@ -224,7 +224,7 @@ async def setup(ctx):
 
 COMMANDS.append(["Values", "config", "Get value or set value.", "admin"])
 @client.command()
-@commands.has_permissions(administrator=True)
+@client.has_permissions(administrator=True)
 async def config(ctx, action=None, name=None, val=None):
     if action == "get" and name:
         val = await GETDATA(ctx, name)
