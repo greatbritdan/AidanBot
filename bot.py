@@ -145,7 +145,10 @@ async def on_message(message):
             invite_allow_channel = await GETDATA(message, "invite_allow_channel")
             if message.channel.name != invite_allow_channel:
                 await message.delete()
-                await message.channel.send(f"No invites outside of {invite_allow_channel}! >:(")
+		if invite_allow_channel != False:
+                    await message.channel.send(f"No invites allowed outside of {invite_allow_channel}! >:(")
+		else:
+		    await message.channel.send(f"No invites allowed! >:(")
 
     await client.process_commands(message)
 
