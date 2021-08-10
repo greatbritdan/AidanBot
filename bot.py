@@ -70,8 +70,13 @@ client.remove_command('help')
 ##############
 
 # make an embed and send it back
-def getEmbed(ctx, command, title=False, description=False, image=False):
-    emb = discord.Embed(title=title, description=description, color=discord.Color.from_rgb(20, 29, 37))
+def getEmbed(ctx, command, title=False, description=False, image=False, red=False):
+    if red:
+        col = discord.Color.from_rgb(220, 29, 37)
+    else:
+        col = discord.Color.from_rgb(20, 29, 37)
+
+    emb = discord.Embed(title=title, description=description, color=col)
     if image:
         emb.set_image(url=image)
 
@@ -212,6 +217,16 @@ COMMANDS.append(["Important", "invite", "Add the bot to your server.", False])
 @client.command()
 async def invite(ctx):
     await ctx.send("Y- you want me on your server??? I'd love too!!! https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot")
+
+COMMANDS.append(["Important", "lockdown", "Delete all invites.", "admin"])
+@client.command()
+@has_permissions(administrator=True)
+async def lockdown(ctx):
+    for invite in await ctx.guild.invites():
+        await invite.delete()
+
+    emb = getEmbed(ctx, "Lockdown", ":lock: **!Lockdown!** :lock:", "The owner has decided to lockdown the server! All invites have been deleted, no one can join so be careful not to leave by accident.", False, True)
+    await ctx.send(embed=emb)
 
 #   DATA   #
 
