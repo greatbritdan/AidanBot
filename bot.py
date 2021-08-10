@@ -150,7 +150,9 @@ async def on_message(message):
                 else:
                     await message.channel.send(f"No invites allowed! >:(")
 
-    await client.process_commands(message)
+    role = get(message.author.roles, name="AidanBotBanned")
+    if not role:
+        await client.process_commands(message)
 
 @client.event
 async def on_guild_join(guild):
