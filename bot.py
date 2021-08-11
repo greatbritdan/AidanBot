@@ -522,13 +522,13 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100, m
     # for cheking if move can be used
     def checkMove(rec, typ, eng=0, con=None):
         if con:
-            return (str(rec.emoji) == typ and player[turn]["energy"] >= eng and con)
+            return (str(rec.emoji) == typ and player[turn]["energy"] >= eng and player[turn]["heals"] > 0)
         else:
             return (str(rec.emoji) == typ and player[turn]["energy"] >= eng)
 
     # for cheking if the right user uses valid reactions on a spesific message
     def check(rec, user):
-        return (user.id == player[turn]["id"] and rec.message.id == MSG.id and (checkMove(rec, "❌", 0) or checkMove(rec, "🕓", 0) or checkMove(rec, "👊", 2) or checkMove(rec, "🍷", 0, player[turn]["heals"] > 0)))
+        return (user.id == player[turn]["id"] and rec.message.id == MSG.id and (checkMove(rec, "❌", 0) or checkMove(rec, "🕓", 0) or checkMove(rec, "👊", 2) or checkMove(rec, "🍷", 0, True)))
 
     # embed for the fight command
     def getFightEmbed(ctx, action):
@@ -539,7 +539,7 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100, m
         if action:
             emb = addField(emb, action[0], action[1])
 
-        text = "🕓: `Wait (+1 Energy)`\n👊: `Attack  (-2 Energy)`"
+        text = f"🕓: `Wait (+1 Energy)`\n👊: `Attack  (" + math.ceil(player[turn]["energy"] / 2) + " Energy)`"
         if player[turn]["heals"] > 0:
             text = text + "\n🍷: `Heal (0 Energy) (" + str(player[turn]["heals"]) + " left)`"
         text = text + "\n❌: `Flee (0 Energy)`"
