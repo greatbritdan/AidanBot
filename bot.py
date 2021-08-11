@@ -202,7 +202,8 @@ async def help(ctx):
                         txt = txt + " (Admins Only)"
                     txt = txt + "\n"
                 
-        emb = addField(emb, f"{sect}.", txt)
+        if txt != "":
+            emb = addField(emb, sect, txt)
 
     await ctx.send(embed=emb)
 
