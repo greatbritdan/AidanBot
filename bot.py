@@ -539,7 +539,7 @@ async def FightNewgame(ctx, p1:discord.User, p2:discord.User, mhealth:int=100, m
         if action:
             emb = addField(emb, action[0], action[1])
 
-        text = f"🕓: `Wait (+1 Energy)`\n👊: `Attack  (" + math.ceil(player[turn]["energy"] / 2) + " Energy)`"
+        text = f"🕓: `Wait (+1 Energy)`\n👊: `Attack  (-" + str(math.ceil(player[turn]["energy"] / 2)) + " Energy)`"
         if player[turn]["heals"] > 0:
             text = text + "\n🍷: `Heal (0 Energy) (" + str(player[turn]["heals"]) + " left)`"
         text = text + "\n❌: `Flee (0 Energy)`"
