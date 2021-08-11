@@ -16,52 +16,6 @@ seed(randint(1, 1000))
 PREFIX = "$"
 VERSION = "Beta 1.0"
 
-thelist = {
-    "1": "1",
-    "2": "2",
-    "3": "3",
-    "4": "4",
-    "5": "5",
-    "6": "6",
-    "7": "7",
-    "8": "8",
-    "9": "9",
-    "0": "0",
-    "a": "11",
-    "b": "12",
-    "c": "13",
-    "d": "14",
-    "e": "15",
-    "f": "16",
-    "g": "17",
-    "h": "18",
-    "i": "19",
-    "j": "20",
-    "k": "21",
-    "l": "22",
-    "m": "23",
-    "n": "24",
-    "o": "25",
-    "p": "26",
-    "q": "27",
-    "r": "28",
-    "s": "29",
-    "t": "30",
-    "u": "31",
-    "v": "32",
-    "w": "33",
-    "x": "34",
-    "y": "35",
-    "z": "36",
-    " ": "37",
-    ".": "38",
-    ",": "39",
-    ":": "40",
-    ";": "41",
-    "'": "42",
-    "/": "43"
-}
-
 client = commands.Bot(command_prefix=PREFIX, case_insensitive=True)
 client.remove_command('help')
 
@@ -104,9 +58,20 @@ def addField(emb, fname, fvalue, fline=False):
 ### FUNCTIONS ###
 #################
 
+thelist = {
+    "1": "1", "2": "2", "3": "3", "4": "4", "5": "5", "6": "6",
+    "7": "7", "8": "8", "9": "9", "0": "0", "a": "11", "b": "12",
+    "c": "13", "d": "14", "e": "15", "f": "16", "g": "17", "h": "18",
+    "i": "19", "j": "20", "k": "21", "l": "22", "m": "23", "n": "24",
+    "o": "25", "p": "26", "q": "27", "r": "28", "s": "29", "t": "30",
+    "u": "31", "v": "32", "w": "33", "x": "34", "y": "35", "z": "36",
+    " ": "37", ".": "38", ",": "39", ":": "40", ";": "41", "'": "42",
+    "/": "43"
+}
+
 def clamp(n, minn, maxn):
     return max(min(maxn, n), minn)
-	
+
 def getIntFromText(txt):
     sed = ""
     for letter in txt:
@@ -169,7 +134,15 @@ async def on_guild_remove(guild):
 
 @client.event
 async def on_command_error(ctx, error):
-    emb = getErrorEmbed(ctx, f"I seem to have ran into an error, It's best to let Aidan know.\n\nError: {error}")
+    err = "I seem to have ran into an error, It's best to let Aidan know."
+    if isinstance(error, commands.BotMissingPermissions):
+        err = err + "\n\nError: Bot Missing Permissions!"
+    elif isinstance(error, commands.MissingPermissions):
+        err = err + "\n\nError: User Missing Permissions!"
+
+    err = err + f"\n\nFull Error: {error}"
+
+    emb = getErrorEmbed(ctx, err)
     await ctx.send(embed=emb)
 
 ################
@@ -388,8 +361,8 @@ async def ask(ctx, *, question:str=None):
 
     # get end, different if it caonatins "how many"
     if "how many" in question.lower():
-        number = str(randint(1,10))
-        end = ["At least " + number + ".", "More than " + number + ", for sure.", number + ". Take it or leave it.", number + "."]
+        number = str(randint(0,10))
+        end = [f"At least {number}.", f"More than {number}, for sure.", f"{number}.", f"Take it or leave it. {number}."]
     else:
         end = ["Yes.", "No, not at all.", "idk, maybe.", "Answer is unclear.", "You will find out soon enough...", "S-sorry, this questions is just... too much for me to handle.", "Maybe the true answer was inside you all along!", "What???"]
 
