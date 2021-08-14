@@ -1,7 +1,7 @@
 from discord.ext import commands
 
-from main import get_prefix, get_version, add_command, get_commands
-from main import getEmbed, Error, addField, userHasPermission, SEND_SYSTEM_MESSAGE
+from bot import get_prefix, get_version, add_command, get_commands
+from bot import getEmbed, Error, addField, userHasPermission, SEND_SYSTEM_MESSAGE
 
 class ImportantCog(commands.Cog):
 	def __init__(self, client):
