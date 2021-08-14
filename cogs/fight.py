@@ -7,8 +7,8 @@ import math
 
 from random import randint
 
-from main import add_command
-from main import getEmbed, Error, addField, clamp
+from bot import add_command
+from bot import getEmbed, Error, addField, clamp
 
 class FightCog(commands.Cog):
 	def __init__(self, client):
