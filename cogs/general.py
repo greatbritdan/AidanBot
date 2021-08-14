@@ -9,8 +9,8 @@ from random import randint
 from py_expression_eval import Parser
 parser = Parser()
 
-from main import add_command
-from main import getEmbed, Error, addField, getIntFromText
+from bot import add_command
+from bot import getEmbed, Error, addField, getIntFromText
 
 class GeneralCog(commands.Cog):
 	def __init__(self, client):
