@@ -6,9 +6,6 @@ import asyncio
 from random import seed
 from random import randint
 
-from py_expression_eval import Parser
-parser = Parser()
-
 from bot import add_command
 from bot import getEmbed, Error, addField, getIntFromText
 
@@ -103,15 +100,6 @@ class GeneralCog(commands.Cog):
 		# way eaiser than i eopected
 		decisions = decisions.split(" ")
 		emb = getEmbed(ctx, "Decide", False, "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]))
-		await ctx.send(embed=emb)
-
-	add_command(["general", "General", "math", "Mafs.", False, False])
-	@commands.command()
-	async def math(self, ctx, *, calculation:str):
-		expr = parser.parse(calculation)
-		summ = expr.evaluate({})
-
-		emb = getEmbed(ctx, "Math", f"It's {summ}", False)
 		await ctx.send(embed=emb)
 
 	add_command(["general", "General", "clone", "Make someone say something stupid lol.", False])
