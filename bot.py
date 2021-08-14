@@ -6,7 +6,7 @@ import os
 import datetime
 import copy
 
-PREFIX = "%"
+PREFIX = "$"
 VERSION = "Beta V2"
 COMMANDS = []
 DEFAULTS = {
