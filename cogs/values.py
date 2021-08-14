@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 
-from main import add_command, get_defaults
-from main import PARCEDATA
+from bot import add_command, get_defaults
+from bot import PARCEDATA
 
 class ValuesCog(commands.Cog):
 	def __init__(self, client):
