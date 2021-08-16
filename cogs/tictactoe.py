@@ -87,10 +87,12 @@ async def TTTNewgame(ctx, client, p1:discord.User, p2:discord.User):
 				message = await client.wait_for("message", timeout=60, check=check)
 				move = message.content
 
+			# add move and remove from movelist
 			if move in movelist:
 				grid[move[0]][move[1]] = player[turn]["let"]
 				movelist.remove(move)
 
+			# delete if message was sent
 			if message:
 				await message.delete()
 
