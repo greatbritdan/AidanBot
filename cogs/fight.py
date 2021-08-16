@@ -7,14 +7,14 @@ import math
 
 from random import randint
 
-from bot import add_command
-from bot import getEmbed, Error, addField, clamp
+from main import add_command
+from main import getEmbed, Error, addField, clamp
 
 class FightCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	add_command(["fight", "Fight", "fight", "Fight a user or bot to the death.", False])
+	add_command(["fight", "Games", "fight", "Fight a user or bot to the death.", False])
 	@commands.command()
 	async def fight(self, ctx, user1:discord.User=None, user2:discord.User=None):
 		if user1 == None:
@@ -29,7 +29,7 @@ class FightCog(commands.Cog):
 
 		await FightNewgame(ctx, self.client, v1, v2)
 
-	add_command(["fight", "Fight", "fightplus", "Fight a user or bot to the death. With extra options", False])
+	add_command(["fight", "Games", "fightplus", "Fight a user or bot to the death. With extra options", False])
 	@commands.command()
 	async def fightplus(self, ctx, user1:discord.User=None, user2:discord.User=None):
 		if user1 == None:

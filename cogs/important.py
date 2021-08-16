@@ -1,7 +1,7 @@
 from discord.ext import commands
 
-from bot import get_prefix, get_version, add_command, get_commands
-from bot import getEmbed, Error, addField, userHasPermission, SEND_SYSTEM_MESSAGE
+from main import get_prefix, get_version, add_command, get_commands
+from main import getEmbed, Error, addField, userHasPermission, SEND_SYSTEM_MESSAGE
 
 class ImportantCog(commands.Cog):
 	def __init__(self, client):
@@ -13,12 +13,12 @@ class ImportantCog(commands.Cog):
 	async def help(self, ctx):
 		prefix = get_prefix()
 		commands = get_commands()
-		commandsections = ["Important", "Values", "General", "Fight"]
+		commandsections = ["Important", "Values", "General", "Games"]
 
 		ismod = userHasPermission(ctx.author, "kick_members") == True
 		isadmin = userHasPermission(ctx.author, "administrator") == True
 
-		emb = getEmbed(ctx, "Help", "All commands you can use:", False)
+		emb = getEmbed(ctx, "Help", "All commands you can use:")
 
 		for sect in commandsections:
 			txt = ""
