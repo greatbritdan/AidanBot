@@ -4,8 +4,8 @@ from discord.ext import commands
 import random
 import asyncio
 
-from main import add_command
-from main import getEmbed, Error, addField
+from bot import add_command
+from bot import getEmbed, Error, addField
 
 class TTTCog(commands.Cog):
 	def __init__(self, client):
