@@ -109,7 +109,7 @@ class GeneralCog(commands.Cog):
 		await webhook.send(message, username=member.name + " (fake)", avatar_url=member.avatar_url)
 		await webhook.delete()
 
-	#add_command(["general", "General", "role", "Add or remove any role that begins with [r].", False])
+	add_command(["general", "General", "role", "Add or remove any role that begins with [r].", False])
 	@commands.command()
 	async def role(self, ctx, *, name=None):
 		if name == None:
