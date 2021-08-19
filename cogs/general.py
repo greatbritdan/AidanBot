@@ -125,7 +125,7 @@ class GeneralCog(commands.Cog):
 			await ctx.send("Try again, i couldn't find this role.")
 			return
 
-		if userHasPermission(ctx.author, "administrator") or r.name.startswith("[r]"):
+		if userHasPermission(ctx.author, "manage_roles") or r.name.startswith("[r]"):
 			if r in ctx.author.roles:
 				await ctx.author.remove_roles(r)
 				await ctx.send(f"Removed {r.name}")
