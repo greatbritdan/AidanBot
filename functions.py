@@ -1,6 +1,5 @@
 import discord
 from discord.utils import get
-from discord_components import Button, ButtonStyle
 
 import datetime
 import copy
@@ -62,30 +61,6 @@ def userHasPermission(member, permission):
 			return True
 
 	return False
-
-def createbutton(client, text="button", color=None, emoji=None, url=None, disable=None):
-	if url:
-		col = ButtonStyle.URL
-	else:
-		if color == "red":
-			col = ButtonStyle.red
-		elif color == "blue":
-			col = ButtonStyle.blue
-		elif color == "green":
-			col = ButtonStyle.green
-		else:
-			col = ButtonStyle.gray
-
-	if isinstance(emoji, int):
-		emoji = client.get_emoji(emoji)
-
-	return Button(
-		label=text,
-		style=col,
-		emoji=emoji,
-		url=url,
-		disabled=disable
-	)
 
 ### SAVE AND LOAD ###
 
