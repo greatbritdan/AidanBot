@@ -2,7 +2,7 @@ from discord.ext import commands
 
 import asyncio
 
-from functions import get_prefix, get_version, add_command, get_commands, getEmbed, Error, addField, userHasPermission, SEND_SYSTEM_MESSAGE, createbutton
+from functions import get_prefix, get_version, add_command, get_commands, getEmbed, Error, addField, userHasPermission, SEND_SYSTEM_MESSAGE
 
 class ImportantCog(commands.Cog):
 	def __init__(self, client):
@@ -73,62 +73,6 @@ class ImportantCog(commands.Cog):
 		prefix = get_prefix()
 		await SEND_SYSTEM_MESSAGE(ctx, self.client, f"Someone use the {prefix}report command!", message)
 		await ctx.send("sent!")
-
-	add_command(["important", "Owner", "help2", "New help command using buttons. saving for if i add too many commands.", False])
-	@commands.command()
-	@commands.is_owner()
-	async def help2(self, ctx):
-		prefix = get_prefix()
-		commands = get_commands()
-
-		ismod = userHasPermission(ctx.author, "kick_members") == True
-		isadmin = userHasPermission(ctx.author, "administrator") == True
-
-		commandsections = ["Important", "Values", "General", "Games", "Owner"]
-		page = 0
-		pages = []
-		comps = [[]]
-		compsdisable = [[]]
-
-		for sect in commandsections:
-			txt = ""
-			for com in commands:
-				if com[1] == sect:
-					if com[4] == False or (com[4] == "mod" and ismod) or (com[4] == "admin" and isadmin):
-						txt = txt + f"`{prefix}{com[2]}`: {com[3]}"
-						if com[4] == "mod":
-							txt = txt + " (Mods only)"
-						if com[4] == "admin":
-							txt = txt + " (Admins only)"
-						txt = txt + "\n"
-						
-			if txt != "":
-				pages.append(txt)
-				comps[0].append(createbutton(self.client, sect, "gray"))
-				compsdisable[0].append(createbutton(self.client, sect, "gray", None, None, True))
-
-		emb = getEmbed(ctx, "Help", commandsections[page] + ":", pages[page])
-		MSG = await ctx.send(embed=emb, components=comps)
-
-		def check(intr):
-			return (intr.author == ctx.author and intr.guild == ctx.guild and intr.channel == ctx.channel)
-	
-		while True:
-			try:
-				intr = await self.client.wait_for("button_click", timeout=30, check=check)
-
-				lab = intr.component.label
-				page = commandsections.index(lab)
-
-				emb = getEmbed(ctx, "Help", commandsections[page] + ":", pages[page])
-				await MSG.edit(embed=emb, components=comps)
-
-				await intr.respond(type=6)
-
-			except asyncio.TimeoutError:
-				emb = getEmbed(ctx, "Help (Timed-out)", commandsections[page] + ":", pages[page])
-				await MSG.edit(embed=emb, components=compsdisable)
-				return
 
 def setup(client):
   client.add_cog(ImportantCog(client))
