@@ -126,6 +126,10 @@ class GeneralCog(commands.Cog):
 			return
 
 		if userHasPermission(ctx.author, "manage_roles") or r.name.startswith("[r]"):
+			if r == ctx.author.top_role:
+				await ctx.send(f"You can't remove your top role")
+				return
+			
 			if r in ctx.author.roles:
 				await ctx.author.remove_roles(r)
 				await ctx.send(f"Removed {r.name}")
