@@ -3,7 +3,6 @@ import discord
 
 from discord.ext import commands
 from discord.utils import get
-from discord_components import DiscordComponents
 
 from functions import get_prefix, clear_command_type, PARCEDATA, userHasPermission, Error, SEND_SYSTEM_MESSAGE
 
@@ -15,7 +14,6 @@ client = commands.Bot(command_prefix=get_prefix(), case_insensitive=True, help_c
 
 @client.event
 async def on_ready():
-	DiscordComponents(client, change_discord_methods=True)
 	print(f'Logged in as big boy {client.user}')
 
 	activity = discord.Activity(name=f'use {get_prefix()}help for help.', type=discord.ActivityType.playing)
