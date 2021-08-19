@@ -1,13 +1,11 @@
 import discord
 from discord.ext import commands
-
-import asyncio
+from discord.utils import get
 
 from random import seed
 from random import randint
 
-from bot import add_command
-from bot import getEmbed, Error, addField, getIntFromText
+from functions import add_command, getEmbed, Error, addField, getIntFromText, userHasPermission
 
 class GeneralCog(commands.Cog):
 	def __init__(self, client):
@@ -26,8 +24,6 @@ class GeneralCog(commands.Cog):
 		async for message in ctx.channel.history(limit=2):
 			if second == False:
 				second == True
-			else:
-				msg = message
 
 		await message.add_reaction(reaction)
 		await ctx.message.delete()
@@ -61,7 +57,7 @@ class GeneralCog(commands.Cog):
 		txt = responces[index][0]
 		rating = randint(responces[index][1][0], responces[index][1][1])
 
-		emb = getEmbed(ctx, "Rate", txt.format(thing), False)
+		emb = getEmbed(ctx, "Rate", txt.format(thing), "")
 		emb = addField(emb, "Score", "**{0}/10**".format(rating))
 
 		await ctx.send(embed=emb)
@@ -72,7 +68,7 @@ class GeneralCog(commands.Cog):
 		seed(getIntFromText(question.lower()))
 
 		if question == None:
-			await Error(ctx, "Missing un-optional argument for command.")
+			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 
 		# get start, really easy
@@ -88,7 +84,7 @@ class GeneralCog(commands.Cog):
 
 		end_txt = end[randint(0, len(end)-1)]
 
-		emb = getEmbed(ctx, "Ask", "What knowledge will i give you today...", False)
+		emb = getEmbed(ctx, "Ask", "What knowledge will i give you today...", "")
 		emb = addField(emb, "Question", question)
 		emb = addField(emb, "Answer", start_txt + end_txt)
 
@@ -99,19 +95,45 @@ class GeneralCog(commands.Cog):
 	async def decide(self, ctx, *, decisions:str):
 		# way eaiser than i eopected
 		decisions = decisions.split(" ")
-		emb = getEmbed(ctx, "Decide", False, "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]))
+		emb = getEmbed(ctx, "Decide", "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]), "")
 		await ctx.send(embed=emb)
 
 	add_command(["general", "General", "clone", "Make someone say something stupid lol.", False])
 	@commands.command()
 	async def clone(self, ctx, member:discord.User=None, *, message:str=None):
 		if member == None or message == None:
-			await Error(ctx, "Missing un-optional argument for command.")
+			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 		
 		webhook = await ctx.channel.create_webhook(name=member.name)
 		await webhook.send(message, username=member.name + " (fake)", avatar_url=member.avatar_url)
 		await webhook.delete()
 
+	#add_command(["general", "General", "role", "Add or remove any role that begins with [r].", False])
+	@commands.command()
+	async def role(self, ctx, *, name=None):
+		if name == None:
+			await Error(ctx, self.client, "Missing un-optional argument for command.")
+			return
+
+		r = None
+		for role in ctx.guild.roles:
+			if name.lower() in role.name.lower():
+				r = role
+
+		if r == None:
+			await ctx.send("Try again, i couldn't find this role.")
+			return
+
+		if userHasPermission(ctx.author, "administrator") or r.name.startswith("[r]"):
+			if r in ctx.author.roles:
+				await ctx.author.remove_roles(r)
+				await ctx.send(f"Removed {r.name}")
+			else:
+				await ctx.author.add_roles(r)
+				await ctx.send(f"Added {r.name}")
+		else:
+			await ctx.send(f"{r.name} is not a role that can be added by anyone")
+		
 def setup(client):
   client.add_cog(GeneralCog(client))

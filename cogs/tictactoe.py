@@ -4,8 +4,7 @@ from discord.ext import commands
 import random
 import asyncio
 
-from bot import add_command
-from bot import getEmbed, Error, addField
+from functions import add_command, getEmbed, Error, addField
 
 class TTTCog(commands.Cog):
 	def __init__(self, client):
@@ -15,7 +14,7 @@ class TTTCog(commands.Cog):
 	@commands.command()
 	async def ttt(self, ctx, user1:discord.User=None):
 		if user1 == None:
-			await Error(ctx, "Missing un-optional argument for command.")
+			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 
 		v1 = ctx.author
@@ -87,12 +86,10 @@ async def TTTNewgame(ctx, client, p1:discord.User, p2:discord.User):
 				message = await client.wait_for("message", timeout=60, check=check)
 				move = message.content
 
-			# add move and remove from movelist
 			if move in movelist:
 				grid[move[0]][move[1]] = player[turn]["let"]
 				movelist.remove(move)
 
-			# delete if message was sent
 			if message:
 				await message.delete()
 

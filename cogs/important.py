@@ -1,7 +1,8 @@
 from discord.ext import commands
 
-from bot import get_prefix, get_version, add_command, get_commands
-from bot import getEmbed, Error, addField, userHasPermission, SEND_SYSTEM_MESSAGE
+import asyncio
+
+from functions import get_prefix, get_version, add_command, get_commands, getEmbed, Error, addField, userHasPermission, SEND_SYSTEM_MESSAGE, createbutton
 
 class ImportantCog(commands.Cog):
 	def __init__(self, client):
@@ -18,7 +19,7 @@ class ImportantCog(commands.Cog):
 		ismod = userHasPermission(ctx.author, "kick_members") == True
 		isadmin = userHasPermission(ctx.author, "administrator") == True
 
-		emb = getEmbed(ctx, "Help", "All commands you can use:")
+		emb = getEmbed(ctx, "Help", "All commands you can use:", "")
 
 		for sect in commandsections:
 			txt = ""
@@ -43,7 +44,7 @@ class ImportantCog(commands.Cog):
 		prefix = get_prefix()
 		version = get_version()
 
-		emb = getEmbed(ctx, "Info", "Hey, I am AidanBot, A small discord bot created by Aidan#8883 for his server that now anyone can use!", f"[Aidan's Youtube](https://www.youtube.com/c/AidanMapper)\n[Aidan's Twitter](https://twitter.com/AidanMapper)\n[Aidan's Discord Server](https://discord.gg/xBnBEpHdb6)\n[Invite me to your server!](https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot)\n\nIf you find a bug or he has made a typo <:AidanSmug:837001740947161168>, you can report it to Aidan on his server in one of the bot chats. You can also suggest features in the suggestion channel on his server.\n\nNote: If you are a server admin and want to setup a feature (e.g. if server invites are deleted automaticaly) use {prefix}config!")
+		emb = getEmbed(ctx, "Info", "Hey, I am AidanBot, A small discord bot created by Aidan#8883 for his server that now anyone can use!", f"[Aidan's Youtube](https://www.youtube.com/c/AidanMapper)\n[Aidan's Twitter](https://twitter.com/Aid0nYT)\n[Aidan's Discord Server](https://discord.gg/KXrDUZfBpq)\n[Invite me to your server!](https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot)\n\nIf you find a bug or he has made a typo <:AidanSmug:837001740947161168>, you can report it to Aidan on his server in one of the bot chats. You can also suggest features in the suggestion channel on his server.\n\nNote: If you are a server admin and want to setup a feature (e.g. if server invites are deleted automaticaly) use {prefix}config!")
 		emb = addField(emb, "Version:", version)
 		await ctx.send(embed=emb)
 
@@ -66,11 +67,68 @@ class ImportantCog(commands.Cog):
 	@commands.command()
 	async def report(self, ctx, *, message:str=None):
 		if message == None:
-			await Error(ctx, "Missing un-optional argument for command.")
+			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 
 		prefix = get_prefix()
-		await SEND_SYSTEM_MESSAGE(ctx, f"Someone use the {prefix}report command!", message)
+		await SEND_SYSTEM_MESSAGE(ctx, self.client, f"Someone use the {prefix}report command!", message)
+		await ctx.send("sent!")
+
+	add_command(["important", "Owner", "help2", "New help command using buttons. saving for if i add too many commands.", False])
+	@commands.command()
+	@commands.is_owner()
+	async def help2(self, ctx):
+		prefix = get_prefix()
+		commands = get_commands()
+
+		ismod = userHasPermission(ctx.author, "kick_members") == True
+		isadmin = userHasPermission(ctx.author, "administrator") == True
+
+		commandsections = ["Important", "Values", "General", "Games", "Owner"]
+		page = 0
+		pages = []
+		comps = [[]]
+		compsdisable = [[]]
+
+		for sect in commandsections:
+			txt = ""
+			for com in commands:
+				if com[1] == sect:
+					if com[4] == False or (com[4] == "mod" and ismod) or (com[4] == "admin" and isadmin):
+						txt = txt + f"`{prefix}{com[2]}`: {com[3]}"
+						if com[4] == "mod":
+							txt = txt + " (Mods only)"
+						if com[4] == "admin":
+							txt = txt + " (Admins only)"
+						txt = txt + "\n"
+						
+			if txt != "":
+				pages.append(txt)
+				comps[0].append(createbutton(self.client, sect, "gray"))
+				compsdisable[0].append(createbutton(self.client, sect, "gray", None, None, True))
+
+		emb = getEmbed(ctx, "Help", commandsections[page] + ":", pages[page])
+		MSG = await ctx.send(embed=emb, components=comps)
+
+		def check(intr):
+			return (intr.author == ctx.author and intr.guild == ctx.guild and intr.channel == ctx.channel)
+	
+		while True:
+			try:
+				intr = await self.client.wait_for("button_click", timeout=30, check=check)
+
+				lab = intr.component.label
+				page = commandsections.index(lab)
+
+				emb = getEmbed(ctx, "Help", commandsections[page] + ":", pages[page])
+				await MSG.edit(embed=emb, components=comps)
+
+				await intr.respond(type=6)
+
+			except asyncio.TimeoutError:
+				emb = getEmbed(ctx, "Help (Timed-out)", commandsections[page] + ":", pages[page])
+				await MSG.edit(embed=emb, components=compsdisable)
+				return
 
 def setup(client):
   client.add_cog(ImportantCog(client))

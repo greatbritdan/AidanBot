@@ -4,11 +4,9 @@ from discord.utils import get
 
 import asyncio
 import math
-
 from random import randint
 
-from bot import add_command
-from bot import getEmbed, Error, addField, clamp
+from functions import add_command, getEmbed, Error, addField, clamp
 
 class FightCog(commands.Cog):
 	def __init__(self, client):
@@ -18,7 +16,7 @@ class FightCog(commands.Cog):
 	@commands.command()
 	async def fight(self, ctx, user1:discord.User=None, user2:discord.User=None):
 		if user1 == None:
-			await Error(ctx, "Missing un-optional argument for command.")
+			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 		elif user2 == None:
 			v1 = ctx.author
@@ -33,7 +31,7 @@ class FightCog(commands.Cog):
 	@commands.command()
 	async def fightplus(self, ctx, user1:discord.User=None, user2:discord.User=None):
 		if user1 == None:
-			await Error(ctx, "Missing un-optional argument for command.")
+			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 		elif user2 == None:
 			v1 = ctx.author
@@ -63,7 +61,7 @@ class FightCog(commands.Cog):
 						try:
 							answers[i] = int(message.content)
 						except ValueError:
-							await Error(ctx, message.content + " is not a valid argument. Needs to be an whole number!")
+							await Error(ctx, self.client, message.content + " is not a valid argument. Needs to be an whole number!")
 							return
 
 						answers[i] = clamp(answers[i], 5, 250)
@@ -192,8 +190,11 @@ async def FightNewgame(ctx, client, p1:discord.User, p2:discord.User, mhealth:in
 		try:
 			if player[turn]["bot"]:
 				reaction = "🍷"
-				if player[turn]["heals"] == 0 or (player[turn]["health"] > 59 or (player[turn]["health"] > 25 and randint(1,4) > 1) or randint(1,2) == 2):
-					reaction = "👊"
+				if player[turn]["heals"] == 0 or player[turn]["health"] >= 50 or (player[turn]["health"] >= 25 and randint(1, 4) == 1) or randint(1, 4) > 1:
+					if player[turn]["energy"] > 0 and (randint(1, 8) + player[turn]["energy"]) > 8:
+						reaction = "👊"
+					else:
+						reaction = "🕓"
 
 				user = get(ctx.guild.members, id=player[turn]["id"])
 				await asyncio.sleep(3.5)
