@@ -4,7 +4,7 @@ from discord.utils import get
 import datetime
 import copy
 
-PREFIX = "%"
+PREFIX = "$"
 VERSION = "Beta V2.5"
 COMMANDS = []
 DEFAULTS = {
