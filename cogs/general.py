@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from discord.utils import get
 
 from random import seed
 from random import randint
@@ -10,12 +9,6 @@ from functions import add_command, getEmbed, Error, addField, getIntFromText, us
 class GeneralCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
-
-	add_command(["general", "General", "ping", "Get bot latency.", False])
-	@commands.command()
-	async def ping(self, ctx):
-		emb = getEmbed(ctx, "Ping", "Ping Pong motherfucker!", "{0}ms".format(round(self.client.latency, 3)))
-		await ctx.send(embed=emb)
 
 	add_command(["general", "General", "echo", "Says what is passed into it.", False])
 	@commands.command()
@@ -141,6 +134,6 @@ class GeneralCog(commands.Cog):
 				await ctx.send(f"Added {r.name}")
 		else:
 			await ctx.send(f"{r.name} is not a role that can be added by anyone")
-		
+
 def setup(client):
   client.add_cog(GeneralCog(client))
