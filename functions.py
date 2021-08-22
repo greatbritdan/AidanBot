@@ -5,7 +5,7 @@ import datetime
 import copy
 
 PREFIX = "$"
-VERSION = "Beta V2.7"
+VERSION = "Beta V2.9"
 COMMANDS = []
 DEFAULTS = {
 	"delete_invites": "false",
@@ -64,24 +64,55 @@ def userHasPermission(member, permission):
 
 ### SAVE AND LOAD ###
 
-async def GETMSG(ctx):
-	channel = get(ctx.guild.text_channels, name="aidanbot-serverdata")
+async def GETMSG(ctx, client):
+	guild = client.get_guild(879063875469860874)
+	channel = get(guild.text_channels, name=str(ctx.guild.id))
 	if channel == None:
 		await ctx.send(f"You need to run {PREFIX}setup first!")
 		return False
 
 	message = await channel.fetch_message(channel.last_message_id)
 	if message == None:
-		await ctx.send(f"Check the data, see if a message is there. if not, delete the channel and rerun {PREFIX}setup!")
 		return False
 
 	return message
 
-async def PARCEDATA(ctx, action, name, val=None):
-	message = await GETMSG(ctx)
+async def CREATEDATA(ctx, client):
+	guild = client.get_guild(879063875469860874)
+	channel = get(guild.text_channels, name=str(ctx.guild.id))
+	if channel:
+		await ctx.send("Your server is already setup!")
+		return False
+	
+	category = get(guild.categories, name="Guilds")
+	channel = await guild.create_text_channel(str(ctx.guild.id), topic=f"AKA {ctx.guild.name}", category=category)
+
+	defaults = get_defaults()
+	data = []
+	for key in defaults:
+		data.append(key + "=" + defaults[key])
+
+	sep = "\n"
+	txt = sep.join(data)
+
+	await channel.send(txt)
+	return True
+
+async def DELETEDATA(guildid, ctx=None, client=None):
+	guild = client.get_guild(879063875469860874)
+	channel = get(guild.text_channels, name=str(guildid))
+	if channel == None:
+		if ctx:
+			await ctx.send("Your server has no server data!")
+			return False
+	
+	await channel.delete()
+	return True
+
+async def PARCEDATA(ctx, client, action, name=None, val=None):
+	message = await GETMSG(ctx, client)
 	if message == False:
 		return
-
 	messcont = message.content
 	lines = messcont.splitlines()
 
@@ -98,8 +129,13 @@ async def PARCEDATA(ctx, action, name, val=None):
 			data[key] = defaults[key]
 
 	# returns false if it doesn't exist
-	if name not in data:
-		return False
+	if action != "list":
+		if name not in data:
+			return False
+
+	# gets all values
+	if action == "list":
+		retun = data
 
 	# gets the value and returns value
 	if action == "get" or action == "getstatic":
@@ -138,15 +174,19 @@ async def SEND_SYSTEM_MESSAGE(ctx, client, title, description):
 ### EMBEDS ###
 
 # make an embed and send it back
-def getEmbed(ctx, command, title=False, description=False, image=False, red=False):
-	if red:
+def getEmbed(ctx, command, title=False, description=False, image=False, color=False, thumb=False):
+	if color == "red":
 		col = discord.Color.from_rgb(220, 29, 37)
+	elif color:
+		col = color
 	else:
 		col = discord.Color.from_rgb(20, 29, 37)
 
 	emb = discord.Embed(title=title, description=description, color=col)
 	if image:
 		emb.set_image(url=image)
+	if thumb:
+		emb.set_thumbnail(url=thumb)
 
 	emb.set_footer(text="Requested by {0} in #{1}".format(ctx.author, ctx.channel))
 	emb.set_author(name="AidanBot > " + command, icon_url="https://cdn.discordapp.com/attachments/806147106054078482/861645806851719188/aidanbot.png")
@@ -165,7 +205,7 @@ def getSystemEmbed(ctx, title=False, description=False):
 	emb = discord.Embed(title=title, description=description, color=discord.Color.from_rgb(70, 29, 37))
 
 	if ctx:
-		emb.set_footer(text="User: {0}".format(ctx.author))
+		emb.set_footer(text="Guild: {0} - Channel: {1} - User: {2}".format(ctx.guild, ctx.channel, ctx.author))
 	else:
 		emb.set_footer(text="Not Via Guild")
 
