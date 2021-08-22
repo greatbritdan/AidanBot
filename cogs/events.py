@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
-from discord.utils import get
 
-from functions import get_prefix, PARCEDATA, userHasPermission, Error, SEND_SYSTEM_MESSAGE
+from functions import get_prefix, DELETEDATA, PARCEDATA, userHasPermission, Error, SEND_SYSTEM_MESSAGE
 
 class EventsCog(commands.Cog):
 	def __init__(self, client):
@@ -25,9 +24,9 @@ class EventsCog(commands.Cog):
 			return
 
 		if "discord.gg" in message.content.lower():
-			delete_invites = await PARCEDATA(message, "getstatic", "delete_invites")
+			delete_invites = await PARCEDATA(message, self.client, "getstatic", "delete_invites")
 			if delete_invites and userHasPermission(message.author, "kick_members") == False:
-				invite_allow_channel = await PARCEDATA(message, "getstatic", "invite_allow_channel")
+				invite_allow_channel = await PARCEDATA(message, self.client, "getstatic", "invite_allow_channel")
 				if message.channel.name != invite_allow_channel:
 					await message.delete()
 					if invite_allow_channel != False:
@@ -41,6 +40,7 @@ class EventsCog(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_guild_remove(self, guild):
+		await DELETEDATA(guild.id, None, self.client)
 		await SEND_SYSTEM_MESSAGE(None, self.client, "SOMEONE DID WHAT?!?!", f"Removed from {guild.name}!")
 
 	@commands.Cog.listener()
@@ -52,7 +52,7 @@ class EventsCog(commands.Cog):
 			err = err + "\n\nError: User Missing Permissions!"
 		err = err + f"\n\nFull Error: {error}"
 
-		if err.endswith("not found"):
+		if ctx.author.id == 384439774972215296 or err.endswith("not found"):
 			await Error(ctx, self.client, err)
 		else:
 			await Error(ctx, self.client, err, True)
