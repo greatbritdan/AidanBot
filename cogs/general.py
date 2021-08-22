@@ -11,6 +11,12 @@ class GeneralCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
+	add_command(["general", "General", "ping", "Get bot latency.", False])
+	@commands.command()
+	async def ping(self, ctx):
+		emb = getEmbed(ctx, "Ping", "Ping Pong motherfucker!", "{0}ms".format(round(self.client.latency, 1)))
+		await ctx.send(embed=emb)
+
 	add_command(["general", "General", "echo", "Says what is passed into it.", False])
 	@commands.command()
 	async def echo(self, ctx, *, text:str="sample text"):
@@ -59,7 +65,6 @@ class GeneralCog(commands.Cog):
 
 		emb = getEmbed(ctx, "Rate", txt.format(thing), "")
 		emb = addField(emb, "Score", "**{0}/10**".format(rating))
-
 		await ctx.send(embed=emb)
 
 	add_command(["general", "General", "ask", "Answers your deepest quetsions.", False])
@@ -87,13 +92,11 @@ class GeneralCog(commands.Cog):
 		emb = getEmbed(ctx, "Ask", "What knowledge will i give you today...", "")
 		emb = addField(emb, "Question", question)
 		emb = addField(emb, "Answer", start_txt + end_txt)
-
 		await ctx.send(embed=emb)
 
 	add_command(["general", "General", "decide", "Picks between the choices given.", False])
 	@commands.command()
 	async def decide(self, ctx, *, decisions:str):
-		# way eaiser than i eopected
 		decisions = decisions.split(" ")
 		emb = getEmbed(ctx, "Decide", "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]), "")
 		await ctx.send(embed=emb)

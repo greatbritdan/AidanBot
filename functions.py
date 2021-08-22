@@ -5,7 +5,7 @@ import datetime
 import copy
 
 PREFIX = "$"
-VERSION = "Beta V2.5"
+VERSION = "Beta V2.7"
 COMMANDS = []
 DEFAULTS = {
 	"delete_invites": "false",
