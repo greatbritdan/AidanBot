@@ -165,7 +165,7 @@ def getSystemEmbed(ctx, title=False, description=False):
 	emb = discord.Embed(title=title, description=description, color=discord.Color.from_rgb(70, 29, 37))
 
 	if ctx:
-		emb.set_footer(text="Guild: {0} - Channel: {1} - User: {2}".format(ctx.guild, ctx.channel, ctx.author))
+		emb.set_footer(text="User: {0}".format(ctx.author))
 	else:
 		emb.set_footer(text="Not Via Guild")
 
