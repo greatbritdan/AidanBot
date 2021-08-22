@@ -159,7 +159,7 @@ async def FightNewgame(ctx, client, p1:discord.User, p2:discord.User, mhealth:in
 
 	# embed for the fight command
 	def getFightEmbed(ctx, action):
-		emb = getEmbed(ctx, "Fight", player["p1"]["name"] + " VS " + player["p2"]["name"])
+		emb = getEmbed(ctx, "Fight", player["p1"]["name"] + " VS " + player["p2"]["name"], "")
 		addField(emb, player["p1"]["name"] + " Stats:", "`Health:` " + getHealthBar(player["p1"]["health"], maxhealth, 10, True) + " (" + str(player["p1"]["health"]) + ")\n`Energy:` " + getHealthBar(player["p1"]["energy"], maxenergy, 5, True) + " (" + str(player["p1"]["energy"]) + ")")
 		addField(emb, player["p2"]["name"] + " Stats:", "`Health:` " + getHealthBar(player["p2"]["health"], maxhealth, 10, True) + " (" + str(player["p2"]["health"]) + ")\n`Energy:` " + getHealthBar(player["p2"]["energy"], maxenergy, 5, True) + " (" + str(player["p2"]["energy"]) + ")")
 
