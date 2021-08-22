@@ -4,8 +4,8 @@ from discord.utils import get
 import datetime
 import copy
 
-PREFIX = "%"
-VERSION = "Beta V2.5"
+PREFIX = "$"
+VERSION = "Beta V2.9"
 COMMANDS = []
 DEFAULTS = {
 	"delete_invites": "false",
