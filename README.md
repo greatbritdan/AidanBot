@@ -22,10 +22,10 @@ Under this license you may not:
     - Copying code (including commands)
     - Copying the bot (Or running your own version)
 
-- Actively damage the bots functionalty
+- Actively damage the bots functionalty;
     Unless accidently, crashing/overloading the bot is stricty prohibited.
   
-- Automate or bot any commands in any way.
+- Automate or bot any commands in any way;
     This includes, but is not limited to botting and using macros.
     
 For futhuer information, contact me directly on discord (Aidan#8883).
