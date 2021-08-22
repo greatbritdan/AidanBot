@@ -14,7 +14,7 @@ class GeneralCog(commands.Cog):
 	add_command(["general", "General", "ping", "Get bot latency.", False])
 	@commands.command()
 	async def ping(self, ctx):
-		emb = getEmbed(ctx, "Ping", "Ping Pong motherfucker!", "{0}ms".format(round(self.client.latency, 1)))
+		emb = getEmbed(ctx, "Ping", "Ping Pong motherfucker!", "{0}ms".format(round(self.client.latency, 3)))
 		await ctx.send(embed=emb)
 
 	add_command(["general", "General", "echo", "Says what is passed into it.", False])
