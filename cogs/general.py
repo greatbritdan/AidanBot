@@ -47,7 +47,8 @@ class GeneralCog(commands.Cog):
 		]
 
 		# if it's aidanbot or aidan, respond differently
-		index = randint(0, 9)
+		index = randint(0, 8)
+		print(thing)
 		if thing.lower() == "aidanbot":
 			index = 9
 		elif thing.lower() == "aidan":
