@@ -4,8 +4,8 @@ from discord.utils import get
 import datetime
 import copy
 
-PREFIX = "$"
-VERSION = "Beta V2.9"
+PREFIX = "%"
+VERSION = "Beta V2.5"
 COMMANDS = []
 DEFAULTS = {
 	"delete_invites": "false",
@@ -165,8 +165,8 @@ async def PARCEDATA(ctx, client, action, name=None, val=None):
 	return retun
 
 async def SEND_SYSTEM_MESSAGE(ctx, client, title, description):
-	guild = get(client.guilds, id=760987756985843733)
-	channel = get(guild.text_channels, id=875312386674941973)
+	guild = get(client.guilds, id=879063875469860874)
+	channel = get(guild.text_channels, name="system-messages")
 
 	emb = getSystemEmbed(ctx, title, description)
 	await channel.send(embed=emb)
@@ -205,7 +205,7 @@ def getSystemEmbed(ctx, title=False, description=False):
 	emb = discord.Embed(title=title, description=description, color=discord.Color.from_rgb(70, 29, 37))
 
 	if ctx:
-		emb.set_footer(text="Guild: {0} - Channel: {1} - User: {2}".format(ctx.guild, ctx.channel, ctx.author))
+		emb.set_footer(text=f"User: {ctx.author}")
 	else:
 		emb.set_footer(text="Not Via Guild")
 
