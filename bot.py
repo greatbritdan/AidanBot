@@ -1,7 +1,7 @@
 import os
 from discord.ext import commands
 
-from discord_components import DiscordComponents, Button
+from discord_components import DiscordComponents
 
 from functions import get_prefix, clear_command_type
 
@@ -29,15 +29,6 @@ async def reload(ctx, extension):
 		clear_command_type(extension)
 	client.load_extension(f'cogs.{extension}')
 	await ctx.send('```{} reloaded!```'.format(extension))
-
-@client.command()
-async def test(ctx):
-	await ctx.send(
-		"Hello, World!",
-		components = [
-			Button(label = "WOW button!", custom_id = "button1")
-		],
-	)
 
 ### LOAD ###
 
