@@ -11,7 +11,6 @@ The only exception is crash reports, it only sends username incase i need to con
 # Terms of service
 By using my bot you are agreeing to my Terms of Service.
 
-Privacy
 My Privacy Policy (seen above) describes how i handle the information and content you provide to us when you use my bot.
 For any privacy concern, contact me directly on discord (Aidan#8883).
 
