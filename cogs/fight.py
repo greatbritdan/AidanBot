@@ -12,7 +12,15 @@ class FightCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	add_command(["fight", "Games", "fight", "Fight a user or bot to the death.", False])
+	add_command({
+		"cog": "fight", "category": "Games",
+		"name": "fight", "description": "Fight a user or bot to the death.",
+		"arguments": [
+			["user1", "your opponent / first person of the fight.", "name/id/mention", True],
+			["user2", "2nd opponent of the fight.", "name/id/mention", False]
+		],
+		"level": False
+	})
 	@commands.command()
 	async def fight(self, ctx, user1:discord.User=None, user2:discord.User=None):
 		if user1 == None:
@@ -27,7 +35,15 @@ class FightCog(commands.Cog):
 
 		await FightNewgame(ctx, self.client, v1, v2)
 
-	add_command(["fight", "Games", "fightplus", "Fight a user or bot to the death. With extra options", False])
+	add_command({
+		"cog": "fight", "category": "Games",
+		"name": "fightplus", "description": "Fight a user or bot to the death, With extra options.",
+		"arguments": [
+			["user1", "your opponent / first person of the fight.", "name/id/mention", True],
+			["user2", "2nd opponent of the fight.", "name/id/mention", False]
+		],
+		"level": False
+	})
 	@commands.command()
 	async def fightplus(self, ctx, user1:discord.User=None, user2:discord.User=None):
 		if user1 == None:
@@ -178,10 +194,11 @@ async def FightNewgame(ctx, client, p1:discord.User, p2:discord.User, mhealth:in
 	embed = getFightEmbed(ctx, False)
 	MSG = await ctx.send(embed=embed)
     
-	await MSG.add_reaction("🕓")
-	await MSG.add_reaction("👊")
-	await MSG.add_reaction("🍷")
-	await MSG.add_reaction("❌")
+	if (not player["p1"]["bot"]) and (not player["p2"]["bot"]):
+		await MSG.add_reaction("🕓")
+		await MSG.add_reaction("👊")
+		await MSG.add_reaction("🍷")
+		await MSG.add_reaction("❌")
 
 	# the main loop
 	playing = True

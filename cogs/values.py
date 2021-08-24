@@ -6,7 +6,11 @@ class ValuesCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	add_command(["values", "Values", "setup", "Sets up server data that holds server values.", "admin"])
+	add_command({
+		"cog": "values", "category": "Values",
+		"name": "setup", "description": "Sets up server data that holds server values.",
+		"arguments": False, "level": "Admins"
+	})
 	@commands.command()
 	@commands.has_permissions(administrator=True)
 	async def setup(self, ctx):
@@ -15,7 +19,11 @@ class ValuesCog(commands.Cog):
 			prefix = get_prefix()
 			await ctx.send(f"Created! run {prefix}unsetup to delete your data at any time.")
 
-	add_command(["values", "Values", "unsetup", "Removes server data that holds server values.", "admin"])
+	add_command({
+		"cog": "values", "category": "Values",
+		"name": "unsetup", "description": "Removes server data that holds server values.",
+		"arguments": False, "level": "Admins"
+	})
 	@commands.command()
 	@commands.has_permissions(administrator=True)
 	async def unsetup(self, ctx):
@@ -24,7 +32,16 @@ class ValuesCog(commands.Cog):
 			prefix = get_prefix()
 			await ctx.send(f"Deleted! run {prefix}setup to set it up again at any time.")
 
-	add_command(["values", "Values", "config", "Get value or set value.", "admin"])
+	add_command({
+		"cog": "values", "category": "Values",
+		"name": "config", "description": "Configure server values.\n\n`config list`: view all values.\n`config get <name>`: view a value.\n`config set <name> <val>`: set a value.",
+		"arguments": [
+			["action", "What action you are performing.", "set/get/list", True],
+			["name", "Name of the value you are getting of setting.", "string", "only if get/set"],
+			["val", "What you aresetting it to.", "string/bool", "only if set"]
+		],
+		"level": "Admins"
+	})
 	@commands.command()
 	@commands.has_permissions(administrator=True)
 	async def config(self, ctx, action=None, name=None, val=None):

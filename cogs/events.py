@@ -1,18 +1,10 @@
-import discord
 from discord.ext import commands
 
-from functions import get_prefix, DELETEDATA, PARCEDATA, userHasPermission, Error, SEND_SYSTEM_MESSAGE
+from functions import DELETEDATA, PARCEDATA, userHasPermission, Error, SEND_SYSTEM_MESSAGE
 
 class EventsCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
-
-	@commands.Cog.listener()
-	async def on_ready(self):
-		print(f'Logged in as big boy {self.client.user}')
-
-		activity = discord.Activity(name=f'use {get_prefix()}help for help.', type=discord.ActivityType.playing)
-		await self.client.change_presence(activity=activity)
 
 	@commands.Cog.listener()
 	async def on_message(self, message):

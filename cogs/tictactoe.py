@@ -10,15 +10,27 @@ class TTTCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	add_command(["tictactoe", "Games", "ttt", "Play tic-tac-toe.", False])
+	add_command({
+		"cog": "tictactoe", "category": "Games",
+		"name": "ttt", "description": "Play tic-tac-toe.",
+		"arguments": [
+			["user1", "your opponent / first person of the game.", "name/id/mention", True],
+			["user2", "2nd opponent of the game.", "name/id/mention", False]
+		],
+		"level": False
+	})
 	@commands.command()
-	async def ttt(self, ctx, user1:discord.User=None):
+	async def ttt(self, ctx, user1:discord.User=None, user2:discord.User=None):
 		if user1 == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 
-		v1 = ctx.author
-		v2 = user1
+		if user2 != None:
+			v1 = user1
+			v2 = user2
+		else:
+			v1 = ctx.author
+			v2 = user1
 
 		await TTTNewgame(ctx, self.client, v1, v2)
 

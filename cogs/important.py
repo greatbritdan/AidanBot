@@ -1,44 +1,89 @@
 from discord.ext import commands
 
-import asyncio
-
 from functions import get_prefix, get_version, add_command, get_commands, getEmbed, Error, addField, userHasPermission, SEND_SYSTEM_MESSAGE
 
 class ImportantCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	# cogname, category name, command name, command description, locked role
-	add_command(["important", "Important", "Help", "Returns a list of most commands.", False])
+	add_command({
+		"cog": "important", "category": "Important",
+		"name": "help", "description": "Returns a list of most commands.",
+		"arguments": [
+			["command", "Get help on a spesific command", "string", False]
+		],
+		"level": False
+	})
 	@commands.command()
-	async def help(self, ctx):
+	async def help(self, ctx, command=None):
 		prefix = get_prefix()
 		commands = get_commands()
-		commandsections = ["Important", "Values", "General", "Games"]
-
 		ismod = userHasPermission(ctx.author, "kick_members") == True
 		isadmin = userHasPermission(ctx.author, "administrator") == True
 
-		emb = getEmbed(ctx, "Help", "All commands you can use:", "")
-
-		for sect in commandsections:
-			txt = ""
+		if command != None:
+			found = False
 			for com in commands:
-				if com[1] == sect:
-					if com[4] == False or (com[4] == "mod" and ismod) or (com[4] == "admin" and isadmin):
-						txt = txt + f"`{prefix}{com[2]}`: {com[3]}"
-						if com[4] == "mod":
-							txt = txt + " (Mods only)"
-						if com[4] == "admin":
-							txt = txt + " (Admins only)"
-						txt = txt + "\n"
-                
-			if txt != "":
-				emb = addField(emb, sect, txt)
+				if com["name"].lower() == command.lower():
+					name = com["name"]
+					description = com["description"]
+					level = com["level"]
+					args = com["arguments"]
+					found = True
+					break
 
-		await ctx.send(embed=emb)
+			if found:
+				if level == False or (level == "Mods" and ismod) or (level == "Admins" and isadmin):
+					comtxt = prefix + command
+					if args != False:
+						for arg in args:
+							comtxt = comtxt + f" <{arg[0]}>"
+						
+					txt = description
+					if level:
+						txt = txt + f" ({level} only)"
 
-	add_command(["important", "Important", "info", "Returns info about the bot.", False])
+					if args != False:
+						argtxt = ""
+						for arg in args:
+							argtxt = argtxt + f"`{arg[0]}`: {arg[1]} (type: {arg[2]}) (required: {str(arg[3])})\n"
+
+					emb = getEmbed(ctx, "Help > " + prefix + command, comtxt, txt)
+					if args != False:
+						emb = addField(emb, "Arguments", argtxt)
+
+					await ctx.send(embed=emb)
+			else:
+				await ctx.send(f"{prefix}{command} isn't a command that exists!")
+		else:
+			emb = getEmbed(ctx, "Help", "All commands you can use:", f"Run {prefix}help <command> to get more help on a command!")
+
+			commandsections = ["Important", "Values", "General", "Games"]
+			for sect in commandsections:
+				txt = ""
+				for com in commands:
+					category = com["category"]
+					name = com["name"]
+					description = com["description"]
+					level = com["level"]
+
+					if category == sect:
+						if level == False or (level == "mod" and ismod) or (level == "admin" and isadmin):
+							txt = txt + f"`{prefix}{name}`: {description}"
+							if level:
+								txt = txt + f" ({level} only)"
+							txt = txt + "\n"
+					
+				if txt != "":
+					emb = addField(emb, sect, txt)
+
+			await ctx.send(embed=emb)
+
+	add_command({
+		"cog": "important", "category": "Important",
+		"name": "info", "description": "Returns info about the bot.",
+		"arguments": False, "level": False
+	})
 	@commands.command()
 	async def info(self, ctx):
 		prefix = get_prefix()
@@ -48,22 +93,23 @@ class ImportantCog(commands.Cog):
 		emb = addField(emb, "Version:", version)
 		await ctx.send(embed=emb)
 
-	add_command(["important", "Important", "invite", "Add the bot to your server.", False])
+	add_command({
+		"cog": "important", "category": "Important",
+		"name": "invite", "description": "Add the bot to your server.",
+		"arguments": False, "level": False
+	})
 	@commands.command()
 	async def invite(self, ctx):
 		await ctx.send("Y- you want me on your server??? I'd love too!!! https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot")
 
-	add_command(["important", "Important", "lockdown", "Delete all invites.", "admin"])
-	@commands.command()
-	@commands.has_permissions(administrator=True)
-	async def lockdown(self, ctx):
-		for invite in await ctx.guild.invites():
-			await invite.delete()
-
-		emb = getEmbed(ctx, "Lockdown", ":lock: **!Lockdown!** :lock:", "The owner has decided to lockdown the server! All invites have been deleted, no one can join so be careful not to leave by accident.", False, True)
-		await ctx.send(embed=emb)
-
-	add_command(["important", "Important", "report", "Report any errors or issues to aidan's system channel.", False])
+	add_command({
+		"cog": "important", "category": "Important",
+		"name": "report", "description": "Report any errors or issues to aidan's system channel.",
+		"arguments": [
+			["message", "Message to send to Aidan.", "string", True]
+		],
+		"level": False
+	})
 	@commands.command()
 	async def report(self, ctx, *, message:str=None):
 		if message == None:
