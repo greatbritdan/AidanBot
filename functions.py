@@ -12,6 +12,8 @@ DEFAULTS = {
 	"invite_allow_channel": "false"
 }
 
+def is_beta():
+	return (PREFIX == "%")
 def get_prefix():
 	return PREFIX
 def get_version():
@@ -20,7 +22,9 @@ def get_defaults():
 	return DEFAULTS
 def get_commands():
 	return COMMANDS
+
 def add_command(com):
+	global COMMANDS
 	COMMANDS.append(com)
 
 def clear_command_type(typ):
@@ -189,7 +193,11 @@ def getEmbed(ctx, command, title=False, description=False, image=False, color=Fa
 		emb.set_thumbnail(url=thumb)
 
 	emb.set_footer(text="Requested by {0} in #{1}".format(ctx.author, ctx.channel))
-	emb.set_author(name="AidanBot > " + command, icon_url="https://cdn.discordapp.com/attachments/806147106054078482/861645806851719188/aidanbot.png")
+	if is_beta():
+		emb.set_author(name="AidanBetaBot > " + command, icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754420936654908/aidanbetabot.png")
+	else:
+		emb.set_author(name="AidanBot > " + command, icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754415068819506/aidanbot.png")
+
 	emb.timestamp = datetime.datetime.utcnow()
 
 	return emb
@@ -209,7 +217,10 @@ def getSystemEmbed(ctx, title=False, description=False):
 	else:
 		emb.set_footer(text="Not Via Guild")
 
-	emb.set_author(name="AidanBot > System Message", icon_url="https://cdn.discordapp.com/attachments/806147106054078482/861645806851719188/aidanbot.png")
+	if is_beta():
+		emb.set_author(name="AidanBetaBot > System Message", icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754420936654908/aidanbetabot.png")
+	else:
+		emb.set_author(name="AidanBot > System Message", icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754415068819506/aidanbot.png")
 	emb.timestamp = datetime.datetime.utcnow()
 
 	return emb
@@ -218,7 +229,10 @@ def getSystemEmbed(ctx, title=False, description=False):
 async def Error(ctx, client, error, send=None):
 	emb = discord.Embed(title="AidanBot Encountered an error and your command was cancelled.", description=error, color=discord.Color.from_rgb(220, 29, 37))
 	emb.set_footer(text="Requested by {0} in #{1}".format(ctx.author, ctx.channel))
-	emb.set_author(name="AidanBot > Error", icon_url="https://cdn.discordapp.com/attachments/806147106054078482/861645806851719188/aidanbot.png")
+	if is_beta():
+		emb.set_author(name="AidanBetaBot > Error", icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754420936654908/aidanbetabot.png")
+	else:
+		emb.set_author(name="AidanBot > Error", icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754415068819506/aidanbot.png")
 	emb.timestamp = datetime.datetime.utcnow()
 
 	if send:
