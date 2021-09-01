@@ -53,7 +53,8 @@ class GeneralCog(commands.Cog):
 			elif word == "me" or word == "i":
 				word == "you"
 				
-		thing = join(words, ' ')
+		thing = " "
+		thing = thing.join(words)
 
 		seed(getIntFromText(thing.lower()))
 
