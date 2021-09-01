@@ -42,10 +42,18 @@ class GeneralCog(commands.Cog):
 		elif thing.lower() == "this server":
 			thing = ctx.guild.name
 
-		thing = thing.replace("your", "my")
-		thing = thing.replace("you", "me")
-		thing = thing.replace("me", "you")
-		thing = thing.replace("i", "you")
+		words = thing.split(" ")
+		for word in words:
+			if word == "your":
+				word == "my"
+			elif word == "you":
+				word == "me"
+			elif word == "my":
+				word == "your"
+			elif word == "me" or word == "i":
+				word == "you"
+				
+		thing = join(words, ' ')
 
 		seed(getIntFromText(thing.lower()))
 
