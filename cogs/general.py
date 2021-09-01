@@ -43,6 +43,9 @@ class GeneralCog(commands.Cog):
 			thing = ctx.guild.name
 
 		thing = thing.replace("your", "my")
+		thing = thing.replace("you", "me")
+		thing = thing.replace("me", "you")
+		thing = thing.replace("i", "you")
 
 		seed(getIntFromText(thing.lower()))
 
@@ -119,7 +122,7 @@ class GeneralCog(commands.Cog):
 		emb = getEmbed(ctx, "Decide", "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]), "")
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description="Make a user say anoything you want.")
+	@commands.command(description="Make a user say anything you want.")
 	async def clone(self, ctx, member:discord.User=None, *, message:str=None):
 		if member == None or message == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
