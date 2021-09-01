@@ -5,7 +5,7 @@ import datetime
 import copy
 import math
 
-PREFIX = "%"
+PREFIX = "$"
 VERSION = "Beta V3"
 COMMANDS = []
 
