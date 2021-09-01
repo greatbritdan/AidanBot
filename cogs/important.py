@@ -95,6 +95,14 @@ class ImportantCog(commands.Cog):
 				await ctx.reply(f"Added {r.name}", mention_author=False)
 		else:
 			await ctx.reply(f"{r.name} is not a role that can be added by anyone", mention_author=False)
+			
+	@commands.command(hidden=True)
+	async def bucket(self, ctx):
+		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333693094547566/cd805_y_bucket-yellow.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333695162343424/cd807_y_bucket-red.webp"]
+
+		emb = getEmbed(ctx, "Bucket", "Buket", "", False, False)
+		emb.set_image(url=random.choice(urls))
+		await ctx.send(embed=emb)
 
 def setup(client):
   client.add_cog(ImportantCog(client))
