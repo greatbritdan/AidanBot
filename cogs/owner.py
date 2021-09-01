@@ -1,33 +1,27 @@
-from discord.ext import commands
-
+import time
 import contextlib
 import io
 import textwrap
 from traceback import format_exception
 
-import asyncio
+from discord.ext import commands
 
-from functions import is_beta, getEmbed, clear_command_type
+from functions import getEmbed
 
 class OwnerCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command()
-	@commands.is_owner()
-	async def isbeta(self, ctx):
-		if is_beta(self.client):
-			await ctx.reply("Yes? are you fucking blind?.", mention_author=False)
-		else:
-			await ctx.reply("No, you fucking dumbass.", mention_author=False)
-
-	@commands.command()
+	@commands.command(description="Gets bot/api latency.")
 	@commands.is_owner()
 	async def ping(self, ctx):
-		emb = getEmbed(ctx, "Ping", "Ping Pong motherfucker!", "{0}ms".format(round(self.client.latency, 3)))
-		await ctx.send(embed=emb)
+		start_time = time.time()
+		message = await ctx.reply("Testing Ping...", mention_author=False)
+		end_time = time.time()
 
-	@commands.command(name="eval")
+		await message.edit(content=f"Ping Pong motherfucker! {round(self.client.latency * 1000)}ms\nAPI: {round((end_time - start_time) * 1000)}ms")
+
+	@commands.command(name="eval", description="Run code.")
 	@commands.is_owner()
 	async def _eval(self, ctx, *, code:str):
 		code = clean_code(code)
@@ -45,28 +39,25 @@ class OwnerCog(commands.Cog):
 			with contextlib.redirect_stdout(stdout):
 				exec(f"async def func():\n{textwrap.indent(code, '    ')}", local_variables,)
 				obj = await local_variables["func"]()
-				if obj:
-					if obj == "NoSend":
-						return
-
-					result = f"{stdout.getvalue()}\n-- {obj}"
+				if obj and obj == "NoSend":
+					return
 				else:
 					result = f"{stdout.getvalue()}"
 		except Exception as e:
 			result = "".join(format_exception(e, e, e.__traceback__))
 
-		emb = getEmbed(ctx, "Eval", "Results:", "```py\n" + result + "\n```")
+		emb = getEmbed(ctx, "Eval", "Results:", "```\n" + result + "\n```")
 		await ctx.send(embed=emb)
 		
 	### COGS ###
 
-	@commands.command()
+	@commands.command(hidden=True)
 	@commands.is_owner()
 	async def load(self, ctx, extension):
 		self.client.load_extension(f'cogs.{extension}')
 		await ctx.send('```{} loaded!```'.format(extension))
 
-	@commands.command()
+	@commands.command(hidden=True)
 	@commands.is_owner()
 	async def unload(self, ctx, extension):
 		if extension == "owner":
@@ -74,36 +65,12 @@ class OwnerCog(commands.Cog):
 			return
 			
 		self.client.unload_extension(f'cogs.{extension}')
-		clear_command_type(extension)
 		await ctx.send('```{} unloaded!```'.format(extension))
 
-	@commands.command()
-	@commands.is_owner()
-	async def forceunload(self, ctx, extension):
-		MSG = await ctx.send('```are you sure you want to unload {}?```'.format(extension))
-		await MSG.add_reaction("✅")
-		await MSG.add_reaction("❎")
-
-		def check(reaction, user):
-			return (user == ctx.author and reaction.message.id == MSG.id and reaction.emoji == "✅" or reaction.emoji == "❎")
-
-		try:
-			reaction, user = await self.client.wait_for("reaction_add", timeout=10, check=check)
-			if reaction.emoji == "✅":
-				self.client.unload_extension(f'cogs.{extension}')
-				clear_command_type(extension)
-				await ctx.send('```{} unloaded!```'.format(extension))
-			else:
-				await ctx.send('```No action was taken.```')
-
-		except asyncio.TimeoutError:
-			await ctx.send('```Timeout```')
-
-	@commands.command()
+	@commands.command(hidden=True)
 	@commands.is_owner()
 	async def reload(self, ctx, extension):
 		self.client.unload_extension(f'cogs.{extension}')
-		clear_command_type(extension)
 		self.client.load_extension(f'cogs.{extension}')
 		await ctx.send('```{} reloaded!```'.format(extension))
 

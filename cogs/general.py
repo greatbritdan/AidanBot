@@ -4,71 +4,38 @@ from discord.ext import commands
 from random import seed
 from random import randint
 
-from functions import is_beta, add_command, getEmbed, Error, addField, getIntFromText, userHasPermission
+from functions import is_beta, getEmbed, addField, Error, getIntFromText
 
 class GeneralCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	add_command({
-		"cog": "general", "category": "General",
-		"name": "echo", "description": "Bot says what is passed into it.",
-		"arguments": [
-			["text", "The text he will say.", "string", False]
-		],
-		"level": False
-	})
-	@commands.command()
+	@commands.command(description="Make me say something.")
 	async def echo(self, ctx, *, text:str="sample text"):
 		await ctx.message.delete()
 		await ctx.send(text)
 
-	add_command({
-		"cog": "general", "category": "General",
-		"name": "reply", "description": "Replys to a message with what is passed into it.",
-		"arguments": [
-			["message id", "ID of the message it is replying to.", "integer", True],
-			["text", "The text he will say.", "string", False]
-		],
-		"level": False
-	})
-	@commands.command()
-	async def reply(self, ctx, mid:int=None, *, text:str="sample text"):
-		if mid == None:
+	@commands.command(description="Reply to a message.")
+	async def reply(self, ctx, message_id:int=None, *, text:str="sample text"):
+		if message_id == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 
-		MSG = await ctx.channel.fetch_message(mid)
+		MSG = await ctx.channel.fetch_message(message_id)
 		await ctx.message.delete()
 		await MSG.reply(text, mention_author=False)
 
-	add_command({
-		"cog": "general", "category": "General",
-		"name": "react", "description": "Reacts to latest message.",
-		"arguments": [
-			["emoji", "The emoji he will react with.", "string", False]
-		],
-		"level": False
-	})
-	@commands.command()
-	async def react(self, ctx, reaction:str="👋"):
-		second = False
-		async for message in ctx.channel.history(limit=2):
-			if second == False:
-				second == True
+	@commands.command(description="React to a message.")
+	async def react(self, ctx, message_id:int=None, reaction:str="👋"):
+		if message_id == None:
+			await Error(ctx, self.client, "Missing un-optional argument for command.")
+			return
 
-		await message.add_reaction(reaction)
+		MSG = await ctx.channel.fetch_message(message_id)
 		await ctx.message.delete()
+		await MSG.add_reaction(reaction)
 
-	add_command({
-		"cog": "general", "category": "General",
-		"name": "rate", "description": "Rates what you pass into it.",
-		"arguments": [
-			["thing", "The thing he will rate.", "string", True]
-		],
-		"level": False
-	})
-	@commands.command()
+	@commands.command(description="Rates something.")
 	async def rate(self, ctx, *, thing=None):
 		if thing.lower() == "me":
 			thing = ctx.author.name
@@ -94,8 +61,7 @@ class GeneralCog(commands.Cog):
 			["{0} is amazing!", [7, 9]],
 			["{0} is the best thing, by far.", [10, 10]],
 			["I AM GOD", [11, 11]],
-			["HE SUCKS SO GOD DAMN MUCH!!!!!", [-3888292929929922, -3888292929929922]],
-			["How... dare you...", [-999999999999999999999999999999999999999999, -999999999999999999999999999999999999999999]]
+			["HE SUCKS SO GOD DAMN MUCH!!!!!", [-3888292929929922, -3888292929929922]]
 		]
 
 		# if it's aidanbot/aidanbetabot or aidan, respond differently
@@ -112,28 +78,14 @@ class GeneralCog(commands.Cog):
 			elif thung == "aidanbetabot":
 				index = 14
 
-		if "cursed" in thung:
-			index = 12
-
-		if randint(0,99) == 99:
-			index = 15
-
 		txt = responces[index][0]
 		rating = randint(responces[index][1][0], responces[index][1][1])
 
 		emb = getEmbed(ctx, "Rate", txt.format(thing), "")
-		emb = addField(emb, "Score", "**{0}/10**".format(rating))
+		emb = addField(emb, "Score", "`{0}/10`".format(rating))
 		await ctx.reply(embed=emb, mention_author=False)
 
-	add_command({
-		"cog": "general", "category": "General",
-		"name": "ask", "description": "Answers your deepest questions.",
-		"arguments": [
-			["question", "The question he will answer.", "string", True]
-		],
-		"level": False
-	})
-	@commands.command()
+	@commands.command(description="Answers a question.")
 	async def ask(self, ctx, *, question:str=None):
 		seed(getIntFromText(question.lower()))
 
@@ -157,17 +109,7 @@ class GeneralCog(commands.Cog):
 		emb = getEmbed(ctx, "Ask", start_txt + end_txt, "")
 		await ctx.reply(embed=emb, mention_author=False)
 
-	add_command({
-		"cog": "general", "category": "General",
-		"name": "decide", "description": "Picks between the choices given.",
-		"arguments": [
-			["choice 1", "The first choice.", "string", True],
-			["choice 2", "The second choice.", "string", False],
-			["choice ...", "The ... choice.", "string", False]
-		],
-		"level": False
-	})
-	@commands.command()
+	@commands.command(description="Picks between given decisions.")
 	async def decide(self, ctx, *, decisions=None):
 		if decisions == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
@@ -177,16 +119,7 @@ class GeneralCog(commands.Cog):
 		emb = getEmbed(ctx, "Decide", "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]), "")
 		await ctx.reply(embed=emb, mention_author=False)
 
-	add_command({
-		"cog": "general", "category": "General",
-		"name": "clone", "description": "Make someone say something.",
-		"arguments": [
-			["user", "The user.", "name/id/mention", True],
-			["message", "The message they will send.", "string", True]
-		],
-		"level": False
-	})
-	@commands.command()
+	@commands.command(description="Make a user say anoything you want.")
 	async def clone(self, ctx, member:discord.User=None, *, message:str=None):
 		if member == None or message == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
@@ -195,43 +128,6 @@ class GeneralCog(commands.Cog):
 		webhook = await ctx.channel.create_webhook(name=member.name)
 		await webhook.send(message, username=member.name + " (fake)", avatar_url=member.avatar_url)
 		await webhook.delete()
-
-	add_command({
-		"cog": "general", "category": "General",
-		"name": "role", "description": "Add or remove any role that begins with [r].",
-		"arguments": [
-			["name", "The name of the role (or close to it).", "string", True]
-		],
-		"level": False
-	})
-	@commands.command()
-	async def role(self, ctx, *, name=None):
-		if name == None:
-			await Error(ctx, self.client, "Missing un-optional argument for command.")
-			return
-
-		r = None
-		for role in ctx.guild.roles:
-			if name.lower() in role.name.lower():
-				r = role
-
-		if r == None:
-			await ctx.send("Try again, i couldn't find this role.")
-			return
-
-		if userHasPermission(ctx.author, "manage_roles") or r.name.startswith("[r]"):
-			if r == ctx.author.top_role:
-				await ctx.send(f"You can't remove your top role")
-				return
-			
-			if r in ctx.author.roles:
-				await ctx.author.remove_roles(r)
-				await ctx.send(f"Removed {r.name}")
-			else:
-				await ctx.author.add_roles(r)
-				await ctx.send(f"Added {r.name}")
-		else:
-			await ctx.send(f"{r.name} is not a role that can be added by anyone")
 
 def setup(client):
   client.add_cog(GeneralCog(client))

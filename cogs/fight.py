@@ -6,22 +6,13 @@ import asyncio
 import math
 from random import randint
 
-from functions import add_command, getEmbed, Error, addField, clamp
+from functions import getEmbed, Error, addField, clamp, getBar
 
 class FightCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	add_command({
-		"cog": "fight", "category": "Games",
-		"name": "fight", "description": "Fight a user or bot to the death.",
-		"arguments": [
-			["user1", "your opponent / first person of the fight.", "name/id/mention", True],
-			["user2", "2nd opponent of the fight.", "name/id/mention", False]
-		],
-		"level": False
-	})
-	@commands.command()
+	@commands.command(description="Fight someone or set 2 others up to fight.\n\nFor more options use `{prefix}fightplus`.")
 	async def fight(self, ctx, user1:discord.User=None, user2:discord.User=None):
 		if user1 == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
@@ -35,17 +26,8 @@ class FightCog(commands.Cog):
 
 		await FightNewgame(ctx, self.client, v1, v2)
 
-	add_command({
-		"cog": "fight", "category": "Games",
-		"name": "fightplus", "description": "Fight a user or bot to the death, With extra options.",
-		"arguments": [
-			["user1", "your opponent / first person of the fight.", "name/id/mention", True],
-			["user2", "2nd opponent of the fight.", "name/id/mention", False]
-		],
-		"level": False
-	})
-	@commands.command()
-	async def fightplus(self, ctx, user1:discord.User=None, user2:discord.User=None):
+	@commands.command(description="Fight someone or set 2 others up to fight.\n\nNow with extra options!")
+	async def fightplus(self, ctx, user1, user2):
 		if user1 == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
@@ -92,50 +74,6 @@ class FightCog(commands.Cog):
 		await MSG.delete()
 		await FightNewgame(ctx, self.client, v1, v2, answers[0], answers[1])
 
-def getHealthBar(health, maxhealth, size, hashalf=False):
-	healthperseg = maxhealth / size
-	segsfilled = math.ceil(health / healthperseg)
-	ishalf = False
-	if hashalf and math.ceil((health - (healthperseg/2)) / healthperseg) < segsfilled:
-		ishalf = True
-
-	bar = ""
-	for i in range(1, size+1):
-		if i == 1:
-			if i < segsfilled:
-				e = "<:left_full:862331445526921287>"
-			elif i == segsfilled:
-				if ishalf:
-					e = "<:left_half:862331445700067328>"
-				else:
-					e = "<:left_fullsingle:862331445750005770>"
-			else:
-				e = "<:left_empty:862331445720121365>"
-		elif i < size:
-			if i < segsfilled:
-				e = "<:middle_full:862331445300428821>"
-			elif i == segsfilled:
-				if ishalf:
-					e = "<:middle_half:862331445845688340>"
-				else:
-					e = "<:middle_fullsingle:862331445703737364>"
-			else:
-				e = "<:middle_empty:862331445813313606>"
-		else:
-			if i < segsfilled:
-				e = "<:right_full:862331445657468939>"
-			elif i == segsfilled:
-				if ishalf:
-					e = "<:right_half:862331445702819880>"
-				else:
-					e = "<:right_full:862331445657468939>"
-			else:
-				e = "<:right_empty:862331445313273857>"
-
-		bar = bar + e
-
-	return bar
-
 async def FightNewgame(ctx, client, p1:discord.User, p2:discord.User, mhealth:int=100, menergy:int=10):
 	# setup vars and lists
 	maxhealth = mhealth
@@ -176,8 +114,8 @@ async def FightNewgame(ctx, client, p1:discord.User, p2:discord.User, mhealth:in
 	# embed for the fight command
 	def getFightEmbed(ctx, action):
 		emb = getEmbed(ctx, "Fight", player["p1"]["name"] + " VS " + player["p2"]["name"], "")
-		addField(emb, player["p1"]["name"] + " Stats:", "`Health:` " + getHealthBar(player["p1"]["health"], maxhealth, 10, True) + " (" + str(player["p1"]["health"]) + ")\n`Energy:` " + getHealthBar(player["p1"]["energy"], maxenergy, 5, True) + " (" + str(player["p1"]["energy"]) + ")")
-		addField(emb, player["p2"]["name"] + " Stats:", "`Health:` " + getHealthBar(player["p2"]["health"], maxhealth, 10, True) + " (" + str(player["p2"]["health"]) + ")\n`Energy:` " + getHealthBar(player["p2"]["energy"], maxenergy, 5, True) + " (" + str(player["p2"]["energy"]) + ")")
+		addField(emb, player["p1"]["name"] + " Stats:", "`Health:` " + getBar(player["p1"]["health"], maxhealth, 10, True) + " (" + str(player["p1"]["health"]) + ")\n`Energy:` " + getBar(player["p1"]["energy"], maxenergy, 5, True) + " (" + str(player["p1"]["energy"]) + ")")
+		addField(emb, player["p2"]["name"] + " Stats:", "`Health:` " + getBar(player["p2"]["health"], maxhealth, 10, True) + " (" + str(player["p2"]["health"]) + ")\n`Energy:` " + getBar(player["p2"]["energy"], maxenergy, 5, True) + " (" + str(player["p2"]["energy"]) + ")")
 
 		if action:
 			emb = addField(emb, action[0], action[1])
