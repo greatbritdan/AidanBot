@@ -128,7 +128,7 @@ class GeneralCog(commands.Cog):
 		emb = getEmbed(ctx, "Ask", start_txt + end_txt, "")
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description="Picks between given decisions.", aliases=['decide', 'choose'])
+	@commands.command(description="Picks between given decisions.", aliases=['choose'])
 	async def decide(self, ctx, *, decisions=None):
 		if decisions == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
