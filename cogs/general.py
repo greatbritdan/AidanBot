@@ -43,18 +43,21 @@ class GeneralCog(commands.Cog):
 			thing = ctx.guild.name
 
 		words = thing.split(" ")
+		newords = []
 		for word in words:
 			if word == "your":
-				word == "my"
+				newords.append("my")
 			elif word == "you":
-				word == "me"
+				newords.append("me")
 			elif word == "my":
-				word == "your"
+				newords.append("your")
 			elif word == "me" or word == "i":
-				word == "you"
-				
+				newords.append("you")
+			else:
+				newords.append(word)
+
 		thing = " "
-		thing = thing.join(words)
+		thing = thing.join(newords)
 
 		seed(getIntFromText(thing.lower()))
 
