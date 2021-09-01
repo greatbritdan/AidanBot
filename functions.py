@@ -3,23 +3,19 @@ from discord.utils import get
 
 import datetime
 import copy
+import math
 
-PREFIX = "$"
-VERSION = "Beta V2.9"
+PREFIX = "%"
+VERSION = "Beta V3"
 COMMANDS = []
-DEFAULTS = {
-	"delete_invites": "false",
-	"invite_allow_channel": "false"
-}
 
 def is_beta():
 	return (PREFIX == "%")
+
 def get_prefix():
 	return PREFIX
 def get_version():
 	return VERSION
-def get_defaults():
-	return DEFAULTS
 def get_commands():
 	return COMMANDS
 
@@ -43,7 +39,7 @@ thelist = {
 	"o": "25", "p": "26", "q": "27", "r": "28", "s": "29", "t": "30",
 	"u": "31", "v": "32", "w": "33", "x": "34", "y": "35", "z": "36",
 	" ": "37", ".": "38", ",": "39", ":": "40", ";": "41", "'": "42",
-	"/": "43", "-": "44", "+": "45"
+	"/": "43", "-": "44", "+": "45", "$": "46", "%": "46"
 }
 
 def clamp(n, minn, maxn):
@@ -55,7 +51,7 @@ def getIntFromText(txt):
 		if letter in thelist:
 			sed = sed + thelist[letter]
 		else:
-			sed = sed + "46"
+			sed = sed + "47"
 
 	return (int(sed))
 
@@ -63,110 +59,7 @@ def userHasPermission(member, permission):
 	for perm in member.guild_permissions:
 		if str(perm[0]) == permission and perm[1] == True:
 			return True
-
 	return False
-
-### SAVE AND LOAD ###
-
-async def GETMSG(ctx, client):
-	guild = client.get_guild(879063875469860874)
-	channel = get(guild.text_channels, name=str(ctx.guild.id))
-	if channel == None:
-		await ctx.send(f"You need to run {PREFIX}setup first!")
-		return False
-
-	message = await channel.fetch_message(channel.last_message_id)
-	if message == None:
-		return False
-
-	return message
-
-async def CREATEDATA(ctx, client):
-	guild = client.get_guild(879063875469860874)
-	channel = get(guild.text_channels, name=str(ctx.guild.id))
-	if channel:
-		await ctx.send("Your server is already setup!")
-		return False
-	
-	category = get(guild.categories, name="Guilds")
-	channel = await guild.create_text_channel(str(ctx.guild.id), topic=f"AKA {ctx.guild.name}", category=category)
-
-	defaults = get_defaults()
-	data = []
-	for key in defaults:
-		data.append(key + "=" + defaults[key])
-
-	sep = "\n"
-	txt = sep.join(data)
-
-	await channel.send(txt)
-	return True
-
-async def DELETEDATA(guildid, ctx=None, client=None):
-	guild = client.get_guild(879063875469860874)
-	channel = get(guild.text_channels, name=str(guildid))
-	if channel == None:
-		if ctx:
-			await ctx.send("Your server has no server data!")
-			return False
-	
-	await channel.delete()
-	return True
-
-async def PARCEDATA(ctx, client, action, name=None, val=None):
-	message = await GETMSG(ctx, client)
-	if message == False:
-		return
-	messcont = message.content
-	lines = messcont.splitlines()
-
-	# get all vals from server data
-	data = {}
-	for var in lines:
-		dat = var.split('=')
-		data[dat[0]] = dat[1]
-
-	# fill in defaults if missing any
-	defaults = get_defaults()
-	for key in defaults:
-		if key not in data:
-			data[key] = defaults[key]
-
-	# returns false if it doesn't exist
-	if action != "list":
-		if name not in data:
-			return False
-
-	# gets all values
-	if action == "list":
-		retun = data
-
-	# gets the value and returns value
-	if action == "get" or action == "getstatic":
-		if data[name] == "true":
-			retun = True
-		elif data[name] == "false":
-			retun = False
-		else:
-			retun = data[name]
-
-	# sets value and returns True
-	elif action == "set":
-		data[name] = val
-		retun = data[name]
-
-	if action != "getstatic":
-		stringdata = []
-		for key in data:
-			stringdata.append(key + "=" + data[key])
-
-		sep = "\n"
-		txt = sep.join(stringdata)
-		
-		await message.delete()
-		await message.channel.send(txt)
-
-	return retun
 
 async def SEND_SYSTEM_MESSAGE(ctx, client, title, description):
 	guild = get(client.guilds, id=879063875469860874)
@@ -178,51 +71,40 @@ async def SEND_SYSTEM_MESSAGE(ctx, client, title, description):
 ### EMBEDS ###
 
 # make an embed and send it back
-def getEmbed(ctx, command, title=False, description=False, image=False, color=False, thumb=False):
-	if color == "red":
-		col = discord.Color.from_rgb(220, 29, 37)
-	elif color:
+def getEmbed(ctx, command, title=False, description=False, color=False, thumb=False):
+	if color:
 		col = color
 	else:
 		col = discord.Color.from_rgb(20, 29, 37)
 
 	emb = discord.Embed(title=title, description=description, color=col)
-	if image:
-		emb.set_image(url=image)
 	if thumb:
 		emb.set_thumbnail(url=thumb)
-
 	emb.set_footer(text="Requested by {0} in #{1}".format(ctx.author, ctx.channel))
 	if is_beta():
 		emb.set_author(name="AidanBetaBot > " + command, icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754420936654908/aidanbetabot.png")
 	else:
 		emb.set_author(name="AidanBot > " + command, icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754415068819506/aidanbot.png")
-
 	emb.timestamp = datetime.datetime.utcnow()
-
 	return emb
 
 # add a feild to an embed
 def addField(emb, fname, fvalue, fline=False):
 	emb.add_field(name=fname, value=fvalue, inline=fline)
-
 	return emb
 
 # make a system embed and sends it to aidans server.
 def getSystemEmbed(ctx, title=False, description=False):
 	emb = discord.Embed(title=title, description=description, color=discord.Color.from_rgb(70, 29, 37))
-
 	if ctx:
 		emb.set_footer(text=f"User: {ctx.author}")
 	else:
 		emb.set_footer(text="Not Via Guild")
-
 	if is_beta():
 		emb.set_author(name="AidanBetaBot > System Message", icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754420936654908/aidanbetabot.png")
 	else:
 		emb.set_author(name="AidanBot > System Message", icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754415068819506/aidanbot.png")
 	emb.timestamp = datetime.datetime.utcnow()
-
 	return emb
 
 # for when a command fails
@@ -234,8 +116,49 @@ async def Error(ctx, client, error, send=None):
 	else:
 		emb.set_author(name="AidanBot > Error", icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754415068819506/aidanbot.png")
 	emb.timestamp = datetime.datetime.utcnow()
-
 	if send:
 		await SEND_SYSTEM_MESSAGE(ctx, client, "Someone Broke AidanBot lol.", error)
-
 	await ctx.send(embed=emb)
+
+def getBar(value, maxvalue, size, hashalf=False):
+	valueperseg = maxvalue / size
+	segsfilled = math.ceil(value / valueperseg)
+	ishalf = False
+	if hashalf and math.ceil((value - (valueperseg/2)) / valueperseg) < segsfilled:
+		ishalf = True
+
+	bar = ""
+	for i in range(1, size+1):
+		if i == 1:
+			if i < segsfilled:
+				e = "<:left_full:862331445526921287>"
+			elif i == segsfilled:
+				if ishalf:
+					e = "<:left_half:862331445700067328>"
+				else:
+					e = "<:left_fullsingle:862331445750005770>"
+			else:
+				e = "<:left_empty:862331445720121365>"
+		elif i < size:
+			if i < segsfilled:
+				e = "<:middle_full:862331445300428821>"
+			elif i == segsfilled:
+				if ishalf:
+					e = "<:middle_half:862331445845688340>"
+				else:
+					e = "<:middle_fullsingle:862331445703737364>"
+			else:
+				e = "<:middle_empty:862331445813313606>"
+		else:
+			if i < segsfilled:
+				e = "<:right_full:862331445657468939>"
+			elif i == segsfilled:
+				if ishalf:
+					e = "<:right_half:862331445702819880>"
+				else:
+					e = "<:right_full:862331445657468939>"
+			else:
+				e = "<:right_empty:862331445313273857>"
+		bar = bar + e
+
+	return bar

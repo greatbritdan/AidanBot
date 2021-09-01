@@ -1,20 +1,20 @@
+import os
+
 import discord
 from discord.ext import commands
-from discord_components import DiscordComponents
+#from discord_components import DiscordComponents
 
-import os
 from functions import get_prefix
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix=get_prefix(), case_insensitive=True, help_command=None, intents=intents)
-DiscordComponents(client)
+#DiscordComponents(client)
 
 @client.event
 async def on_ready():
-	print(f'Hello there {client.user}')
+	print(f'Logged in as {client.user}')
 
-	activity = discord.Activity(name=f'use {get_prefix()}help for help.', type=discord.ActivityType.playing)
-	await client.change_presence(activity=activity)
+	await client.change_presence(activity=discord.Activity(name=f'use {get_prefix()}help for help.',type=discord.ActivityType.playing))
 
 for filename in os.listdir('./cogs'):
 	if filename.endswith('.py'):
