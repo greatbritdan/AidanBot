@@ -49,10 +49,14 @@ class GeneralCog(commands.Cog):
 				newords.append("my")
 			elif word == "you":
 				newords.append("me")
+			elif word == "yourself":
+				newords.append("myself")
 			elif word == "my":
 				newords.append("your")
 			elif word == "me" or word == "i":
 				newords.append("you")
+			elif word == "myself":
+				newords.append("yourself")
 			else:
 				newords.append(word)
 
@@ -83,12 +87,12 @@ class GeneralCog(commands.Cog):
 		index = randint(0, 12)
 		thung = thing.lower()
 		if is_beta():
-			if thung == "aidanbetabot" or thung == "you":
+			if thung == "aidanbetabot" or thung == "me":
 				index = 13
 			elif thung == "aidanbot":
 				index = 14
 		else:
-			if thung == "aidanbot" or thung == "you":
+			if thung == "aidanbot" or thung == "me":
 				index = 13
 			elif thung == "aidanbetabot":
 				index = 14
