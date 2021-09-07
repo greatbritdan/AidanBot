@@ -2,13 +2,11 @@ import os
 
 import discord
 from discord.ext import commands
-#from discord_components import DiscordComponents
 
 from functions import get_prefix
 
 intents = discord.Intents.all()
 client = commands.Bot(command_prefix=get_prefix(), case_insensitive=True, help_command=None, intents=intents)
-#DiscordComponents(client)
 
 @client.event
 async def on_ready():
