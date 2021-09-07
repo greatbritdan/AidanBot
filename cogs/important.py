@@ -34,7 +34,8 @@ class ImportantCog(commands.Cog):
 			# Get all visible commands
 			emb = getEmbed(ctx, "Help", "All commands you can use:", f"Run {prefix}help <command> to get more help on a command!")
 
-			cognames = ["ImportantCog", "GeneralCog", "FightCog", "StatsCog", "OwnerCog"]
+			cognames = ["ImportantCog", "GeneralCog", "FightCog", "StatsCog", "PPCog", "OwnerCog"]
+			neatcognames = ["Important", "General", "Fight", "Stats", "Pip0n's Palace Only", "Owner Only"]
 			for cog in cognames:
 				txt = ""
 				for com in self.client.commands:
@@ -52,7 +53,7 @@ class ImportantCog(commands.Cog):
 						txt = txt + f"`{prefix}{com.name}`: {desc}\n"
 
 				if txt != "":
-					emb = addField(emb, cog[0:-3], txt, False)
+					emb = addField(emb, neatcognames[cognames.index(cog)], txt, False)
 
 			await ctx.reply(embed=emb, mention_author=False)
 
@@ -95,7 +96,7 @@ class ImportantCog(commands.Cog):
 				await ctx.reply(f"Added {r.name}", mention_author=False)
 		else:
 			await ctx.reply(f"{r.name} is not a role that can be added by anyone", mention_author=False)
-			
+
 	@commands.command(hidden=True)
 	async def bucket(self, ctx):
 		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333693094547566/cd805_y_bucket-yellow.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333695162343424/cd807_y_bucket-red.webp"]

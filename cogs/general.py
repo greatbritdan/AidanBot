@@ -128,7 +128,7 @@ class GeneralCog(commands.Cog):
 		emb = getEmbed(ctx, "Ask", start_txt + end_txt, "")
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description="Picks between given decisions.", aliases=['choose'])
+	@commands.command(description="Picks between given decisions.")
 	async def decide(self, ctx, *, decisions=None):
 		if decisions == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
@@ -138,7 +138,7 @@ class GeneralCog(commands.Cog):
 		emb = getEmbed(ctx, "Decide", "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]), "")
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description="Make a user say anything you want.")
+	@commands.command(description="Make a user say anoything you want.")
 	async def clone(self, ctx, member:discord.User=None, *, message:str=None):
 		if member == None or message == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
@@ -147,6 +147,12 @@ class GeneralCog(commands.Cog):
 		webhook = await ctx.channel.create_webhook(name=member.name)
 		await webhook.send(message, username=member.name + " (fake)", avatar_url=member.avatar_url)
 		await webhook.delete()
+
+def join(l, sep):
+    out_str = ''
+    for i, el in enumerate(l):
+        out_str += '{}{}'.format(el, sep)
+    return out_str[:-len(sep)]
 
 def setup(client):
   client.add_cog(GeneralCog(client))
