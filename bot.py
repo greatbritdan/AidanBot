@@ -2,6 +2,7 @@ import os
 
 import discord
 from discord.ext import commands
+from discord.utils import get
 
 from functions import get_prefix
 
@@ -13,6 +14,15 @@ async def on_ready():
 	print(f'Logged in as {client.user}')
 
 	await client.change_presence(activity=discord.Activity(name=f'use {get_prefix()}help for help.',type=discord.ActivityType.playing))
+
+## Archive Coolguy's Community hub messages, due to recent ghost pings ##
+@client.event
+async def on_message(message):
+	if message.guild.id == 754952103381696656:
+		guild = get(client.guilds, id=879063875469860874)
+		channel = get(guild.text_channels, id=886191398259392512)
+
+		await channel.send(f"From `{message.author.name}` in `#{message.channel.name}`:  {message.content}")
 
 for filename in os.listdir('./cogs'):
 	if filename.endswith('.py'):
