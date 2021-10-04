@@ -6,7 +6,7 @@ import copy
 import math
 
 PREFIX = "$"
-VERSION = "Beta V3.1"
+VERSION = "Beta V3.5"
 COMMANDS = []
 
 def is_beta():
