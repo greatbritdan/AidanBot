@@ -128,6 +128,33 @@ class GeneralCog(commands.Cog):
 		emb = getEmbed(ctx, "Ask", start_txt + end_txt, "")
 		await ctx.reply(embed=emb, mention_author=False)
 
+	@commands.command(description="What percentage of something is you?")
+	async def percent(self, ctx, something:str=None, *, person:str=None):
+		if something == None:
+			await Error(ctx, self.client, "Missing un-optional argument for command.")
+			return
+
+		seed(getIntFromText(something.lower()) + ctx.author.id)
+		value = randint(0,100)
+
+		end = ""
+		if value == 0:
+			end = "wow. 0%, didn't expect that."
+		elif value == 100:
+			end = "FULL HOUSE BABEY!"
+		elif value == 69:
+			end = "( ͡° ͜ʖ ͡°)"
+		elif randint(1,3) == 3:
+			endings = ["I don't make the rules.", "that isn't that bad when you think about it.", "LOL!", "¯\_(ツ)_/¯", "don't blame me, blame randint.", "sorry...", "i've seen worse don't worry.", "better than Aidan.", "I know, I know."]
+
+			end = endings[randint(0, len(endings)-1)]
+
+		if person == None:
+			emb = getEmbed(ctx, "Percent", f"You are **{str(value)}%** {something}.", end)
+		else:
+			emb = getEmbed(ctx, "Percent", f"{person} is **{str(value)}%** {something}.", end)
+		await ctx.reply(embed=emb, mention_author=False)
+
 	@commands.command(description="Picks between given decisions.")
 	async def decide(self, ctx, *, decisions=None):
 		if decisions == None:
@@ -147,6 +174,20 @@ class GeneralCog(commands.Cog):
 		webhook = await ctx.channel.create_webhook(name=member.name)
 		await webhook.send(message, username=member.name + " (fake)", avatar_url=member.avatar_url)
 		await webhook.delete()
+
+	@commands.command(description="**Punish**.")
+	async def punish(self, ctx):
+		texts = [
+			"AAAAAAAAAAAAAAAAAHHHHHHH!!!!!",
+			"AAAHHH PLEASE STO-P!!!!",
+			"I'M SORRY AHHHHHHH!!!",
+			"PLEASE!... HAVE MERCY!...",
+			"STOP...   *CRIES*", "AAAAAAHHHH!!!",
+			"I'M SO SORRY.AAA!!!"
+		]
+		text = texts[randint(0, len(texts)-1)]
+
+		await ctx.send("**" + text + "**")
 
 def join(l, sep):
     out_str = ''
