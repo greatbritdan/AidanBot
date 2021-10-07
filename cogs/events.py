@@ -6,15 +6,6 @@ from functions import Error, SEND_SYSTEM_MESSAGE
 class EventsCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
-		
-	## Archive Coolguy's Community hub messages, due to recent ghost pings ##
-	@commands.Cog.listener()
-	async def on_message(self, message):
-		if message.guild.id == 754952103381696656:
-			guild = get(self.client.guilds, id=879063875469860874)
-			channel = get(guild.text_channels, id=886191398259392512)
-
-			await channel.send(f"From `{message.author.name}` in `#{message.channel.name}`:  {message.content}")
 
 	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
