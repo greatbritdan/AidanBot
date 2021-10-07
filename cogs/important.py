@@ -34,8 +34,8 @@ class ImportantCog(commands.Cog):
 			# Get all visible commands
 			emb = getEmbed(ctx, "Help", "All commands you can use:", f"Run {prefix}help <command> to get more help on a command!")
 
-			cognames = ["ImportantCog", "GeneralCog", "FightCog", "StatsCog", "PPCog", "OwnerCog"]
-			neatcognames = ["Important", "General", "Fight", "Stats", "Pip0n's Palace Only", "Owner Only"]
+			cognames = ["ImportantCog", "GeneralCog", "FightCog", "StatsCog", "PPCog", "QOTDCog", "OwnerCog"]
+			neatcognames = ["Important", "General", "Fight", "Stats", "Pip0n's Palace Only", "Question of the day", "Owner Only"]
 			for cog in cognames:
 				txt = ""
 				for com in self.client.commands:
