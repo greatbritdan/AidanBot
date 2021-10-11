@@ -38,7 +38,7 @@ class QOTDCog(commands.Cog):
 				await channel.send(f"**Question of the day:** {question}")
 				
 			self.done = True
-		elseif self.done:
+		elif self.done:
 			self.done = False
 		
 	@commands.command(description="Submit Question.")
