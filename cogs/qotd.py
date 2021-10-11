@@ -12,7 +12,6 @@ def is_pipon_palace(ctx):
 class QOTDCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
-		self.done = False
 		self.qotd.start()
 
 	def cog_unload(self):
@@ -21,7 +20,7 @@ class QOTDCog(commands.Cog):
 	@tasks.loop(minutes=5)
 	async def qotd(self):
 		current_time = datetime.datetime.now().strftime("%H:%M")
-		if current_time == "14:00" and not self.done:
+		if current_time == "14:00":
 
 			questions = await getquestions(self.client)
 			if len(questions) > 1:
@@ -36,10 +35,6 @@ class QOTDCog(commands.Cog):
 				if "?" not in question:
 					question = question + "?"
 				await channel.send(f"**Question of the day:** {question}")
-
-			self.done = True
-		elif current_time != "14:00" and self.done:
-			self.done = False
 
 	@commands.command(description="Submit Question.")
 	@commands.check(is_pipon_palace)
