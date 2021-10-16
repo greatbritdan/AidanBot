@@ -51,23 +51,23 @@ class OwnerCog(commands.Cog):
 		
 	### COGS ###
 
-	@commands.command(hidden=True)
+	@commands.command(description="Loads a cog.")
 	@commands.is_owner()
 	async def load(self, ctx, extension):
 		self.client.load_extension(f'cogs.{extension}')
 		await ctx.send('```{} loaded!```'.format(extension))
 
-	@commands.command(hidden=True)
+	@commands.command(description="Unloads a cog.")
 	@commands.is_owner()
 	async def unload(self, ctx, extension):
 		if extension == "owner":
 			await ctx.send('```owner can not be unloaded, it holds the $load, $unload and $reload function!```')
 			return
 			
-		self.client.unload_extension(f'cogs.{extension}')
-		await ctx.send('```{} unloaded!```'.format(extension))
+		self.client.unload_extension(f'cogs.{extension.lower()}')
+		await ctx.send('```{} unloaded!```'.format(extension.lower()))
 
-	@commands.command(hidden=True)
+	@commands.command(description="Reloads a cog.")
 	@commands.is_owner()
 	async def reload(self, ctx, extension):
 		self.client.unload_extension(f'cogs.{extension}')
