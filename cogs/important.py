@@ -1,6 +1,7 @@
 from discord.ext import commands
 
 import random
+import asyncio
 
 from functions import get_prefix, get_version, getEmbed, addField, Error, userHasPermission
 
@@ -32,12 +33,19 @@ class ImportantCog(commands.Cog):
 						break
 		else:
 			# Get all visible commands
-			emb = getEmbed(ctx, "Help", "All commands you can use:", f"Run {prefix}help <command> to get more help on a command!")
+			semb = getEmbed(ctx, "Help (loading...)", "All commands you can use:", f"Run {prefix}help <command> to get more help on a command!")
 
-			cognames = ["ImportantCog", "GeneralCog", "FightCog", "StatsCog", "PPCog", "QOTDCog", "OwnerCog"]
-			neatcognames = ["Important", "General", "Fight", "Stats", "Pip0n's Palace Only", "Question of the day", "Owner Only"]
+			cognames = ["ImportantCog", "GeneralCog", "FightCog", "PPCog", "QOTDCog", "OwnerCog"]
+			neatcognames = ["Important", "General", "Fight", "Pip0n's Palace Only", "Question of the day", "Owner Only"]
+
+			page = 0
+			maxpages = 0
+			content = []
+			minlen = 12
+
 			for cog in cognames:
 				txt = ""
+				lenn = 0
 				for com in self.client.commands:
 					try:
 						await com.can_run(ctx)
@@ -51,11 +59,52 @@ class ImportantCog(commands.Cog):
 							desc = lines[0]
 								
 						txt = txt + f"`{prefix}{com.name}`: {desc}\n"
+						lenn += 1
 
 				if txt != "":
-					emb = addField(emb, neatcognames[cognames.index(cog)], txt, False)
+					content.append([neatcognames[cognames.index(cog)], txt, lenn])
 
-			await ctx.reply(embed=emb, mention_author=False)
+			pagesi = [[]]
+			pagelen = 0
+			for i in range(0, len(content)):
+				pagesi[maxpages].append(i)
+				pagelen += content[i][2]
+				if pagelen >= minlen and i != len(content)-1:
+					maxpages += 1
+					pagelen = 0
+					pagesi.append([])
+
+			recup = "⬆️"
+			recdown = "⬇️"
+
+			MSG = await ctx.reply(embed=semb, mention_author=False)
+			await MSG.add_reaction(recup)
+			await MSG.add_reaction(recdown)
+
+			while True:
+				def check(reaction, user):
+					return (user.id == ctx.author.id and reaction.message.id == MSG.id and ((reaction.emoji == recup and page > 0) or (reaction.emoji == recdown and page < maxpages)))
+
+				emb = getEmbed(ctx, f"Help (page {page+1} of {maxpages+1})", "All commands you can use:", f"Run {prefix}help <command> to get more help on a command!")
+				for i in pagesi[page]:
+					emb = addField(emb, content[i][0], content[i][1], False)
+
+				await MSG.edit(embed=emb)
+
+				try:
+					reaction, user = await self.client.wait_for("reaction_add", timeout=60, check=check)
+
+					if reaction.emoji == recup:
+						page -= 1
+					if reaction.emoji == recdown:
+						page += 1
+
+					await MSG.remove_reaction(reaction, user)
+
+				except asyncio.TimeoutError:
+					emb = getEmbed(ctx, "Help (timeout)", "All commands you can use:", f"Run {prefix}help <command> to get more help on a command!")
+					await MSG.edit(embed=emb)
+					return
 
 	@commands.command(description="Get info on the bot.")
 	async def info(self, ctx):

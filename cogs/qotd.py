@@ -23,20 +23,7 @@ class QOTDCog(commands.Cog):
 		current_time = datetime.datetime.now().strftime("%H:%M")
 		times = ["14:00", "14:01", "14:02", "14:03", "14:04"]
 		if current_time in times and not self.done:
-			questions = await getquestions(self.client)
-			if len(questions) > 1:
-				questioni = randint(1, len(questions)-1)
-				question = questions[questioni]
-				questions.pop(questioni)
-				await setquestions(self.client, questions)
-
-				guild = get(self.client.guilds, id=836936601824788520)
-				channel = get(guild.text_channels, id=856977059132866571)
-
-				if "?" not in question:
-					question = question + "?"
-				await channel.send(f"**Question of the day:** {question}")
-				
+			await qotdask(self.client)	
 			self.done = True
 		elif self.done:
 			self.done = False
@@ -54,23 +41,36 @@ class QOTDCog(commands.Cog):
 
 		await ctx.send(f"added '{question}' to the list")
 
-	@commands.command(description="Test Question.")
-	@commands.is_owner()
-	async def qotdtest(self, ctx):
+	@commands.command(description="Get All Questions.")
+	@commands.check(is_pipon_palace)
+	async def qotdget(self, ctx):
 		questions = await getquestions(self.client)
-	
-		if len(questions) > 1:
-			questioni = randint(1, len(questions)-1)
-			question = questions[questioni]
-			questions.pop(questioni)
-			await setquestions(self.client, questions)
+		questions.pop(0)
+		split = "\n- "
+		questions = split.join(questions)
 
-			guild = get(self.client.guilds, id=836936601824788520)
-			channel = get(guild.text_channels, id=856977059132866571)
-			
-			if "?" not in question:
-				question = question + "?"
-			await channel.send(f"**Question of the day:** {question}")
+		await ctx.send(f"Questions:\n```- {questions}```")
+
+	@commands.command(name="qotdask", description="Ask Question.")
+	@commands.check(is_pipon_palace)
+	@commands.is_owner()
+	async def qotdask_(self, ctx):
+		await qotdask(self.client)
+
+async def qotdask(client):
+	questions = await getquestions(client)
+	if len(questions) > 1:
+		questioni = randint(1, len(questions)-1)
+		question = questions[questioni]
+		questions.pop(questioni)
+		await setquestions(client, questions)
+
+		guild = get(client.guilds, id=836936601824788520)
+		channel = get(guild.text_channels, id=856977059132866571)
+
+		if "?" not in question:
+			question = question + "?"
+		await channel.send(f"**Question of the day:** {question}")
 
 async def getquestions(client):
 	guild = get(client.guilds, id=879063875469860874)

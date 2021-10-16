@@ -8,6 +8,11 @@ class EventsCog(commands.Cog):
 		self.client = client
 
 	@commands.Cog.listener()
+	async def on_message(self, message):
+		if message.content.lower() == "hi five":
+			await message.add_reaction("🖐️")
+
+	@commands.Cog.listener()
 	async def on_guild_join(self, guild):
 		await SEND_SYSTEM_MESSAGE(None, self.client, "SOMEONE DID WHAT?!?!", f"Added to {guild.name}!")
 
