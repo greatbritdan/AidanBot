@@ -134,7 +134,11 @@ class GeneralCog(commands.Cog):
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 
-		seed(getIntFromText(something.lower()) + ctx.author.id)
+		if person == None:
+			seed(getIntFromText(something.lower() + ctx.author.name))
+		else:
+			seed(getIntFromText(something.lower() + person))
+			
 		value = randint(0,100)
 
 		end = ""
