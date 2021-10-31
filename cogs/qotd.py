@@ -3,7 +3,7 @@ from discord.ext import commands, tasks
 from discord.utils import get
 
 import datetime
-from functions import Error
+from functions import Error, getEmbed
 from random import randint
 
 def is_pipon_palace(ctx):
@@ -18,10 +18,10 @@ class QOTDCog(commands.Cog):
 	def cog_unload(self):
 		self.qotd.cancel()
 			
-	@tasks.loop(minutes=5)
+	@tasks.loop(minutes=1)
 	async def qotd(self):
 		current_time = datetime.datetime.now().strftime("%H:%M")
-		times = ["14:00", "14:01", "14:02", "14:03", "14:04"]
+		times = ["14:00", "14:01"]
 		if current_time in times and not self.done:
 			await qotdask(self.client)	
 			self.done = True
@@ -39,7 +39,8 @@ class QOTDCog(commands.Cog):
 		questions.append(question)
 		await setquestions(self.client, questions)
 
-		await ctx.send(f"added '{question}' to the list")
+		emb = getEmbed(ctx, "qotdadd", "**Question added:**", f"```- {question}```")
+		await ctx.send(embed=emb)
 
 	@commands.command(description="Get All Questions.")
 	@commands.check(is_pipon_palace)
@@ -49,28 +50,34 @@ class QOTDCog(commands.Cog):
 		split = "\n- "
 		questions = split.join(questions)
 
-		await ctx.send(f"Questions:\n```- {questions}```")
+		emb = getEmbed(ctx, "qotdget", "**Questions:**", f"```- {questions}```")
+		await ctx.send(embed=emb)
 
 	@commands.command(name="qotdask", description="Ask Question.")
 	@commands.check(is_pipon_palace)
 	@commands.is_owner()
 	async def qotdask_(self, ctx):
-		await qotdask(self.client)
+		await qotdask(self.client, ctx)
 
-async def qotdask(client):
+async def qotdask(client, ctx=None):
 	questions = await getquestions(client)
 	if len(questions) > 1:
 		questioni = randint(1, len(questions)-1)
 		question = questions[questioni]
+		if "?" not in question:
+			question = question + "?"
+
 		questions.pop(questioni)
 		await setquestions(client, questions)
 
 		guild = get(client.guilds, id=836936601824788520)
 		channel = get(guild.text_channels, id=856977059132866571)
 
-		if "?" not in question:
-			question = question + "?"
-		await channel.send(f"**Question of the day:** {question}")
+		emb = getEmbed(ctx, "qotdask", "**Question of the day:**", question)
+		if ctx:
+			await ctx.send(embed=emb)
+		else:
+			await channel.send(embed=emb)
 
 async def getquestions(client):
 	guild = get(client.guilds, id=879063875469860874)
