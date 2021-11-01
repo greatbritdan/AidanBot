@@ -71,16 +71,19 @@ async def SEND_SYSTEM_MESSAGE(ctx, client, title, description):
 ### EMBEDS ###
 
 # make an embed and send it back
-def getEmbed(ctx, command, title=False, description=False, color=False, thumb=False):
+def getEmbed(ctx=None, command, title=False, description=False, color=False, image=False):
 	if color:
 		col = color
 	else:
 		col = discord.Color.from_rgb(20, 29, 37)
 
 	emb = discord.Embed(title=title, description=description, color=col)
-	if thumb:
+	if image:
 		emb.set_thumbnail(url=thumb)
-	emb.set_footer(text="Requested by {0} in #{1}".format(ctx.author, ctx.channel))
+	if ctx:
+		emb.set_footer(text="Requested by {0} in #{1}".format(ctx.author, ctx.channel))
+	else:
+		emb.set_footer(text="Sent By AidanBot")
 	if is_beta():
 		emb.set_author(name="AidanBetaBot > " + command, icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754420936654908/aidanbetabot.png")
 	else:
