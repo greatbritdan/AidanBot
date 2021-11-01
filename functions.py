@@ -71,7 +71,7 @@ async def SEND_SYSTEM_MESSAGE(ctx, client, title, description):
 ### EMBEDS ###
 
 # make an embed and send it back
-def getEmbed(ctx=None, command, title=False, description=False, color=False, image=False):
+def getEmbed(ctx, command, title=False, description=False, color=False, image=False):
 	if color:
 		col = color
 	else:
@@ -79,7 +79,7 @@ def getEmbed(ctx=None, command, title=False, description=False, color=False, ima
 
 	emb = discord.Embed(title=title, description=description, color=col)
 	if image:
-		emb.set_thumbnail(url=thumb)
+		emb.set_image(url=thumb)
 	if ctx:
 		emb.set_footer(text="Requested by {0} in #{1}".format(ctx.author, ctx.channel))
 	else:
