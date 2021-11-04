@@ -25,5 +25,37 @@ class PPCog(commands.Cog):
 
 		await ctx.send(emoji)
 		
+	@commands.Cog.listener()
+	async def on_raw_reaction_add(self, payload):
+		if payload.guild_id != 836936601824788520:
+			return
+			
+		guild = get(self.client.guilds, id=payload.guild_id)
+		channel = get(guild.channels, id=payload.channel_id)
+		message = await channel.fetch_message(payload.message_id)
+		pin = find(lambda m: m.emoji == "📌", message.reactions)
+
+		if pin and pin.count == 10:
+			for reac in message.reactions:
+				if reac.emoji == "✖️":
+					async for user in reac.users():
+						if userHasPermission(user, "manage_messages"):
+							return
+
+			await message.pin()
+
+	@commands.Cog.listener()
+	async def on_raw_reaction_remove(self, payload):
+		if payload.guild_id != 836936601824788520:
+			return
+
+		guild = get(self.client.guilds, id=payload.guild_id)
+		channel = get(guild.channels, id=payload.channel_id)
+		message = await channel.fetch_message(payload.message_id)
+		pin = find(lambda m: m.emoji == "📌", message.reactions)
+
+		if message.pinned and pin and pin.count < 10:
+			await message.unpin()
+		
 def setup(client):
   client.add_cog(PPCog(client))
