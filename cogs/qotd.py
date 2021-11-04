@@ -75,9 +75,9 @@ async def qotdask(client, ctx=None):
 
 		emb = getEmbed(ctx, "qotdask", "**Question of the day:**", question)
 		if ctx:
-			await ctx.send(embed=emb)
+			await ctx.send("<@&904766106793832518>", embed=emb)
 		else:
-			await channel.send(embed=emb)
+			await channel.send("<@&904766106793832518>", embed=emb)
 
 async def getquestions(client):
 	guild = get(client.guilds, id=879063875469860874)
