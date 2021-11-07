@@ -5,7 +5,7 @@ import datetime
 import copy
 import math
 
-PREFIX = "%"
+PREFIX = "$"
 VERSION = "Full Release V1"
 
 def is_beta():
