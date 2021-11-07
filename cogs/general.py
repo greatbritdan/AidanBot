@@ -1,31 +1,32 @@
 import discord
 from discord.ext import commands
 
-from random import seed
-from random import randint
+import time
+import random
+from random import seed, randint
 
-from functions import is_beta, getEmbed, addField, Error, getIntFromText
+from functions import get_prefix, is_beta, getEmbed, addField, Error, getIntFromText, getBar
+
+import json
+with open('./desc.json') as file:
+    DESC = json.load(file)
 
 class GeneralCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(description="Make me say something.")
+	@commands.command(description=DESC["echo"])
+	@commands.cooldown(1, 6, commands.BucketType.channel)
 	async def echo(self, ctx, *, text:str="sample text"):
+		if "love" in text:
+			await ctx.send("***no***")
+			return
+
 		await ctx.message.delete()
 		await ctx.send(text)
 
-	@commands.command(description="Reply to a message.")
-	async def reply(self, ctx, message_id:int=None, *, text:str="sample text"):
-		if message_id == None:
-			await Error(ctx, self.client, "Missing un-optional argument for command.")
-			return
-
-		MSG = await ctx.channel.fetch_message(message_id)
-		await ctx.message.delete()
-		await MSG.reply(text, mention_author=False)
-
-	@commands.command(description="React to a message.")
+	@commands.command(description=DESC["react"])
+	@commands.cooldown(1, 6, commands.BucketType.channel)
 	async def react(self, ctx, message_id:int=None, reaction:str="👋"):
 		if message_id == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
@@ -35,7 +36,8 @@ class GeneralCog(commands.Cog):
 		await ctx.message.delete()
 		await MSG.add_reaction(reaction)
 
-	@commands.command(description="Rates something.")
+	@commands.command(description=DESC["rate"])
+	@commands.cooldown(1, 6, commands.BucketType.user)
 	async def rate(self, ctx, *, thing=None):
 		if thing.lower() == "me":
 			thing = ctx.author.name
@@ -104,100 +106,131 @@ class GeneralCog(commands.Cog):
 		emb = addField(emb, "Score", "`{0}/10`".format(rating))
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description="Answers a question.")
+	@commands.command(description=DESC["ask"])
+	@commands.cooldown(1, 6, commands.BucketType.user)
 	async def ask(self, ctx, *, question:str=None):
-		seed(getIntFromText(question.lower()))
-
 		if question == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
+		seed(getIntFromText(question.lower()))
 
-		# get start, really easy
-		start = ["My heart tells me... ", "In all honestly, ", "hAH, ", "", "", ""]
-		start_txt = start[randint(0, len(start)-1)]
-
-		# get end, different if it caonatins "how many"
-		if "how many" in question.lower():
-			number = str(randint(0,10))
-			end = [f"At least {number}.", f"More than {number}, for sure.", f"{number}.", f"Take it or leave it. {number}."]
+		starts = []
+		answers = []
+		answer = ""
+		start = ""
+		question = question.lower()
+		if question.startswith("how many"):
+			num = str(randint(0, 20))
+			starts = ["OH! ", "my stupid heart tells me ", "uhhhhh, ", "imho, ", "", "", ""]
+			answers = [f"100% not {num}!", f"at least {num} idfk...", f"{num}, take it or leave it.", f"i know this one, {num}."]
+		elif question.startswith("who"):
+			starts = ["i'll go for... ", "100% ", "Yeah that has to be ", "hmm... ", "that's easy, ", ""]
+			member = ctx.guild.members[randint(0, len(ctx.guild.members)-1)]
+			answer = member.display_name
+		elif question.startswith("why"):
+			if "you" in question:
+				answers = ["i did no such thing.", "no comment.", "that's crazy and false... yeah."]
+			else:
+				answers = ["beacuse... yes.", "i have been warned not to give an answer...", "why not? lol!"]
+		elif question.startswith("where"):
+			starts = ["how do i put this... ", "my stupid heart tells me ", "uhhhhh, ", "", ""]
+			answers = ["Aidan's basement.", "my attic.", "Brazil!", "China.", "the middle of the ocean.", "somewhere idk...", "gone, never to be found again...", "Britan!", "The void..."]
+		elif question.startswith("when"):
+			if question.startswith("when will") or question.startswith("when is"):
+				answer = random_date("1/1/2022 12:00 AM", "1/1/2122 12:00 AM")
+			else:
+				answer = random_date("1/1/2000 12:00 AM", "1/1/2021 12:00 AM")
+		elif question.startswith("what command"):
+			prefix = get_prefix()
+			starts = ["i'll go for... ", "100% ", "Yeah that has to be ", "hmm... ", "that's easy, ", ""]
+			coms = []
+			for command in self.client.commands:
+				coms.append(command.name)
+			answer = prefix + coms[randint(0, len(coms)-1)]
 		else:
-			end = ["Yes.", "No, not at all.", "idk, maybe.", "Answer is unclear.", "You will find out soon enough...", "S-sorry, this questions is just... too much for me to handle.", "Maybe the true answer was inside you all along!", "What???"]
+			starts = ["how do i put this... ", "my stupid heart tells me ", "uhhhhh, ", "actually. ", "", "", ""]
+			answers = ["ye.", "no.", "absolutely not!", "HAH, NO WAY AT ALL.", "maybe, probably...", "uhhh, it's unlikely", "i can't tell, sorry."]
 
-		end_txt = end[randint(0, len(end)-1)]
+		if len(answers) > 0:
+			answer = answers[randint(0, len(answers)-1)]
+		if len(starts) > 0:
+			start = starts[randint(0, len(starts)-1)]
 
-		emb = getEmbed(ctx, "Ask", start_txt + end_txt, "")
+		fullans = start + answer
+		allbutone = len(fullans)-1
+		fullans = fullans[:-allbutone].capitalize() + fullans[1:]
+		emb = getEmbed(ctx, "Ask", fullans, "")
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description="What percentage of something is you?")
+	@commands.command(description=DESC["percent"])
+	@commands.cooldown(1, 6, commands.BucketType.user)
 	async def percent(self, ctx, something:str=None, *, person:str=None):
 		if something == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
-
 		if person == None:
 			seed(getIntFromText(something.lower() + ctx.author.name))
 		else:
 			seed(getIntFromText(something.lower() + person))
-			
+
 		value = randint(0,100)
-
-		end = ""
-		if value == 0:
-			end = "wow. 0%, didn't expect that."
-		elif value == 100:
-			end = "FULL HOUSE BABEY!"
-		elif value == 69:
-			end = "( ͡° ͜ʖ ͡°)"
-		elif randint(1,3) == 3:
-			endings = ["I don't make the rules.", "that isn't that bad when you think about it.", "LOL!", "¯\_(ツ)_/¯", "don't blame me, blame randint.", "sorry...", "i've seen worse don't worry.", "better than Aidan.", "I know, I know."]
-
-			end = endings[randint(0, len(endings)-1)]
-
+		end = getBar(value, 100, 10, True)
 		if person == None:
 			emb = getEmbed(ctx, "Percent", f"You are **{str(value)}%** {something}.", end)
 		else:
 			emb = getEmbed(ctx, "Percent", f"{person} is **{str(value)}%** {something}.", end)
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description="Picks between given decisions.")
-	async def decide(self, ctx, *, decisions=None):
+	@commands.command(description=DESC["decide"])
+	@commands.cooldown(1, 3, commands.BucketType.user)
+	async def decide(self, ctx, *decisions):
 		if decisions == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 
-		decisions = decisions.split(" ")
+		# decisions = decisions.split(" ")
 		emb = getEmbed(ctx, "Decide", "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]), "")
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description="Make a user say anoything you want.")
-	async def clone(self, ctx, member:discord.User=None, *, message:str=None):
+	@commands.command(description=DESC["clone"])
+	@commands.cooldown(1, 6, commands.BucketType.user)
+	async def clone(self, ctx, member:discord.Member=None, *, message:str=None):
 		if member == None or message == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 		
 		webhook = await ctx.channel.create_webhook(name=member.name)
-		await webhook.send(message, username=member.name + " (fake)", avatar_url=member.avatar_url)
+		await webhook.send(message, username=member.name + " (fake)", avatar_url=member.display_avatar.url)
 		await webhook.delete()
 
-	@commands.command(description="**Punish**.")
+	@commands.command(description=DESC["punish"])
+	@commands.cooldown(1, 3, commands.BucketType.user)
 	async def punish(self, ctx):
 		texts = [
-			"AAAAAAAAAAAAAAAAAHHHHHHH!!!!!",
-			"AAAHHH PLEASE STO-P!!!!",
-			"I'M SORRY AHHHHHHH!!!",
-			"PLEASE!... HAVE MERCY!...",
-			"STOP...   *CRIES*", "AAAAAAHHHH!!!",
-			"I'M SO SORRY.AAA!!!"
+			"AAAAAAAAAAAAAAAAAHHHHHHH!!!!!", "AAAHHH PLEASE STO-P!!!!", "I'M SORRY AHHHHHHH!!!",
+			"PLEASE!... HAVE MERCY!...", "STOP...   *CRIES*", "AAAAAAHHHH!!!", "I'M SO SORRY.AAA!!!"
 		]
 		text = texts[randint(0, len(texts)-1)]
-
 		await ctx.send("**" + text + "**")
+    
+def str_time_prop(start, end, time_format):
+    """Get a time at a proportion of a range of two formatted times.
 
-def join(l, sep):
-    out_str = ''
-    for i, el in enumerate(l):
-        out_str += '{}{}'.format(el, sep)
-    return out_str[:-len(sep)]
+    start and end should be strings specifying times formatted in the
+    given format (strftime-style), giving an interval [start, end].
+    prop specifies how a proportion of the interval to be taken after
+    start.  The returned time will be in the specified format.
+    """
+
+    stime = time.mktime(time.strptime(start, time_format))
+    etime = time.mktime(time.strptime(end, time_format))
+
+    ptime = stime + random.random() * (etime - stime)
+
+    return time.strftime(time_format, time.localtime(ptime))
+
+def random_date(start, end):
+    return str_time_prop(start, end, '%m/%d/%Y %I:%M %p')
 
 def setup(client):
   client.add_cog(GeneralCog(client))

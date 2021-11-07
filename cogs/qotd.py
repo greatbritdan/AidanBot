@@ -1,10 +1,14 @@
-import discord
 from discord.ext import commands, tasks
 from discord.utils import get
 
 import datetime
-from functions import Error, getEmbed
 from random import randint
+
+from functions import Error, getEmbed, is_beta, is_beta
+
+import json
+with open('./desc.json') as file:
+    DESC = json.load(file)
 
 def is_pipon_palace(ctx):
 	return (ctx.guild.id == 836936601824788520)
@@ -28,8 +32,9 @@ class QOTDCog(commands.Cog):
 		elif self.done:
 			self.done = False
 		
-	@commands.command(description="Submit Question.")
+	@commands.command(description=DESC["qotdadd"])
 	@commands.check(is_pipon_palace)
+	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def qotdadd(self, ctx, *, question:str=None):
 		if question == None:
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
@@ -42,8 +47,9 @@ class QOTDCog(commands.Cog):
 		emb = getEmbed(ctx, "qotdadd", "**Question added:**", f"```- {question}```")
 		await ctx.send(embed=emb)
 
-	@commands.command(description="Get All Questions.")
+	@commands.command(description=DESC["qotdget"])
 	@commands.check(is_pipon_palace)
+	@commands.cooldown(1, 10, commands.BucketType.user)
 	async def qotdget(self, ctx):
 		questions = await getquestions(self.client)
 		questions.pop(0)
@@ -53,7 +59,7 @@ class QOTDCog(commands.Cog):
 		emb = getEmbed(ctx, "qotdget", "**Questions:**", f"```- {questions}```")
 		await ctx.send(embed=emb)
 
-	@commands.command(name="qotdask", description="Ask Question.")
+	@commands.command(name="qotdask", description=DESC["qotdask"])
 	@commands.check(is_pipon_palace)
 	@commands.is_owner()
 	async def qotdask_(self, ctx):
@@ -61,7 +67,7 @@ class QOTDCog(commands.Cog):
 
 async def qotdask(client, ctx=None):
 	questions = await getquestions(client)
-	if len(questions) > 1:
+	if len(questions) > 1 and (not is_beta()):
 		questioni = randint(1, len(questions)-1)
 		question = questions[questioni]
 		if "?" not in question:
@@ -75,9 +81,9 @@ async def qotdask(client, ctx=None):
 
 		emb = getEmbed(ctx, "qotdask", "**Question of the day:**", question)
 		if ctx:
-			await ctx.send("<@&904766106793832518>", embed=emb)
+			await ctx.send(embed=emb)
 		else:
-			await channel.send("<@&904766106793832518>", embed=emb)
+			await channel.send(embed=emb)
 
 async def getquestions(client):
 	guild = get(client.guilds, id=879063875469860874)
