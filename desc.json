@@ -1,0 +1,38 @@
+{
+    "help": "Get help on a command or specific command.\n\nCooldown: 1 per 10 seconds per channel.",
+    "info": "Get info on the bot and its owner.\n\nCooldown: 1 per 10 seconds per channel.",
+    "invite": "Invite AidanBot to your server!\n\nCooldown: 1 per 10 seconds per channel.",
+    "role": "Get any role that starts with [r]\nUsers with `manage_roles` permission can add and remove any role below their top.\n\nCooldown: 3 per 30 seconds per user.",
+
+    "echo": "Make me say something.\n\nCooldown: 1 per 6 seconds per channel.",
+    "react": "Make me react to a message.\n\nCooldown: 1 per 6 seconds per channel.",
+    "rate": "I'll rate something, all my opinions are fact.\n\nCooldown: 1 per 6 seconds per user.",
+    "ask": "Got a question? AidanBot will answer it, it'll probably be wrong tho.\n\nCooldown: 1 per 6 seconds per user.",
+    "percent": "What percentage of something is you?\n\nCooldown: 1 per 6 seconds per user.",
+    "decide": "I'll pick a random result of given options.\n\nCooldown: 1 per 3 seconds per user.",
+    "clone": "Make a user say anything you want.\n\nCooldown: 1 per 6 seconds per user.",
+    "punish": "**Punish.**\n\nCooldown: 1 per 3 seconds per user.",
+
+    "fight": "Fight someone or set 2 others up to fight to the death!!\n\nCooldown: 1 per 30 seconds per channel.",
+    "rps": "Classic game of Rock, Paper, Scissors.\n\nCooldown: 1 per 6 seconds per channel.",
+
+    "slowmode": "Set the slowmode of the channel or thread.",
+    "kick": "Kicks a given member.",
+    "ban": "Bans a given member and can delete a certon days worth of messages.",
+    "clear": "Purges a set of messages in a channel or thread.",
+
+    "emoteify": "Create an emote from an image that you can use in the server with NQN.\n\nCooldown: 1 per 10 seconds per channel.",
+
+    "qotdadd": "Submit Question.\n\nCooldown: 1 per 10 seconds per user.",
+    "qotdget": "Get All Questions.\n\nCooldown: 1 per 10 seconds per user.",
+    "qotdask": "Ask a Question on demand.",
+
+    "ping": "Gets bot/api latency.",
+    "eval": "Run python code in discord.",
+    "load": "Loads an extension.",
+    "unload": "Unloads an extension.",
+    "reload": "Reloads an extension.",
+    "all": "Shows all loaded extensions.",
+    "restart": "Restarts the whole bot.",
+    "shutdown": "Shutsdown the bot."
+}

@@ -5,41 +5,24 @@ import datetime
 import copy
 import math
 
-PREFIX = "$"
-VERSION = "Beta V4"
-COMMANDS = []
+PREFIX = "%"
+VERSION = "Full Release V1"
 
 def is_beta():
+	global PREFIX
 	return (PREFIX == "%")
-
 def get_prefix():
+	global PREFIX
 	return PREFIX
 def get_version():
+	global VERSION
 	return VERSION
-def get_commands():
-	return COMMANDS
-
-def add_command(com):
-	global COMMANDS
-	COMMANDS.append(com)
-
-def clear_command_type(typ):
-	global COMMANDS
-	newcommands = []
-	for com in COMMANDS:
-		if com[0] != typ:
-			newcommands.append(com)
-	COMMANDS = copy.deepcopy(newcommands)
 
 thelist = {
-	"1": "1", "2": "2", "3": "3", "4": "4", "5": "5", "6": "6",
-	"7": "7", "8": "8", "9": "9", "0": "0", "a": "11", "b": "12",
-	"c": "13", "d": "14", "e": "15", "f": "16", "g": "17", "h": "18",
-	"i": "19", "j": "20", "k": "21", "l": "22", "m": "23", "n": "24",
-	"o": "25", "p": "26", "q": "27", "r": "28", "s": "29", "t": "30",
-	"u": "31", "v": "32", "w": "33", "x": "34", "y": "35", "z": "36",
-	" ": "37", ".": "38", ",": "39", ":": "40", ";": "41", "'": "42",
-	"/": "43", "-": "44", "+": "45", "$": "46", "%": "46"
+	"1": "1", "2": "2", "3": "3", "4": "4", "5": "5", "6": "6", "7": "7", "8": "8", "9": "9", "0": "0", "a": "11", "b": "12",
+	"c": "13", "d": "14", "e": "15", "f": "16", "g": "17", "h": "18", "i": "19", "j": "20", "k": "21", "l": "22", "m": "23", "n": "24",
+	"o": "25", "p": "26", "q": "27", "r": "28", "s": "29", "t": "30", "u": "31", "v": "32", "w": "33", "x": "34", "y": "35", "z": "36",
+	" ": "37", ".": "38", ",": "39", ":": "40", ";": "41", "'": "42", "/": "43", "-": "44", "+": "45", "$": "46", "%": "46"
 }
 
 def clamp(n, minn, maxn):
@@ -52,7 +35,6 @@ def getIntFromText(txt):
 			sed = sed + thelist[letter]
 		else:
 			sed = sed + "47"
-
 	return (int(sed))
 
 def userHasPermission(member, permission):
@@ -71,7 +53,7 @@ async def SEND_SYSTEM_MESSAGE(ctx, client, title, description):
 ### EMBEDS ###
 
 # make an embed and send it back
-def getEmbed(ctx, command, title=False, description=False, color=False, image=False):
+def getEmbed(ctx, command, title=False, description=False, color=False, image=False, thumb=False):
 	if color:
 		col = color
 	else:
@@ -79,11 +61,13 @@ def getEmbed(ctx, command, title=False, description=False, color=False, image=Fa
 
 	emb = discord.Embed(title=title, description=description, color=col)
 	if image:
-		emb.set_image(url=thumb)
+		emb.set_image(url=image)
+	if thumb:
+		emb.set_thumbnail(url=thumb)
 	if ctx:
 		emb.set_footer(text="Requested by {0} in #{1}".format(ctx.author, ctx.channel))
 	else:
-		emb.set_footer(text="Sent By AidanBot")
+		emb.set_footer(text="Requested by AidanBot")
 	if is_beta():
 		emb.set_author(name="AidanBetaBot > " + command, icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754420936654908/aidanbetabot.png")
 	else:
@@ -121,6 +105,17 @@ async def Error(ctx, client, error, send=None):
 	emb.timestamp = datetime.datetime.utcnow()
 	if send:
 		await SEND_SYSTEM_MESSAGE(ctx, client, "Someone Broke AidanBot lol.", error)
+	await ctx.send(embed=emb)
+
+# for command cooldown
+async def CooldownError(ctx, client, error):
+	emb = discord.Embed(title=error, description="", color=discord.Color.from_rgb(145, 29, 37))
+	emb.set_footer(text="Requested by {0} in #{1}".format(ctx.author, ctx.channel))
+	if is_beta():
+		emb.set_author(name="AidanBetaBot > Cooldown Error", icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754420936654908/aidanbetabot.png")
+	else:
+		emb.set_author(name="AidanBot > Cooldown Error", icon_url="https://cdn.discordapp.com/attachments/879754347200786503/879754415068819506/aidanbot.png")
+	emb.timestamp = datetime.datetime.utcnow()
 	await ctx.send(embed=emb)
 
 def getBar(value, maxvalue, size, hashalf=False):
@@ -165,3 +160,26 @@ def getBar(value, maxvalue, size, hashalf=False):
 		bar = bar + e
 
 	return bar
+
+class ButtonClass(discord.ui.Button):
+    def __init__(self, text, color, func):
+        self.func = func
+        super().__init__( label=text, style=setButtonColor(color) )
+
+    async def callback(self, interaction:discord.Interaction):
+        self, text, color = await self.func(self, interaction)
+        if text:
+            self.label = text
+        if color:
+            self.style = setButtonColor(color)
+
+        await interaction.response.edit_message(view=discord.ui.View(self))
+
+def setButtonColor(color):
+    if color == "blue":
+        color = "blurple"
+
+    if discord.ButtonStyle[color]:
+        return discord.ButtonStyle[color]
+    else:
+        return discord.ButtonStyle["grey"]
