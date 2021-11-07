@@ -1,3 +1,3 @@
-py-cord==1.7.3
-dnspython==1.16.0
-async-timeout==3.0.1
+git+https://github.com/Pycord-Development/pycord
+dnspython
+async-timeout
