@@ -5,7 +5,7 @@ from discord.ext import commands
 from functions import get_prefix
 
 intents = discord.Intents.all()
-client = commands.Bot(command_prefix=get_prefix(), case_insensitive=True, help_command=None, intents=intents)
+client = commands.Bot(command_prefix=get_prefix(), case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
 
 @client.event
 async def on_ready():
