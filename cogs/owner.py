@@ -10,6 +10,8 @@ import textwrap
 import sys
 from traceback import format_exception
 
+from discord.utils import resolve_template
+
 from functions import getEmbed
 
 import json
@@ -27,7 +29,7 @@ class OwnerCog(commands.Cog):
 		message = await ctx.reply("Testing Ping...", mention_author=False)
 		end_time = time.time()
 
-		await message.edit(content=f"Ping Pong motherfucker!\nBot: {round(self.client.latency * 1000)}ms\nAPI: {round((end_time - start_time) * 1000)}ms")
+		await message.edit(content=f"Ping Pong mother||fuck||er!\nBot: {round(self.client.latency * 1000)}ms\nAPI: {round((end_time - start_time) * 1000)}ms")
 
 	@commands.command(name="eval", description=DESC["eval"])
 	@commands.is_owner()
@@ -45,7 +47,7 @@ class OwnerCog(commands.Cog):
 
 		try:
 			with contextlib.redirect_stdout(stdout):
-				exec(f"async def func():\n{textwrap.indent(code, '    ')}", local_variables,)
+				exec(f"async def func():\n{textwrap.indent(code, '    ')}", local_variables)
 				obj = await local_variables["func"]()
 				if obj and obj == "NoSend":
 					return
@@ -70,38 +72,58 @@ class OwnerCog(commands.Cog):
 	async def unload(self, ctx, extension):
 		await cog_edit(self.client, ctx, "unload", extension)
 		
-	@commands.command(description=DESC["reload"])
+	@commands.command(description=DESC["reload"], aliases=["r"])
 	@commands.is_owner()
 	async def reload(self, ctx, extension):
 		await cog_edit(self.client, ctx, "reload", extension)
-
-	@commands.command(description=DESC["all"])
-	@commands.is_owner()
-	async def all(self, ctx):
-		await cog_edit(self.client, ctx, "all")
 
 	@commands.command(description=DESC["restart"])
 	@commands.is_owner()
 	async def restart(self, ctx):
 		await ctx.send("Restarting bot...")
+		restart = {
+			"channel_id": ctx.channel.id,
+			"guild_id": ctx.guild.id,
+			"time": time.time()
+		}
+		with open("restart.json", "w") as fp:
+			json.dump(restart, fp)
+
 		os.execv(sys.executable, ['python'] + sys.argv)
 
-	@commands.command(description=DESC["shutdown"])
+	@commands.command(description=DESC["sleep"])
 	@commands.is_owner()
-	async def shutdown(self, ctx):
-		await ctx.send("Awwwww... goodbye everyone :(...")
-		await self.client.close()
-		print(f'Logged out: {self.client.user}')
-		return
+	async def sleep(self, ctx):
+		if self.client.ASLEAP:
+			await ctx.send("zzzzz, HUH WHA, bruh i am already alseep! zzzzz")
+		else:
+			self.client.ASLEAP = True
+			await ctx.send(f"CYA SCRUBS!!!")
+			await self.client.change_presence(status=discord.Status.idle)
 
-	@commands.command()
+	@commands.command(description=DESC["wake"])
 	@commands.is_owner()
-	async def dev(self, ctx, inp):
-		list = strtolist(inp)
-		text = listtostr(list)
-		await ctx.send(text)
+	async def wake(self, ctx):
+		if not self.client.ASLEAP:
+			await ctx.send("I'm already awake, you dumbass...")
+		else:
+			self.client.ASLEAP = False
+			await ctx.send("Aww, ok fine, ready to take command!")
+			await self.client.change_presence(status=discord.Status.online)
 
 async def cog_edit(client, ctx, type, extension=None):
+	if len(extension) == 1:
+		if extension == "g":
+			extension = "general"
+		elif extension == "i":
+			extension = "important"
+		elif extension == "m":
+			extension = "moderation"
+		elif extension == "e":
+			extension = "events"
+		elif extension == "o":
+			extension = "owner"
+
 	if extension and extension == "owner" and type != "load":
 		MSG = await ctx.send(f'```if it crashes you wont be able to load or reload, are you sure?\n(make sure to check you are reloading, not unloading)```', view=discord.ui.View(
 			discord.ui.Button(label="Yes", style=discord.ButtonStyle.red, custom_id="accept"),
@@ -141,67 +163,6 @@ async def cog_edit(client, ctx, type, extension=None):
 		client.unload_extension(f'cogs.{extension}')
 		client.load_extension(f'cogs.{extension}')
 		await ctx.send('```{} reloaded!```'.format(extension))
-
-	elif type == "all":
-		txt = ""
-		for name in client.extensions:
-			txt = txt + name + "\n"
-		await ctx.send(f'```All cogs:\n{txt}```')
-
-def strtolist(inp):
-	table = []
-	index = -1
-	cur = ""
-	for letter in inp:
-		if letter == "{":
-			table.append({})
-			index += 1
-		elif letter == "," or letter == "}":
-			if cur != "":
-				i = cur.split("=")
-				ii = i[1].split(":")
-				name,val,typ = i[0], ii[0], ii[1]
-
-				if typ == "bool":
-					if val.lower() == "true":
-						table[index][name] = True
-					elif val.lower() == "false":
-						table[index][name] = False
-				elif typ == "int":
-					try:
-						table[index][name] = int(val)
-					except:
-						print("int error!")
-						table[index][name] = 0
-				else:
-					table[index][name] = val
-
-				cur = ""
-		else:
-			cur = cur + letter
-
-	return table
-
-def listtostr(inp):
-	test = ""
-	for list in inp:
-		test += "{"
-		for name in list:
-			val = str(list[name])
-			if type(list[name]) is int:
-				typ = "int"
-			elif type(list[name]) is bool:
-				typ = "bool"
-			else:
-				typ = "str"
-
-			test = test + name + "=" + val + ":" + typ + ","
-		
-		test = test[:-1] + "},"
-
-	test = test[:-1]
-
-	return test
 
 def clean_code(content):
 	if content.startswith("```") and content.endswith("```"):

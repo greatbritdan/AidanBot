@@ -5,7 +5,7 @@ import asyncio
 import math
 from random import randint
 
-from functions import getEmbed, addField, clamp, getBar
+from functions import getEmbed, addField, getBar
 
 import json
 with open('./desc.json') as file:
@@ -259,5 +259,8 @@ async def FightNewgame(ctx, client, p1:discord.Member, p2:discord.Member, mhealt
 		await MSG.delete()
 		await ctx.send("GG " + player[win]["name"] + "!!! Tough luck " + player[wint]["name"])
 
+def clamp(n, minn, maxn):
+	return max(min(maxn, n), minn)
+
 def setup(client):
-  client.add_cog(GamesCog(client))
+	client.add_cog(GamesCog(client))

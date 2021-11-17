@@ -43,4 +43,4 @@ class ModerationCog(commands.Cog):
 		await ctx.channel.purge(limit=limit+1)
 
 def setup(client):
-  client.add_cog(ModerationCog(client))
+	client.add_cog(ModerationCog(client))

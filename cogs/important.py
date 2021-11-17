@@ -1,31 +1,24 @@
-import os
 import discord
-from discord.commands.commands import command
 from discord.ext import commands
 from discord.utils import find
 
-import random
 import asyncio
 
-from functions import get_prefix, get_version, getEmbed, addField, Error, userHasPermission, is_beta
+from functions import getEmbed, addField, Error, userHasPermission
 
 import json
 with open('./desc.json') as file:
     DESC = json.load(file)
 
 async def getCommand(ctx, client, commandparam):
-	com = commandparam
-	if type(commandparam) == str:
-		# get command by name and check it can run
-		com = None
-		for command in client.commands:
-			if command.name.lower() == commandparam.lower():
-				com = command
-		if not com:
-			return "NotWork"
+	com = None
+	for command in client.commands:
+		if command.name.lower() == commandparam.lower():
+			com = command
+	if not com:
+		return "NotWork"
 
-	# check command can run
-	if com.hidden:
+	if com.hidden: # check command can run
 		return "NotWork"
 	try:
 		succ = await com.can_run(ctx)
@@ -41,36 +34,69 @@ class ImportantCog(commands.Cog):
 
 	@commands.cooldown(1, 10, commands.BucketType.channel)
 	@commands.command(description=DESC["help"])
-	async def help(self, ctx, commandname:str=None):
-		prefix = get_prefix()
+	async def help(self, ctx, name:str=None):
+		prefix = self.client.PREFIX
 
-		if commandname:   # Get help on a spesific command
-			command = await getCommand(ctx, self.client, commandname)
-			if command == "NotWork":
-				await Error(ctx, self.client, "This command doesn't exist :/")
-				return
-			
-			emb = getEmbed(ctx, f"Help > {prefix}{command.name}", f"{prefix}{command.name} {command.signature}" , command.description.format(prefix=prefix))
-			await ctx.reply(embed=emb, mention_author=False)
+		if name: 
+			command = await getCommand(ctx, self.client, name)
+			if command != "NotWork":   # Get help on a spesific command
+				name = f"{prefix}{command.name}"
+				if command.aliases:
+					name += f" (or {prefix}{command.aliases[0]})"
 
-		else:   # Get all visible commands
-			cognames = ["ImportantCog", "GeneralCog", "GamesCog", "ModerationCog", "PPCog", "QOTDCog", "OwnerCog"]
-			neatcognames = ["Important", "General", "Games", "Moderation", "Pip0n's Palace Only", "Question of the day", "Owner Only"]
-			categories = []
-			for cog in cognames:
-				txt, lenn = "", 0
-				for command in self.client.commands:
-					work = await getCommand(ctx, self.client, command)
-					if work == "NotWork":
+				emb = getEmbed(ctx, f"Help > {prefix}{command.name}", f"{name} - {command.signature}", command.description.format(prefix=prefix))
+				await ctx.reply(embed=emb, mention_author=False)
+
+			else:   # Get all commands in a category
+				category, categoryname = False, False
+				for order in DESC["_order_"]:
+					nicename = order
+					if order in DESC["_ordernicenames_"]:
+						nicename = DESC["_ordernicenames_"][order][0]
+						
+					if name.lower() == order.lower():
+						category, categoryname = DESC["_order_"][order], nicename
+					if order in DESC["_ordernicenames_"]:
+						for nname in DESC["_ordernicenames_"][order]:
+							if name.lower() == nname.lower():
+								category, categoryname = DESC["_order_"][order], nicename
+
+				if not category:
+					await ctx.send("Couldn't find command or category with that name :/")
+					return
+
+				txt = ""
+				for commandname in category:
+					command = await getCommand(ctx, self.client, commandname)
+					if command == "NotWork":
 						continue
-					if command.cog_name == cog:
-						desc = command.description or "No description."
-						if "\n" in desc:
-							desc = desc.splitlines()[0]
-						txt = txt + f"`{prefix}{command.name}`: {desc}\n"
-						lenn += 1
+					desc = command.description.format(prefix=prefix) or "No description."
+					if "\n" in desc:
+						desc = desc.splitlines()[0]
+					txt = txt + f"`{prefix}{command.name}`: {desc}\n"
+
+				emb = getEmbed(ctx, f"Help > {name}", f"All commands in {name}:", f"Run {prefix}help <command> to get more help on a command!")
+				emb = addField(emb, categoryname, txt, False)
+				await ctx.reply(embed=emb, mention_author=False)
+
+		else:   # Get all commands
+			categories = []
+			for order in DESC["_order_"]:
+				txt, lenn = "", 0
+				for commandname in DESC["_order_"][order]:
+					command = await getCommand(ctx, self.client, commandname)
+					if command == "NotWork":
+						continue
+					desc = command.description.format(prefix=prefix) or "No description."
+					if "\n" in desc:
+						desc = desc.splitlines()[0]
+					txt = txt + f"`{prefix}{command.name}`: {desc}\n"
+					lenn += 1
 				if txt != "":
-					categories.append([neatcognames[cognames.index(cog)], txt, lenn])
+					nicename = order
+					if order in DESC["_ordernicenames_"]:
+						nicename = DESC["_ordernicenames_"][order][0]
+					categories.append([nicename, txt, lenn])
 
 			pagesi = [[]]
 			page, maxpages, pagelen, minlen = 0, 0, 0, 9
@@ -97,7 +123,7 @@ class ImportantCog(commands.Cog):
 					discord.ui.Button(emoji="✖️", style=discord.ButtonStyle.grey, custom_id="exit", disabled=timeout)
 				)
 
-				emb = getEmbed(ctx, title, "All commands you can use:", f"Run {prefix}help <command> to get more help on a command!")
+				emb = getEmbed(ctx, title, "All commands you can use:", f"Run {prefix}help <command> to get more help on a command!\nRun {prefix}help <category> to get all commands in a category.")
 				for i in pagesi[page]:
 					emb = addField(emb, categories[i][0], categories[i][1], False)
 
@@ -131,15 +157,20 @@ class ImportantCog(commands.Cog):
 	@commands.command(description=DESC["info"])
 	@commands.cooldown(1, 10, commands.BucketType.channel)
 	async def info(self, ctx):
-		emb = getEmbed(ctx, "Info", "Hey, I am AidanBot, A small discord bot created by Aidan#8883 for his server that now anyone can use!", f"[Aidan's Youtube](https://www.youtube.com/c/AidanMapper)\n[Aidan's Twitter](https://twitter.com/Aid0nYT)\n[Aidan's Discord Server](https://discord.gg/KXrDUZfBpq)\n\n[Invite me to your server!](https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot)\n[Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy)\n[Terms Of Service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service)\n\nIf you find a bug or he has made a typo <:AidanSmug:837001740947161168>, you can report it to Aidan on his server in one of the bot chats. You can also suggest features in the suggestion channel on his server.")
-		emb = addField(emb, "Version:", get_version())
+		emb = getEmbed(ctx, "Info", f"Hey, I am {self.client.NAME}!", self.client.DESC)
+
+		emb = addField(emb, "Version:", self.client.VERSION)
 		await ctx.reply(embed=emb, mention_author=False)
 
 	@commands.command(description=DESC["invite"])
 	@commands.cooldown(1, 10, commands.BucketType.channel)
 	async def invite(self, ctx):
-		if is_beta():
-			await ctx.reply("I'm a test bot so you can't add me sorry, my brother would love to join your server tho! https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot", mention_author=False)
+		if self.client.ISBETA:
+			if ctx.author.id == 384439774972215296:
+				await ctx.reply("Sent to your DM's aidan, gotta keep me safe :3", mention_author=False)
+				await ctx.author.send("https://discord.com/api/oauth2/authorize?client_id=861571290132643850&permissions=8&scope=bot%20applications.commands")
+			else:
+				await ctx.reply("I'm a test bot so you can't add me sorry, my brother would love to join your server tho! https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot", mention_author=False)
 		else:
 			await ctx.reply("Y- you want me on your server??? I'd love too!!! https://discord.com/api/oauth2/authorize?client_id=804319602292949013&permissions=8&scope=bot", mention_author=False)
 
@@ -159,7 +190,6 @@ class ImportantCog(commands.Cog):
 			if r == ctx.author.top_role:
 				await ctx.reply(f"You can't remove your top role", mention_author=False)
 				return
-			
 			if r in ctx.author.roles:
 				await ctx.author.remove_roles(r)
 				await ctx.reply(f"Removed {r.name}", mention_author=False)
@@ -170,4 +200,4 @@ class ImportantCog(commands.Cog):
 			await ctx.reply(f"{r.name} is not a role that can be added by anyone", mention_author=False)
 
 def setup(client):
-  client.add_cog(ImportantCog(client))
+	client.add_cog(ImportantCog(client))

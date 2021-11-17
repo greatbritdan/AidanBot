@@ -4,7 +4,7 @@ from discord.utils import get
 import datetime
 from random import randint
 
-from functions import Error, getEmbed, is_beta, is_beta
+from functions import Error, getEmbed
 
 import json
 with open('./desc.json') as file:
@@ -27,7 +27,7 @@ class QOTDCog(commands.Cog):
 		current_time = datetime.datetime.now().strftime("%H:%M")
 		times = ["14:00", "14:01"]
 		if current_time in times and not self.done:
-			await qotdask(self.client)	
+			await qotdask(self.client, None, True)	
 			self.done = True
 		elif self.done:
 			self.done = False
@@ -62,12 +62,15 @@ class QOTDCog(commands.Cog):
 	@commands.command(name="qotdask", description=DESC["qotdask"])
 	@commands.check(is_pipon_palace)
 	@commands.is_owner()
-	async def qotdask_(self, ctx):
-		await qotdask(self.client, ctx)
+	async def qotdask_(self, ctx, ping:int=False):
+		await qotdask(self.client, ctx, ping)
 
-async def qotdask(client, ctx=None):
+async def qotdask(client, ctx=None, ping=False):
 	questions = await getquestions(client)
-	if len(questions) > 1 and (not is_beta()):
+	if len(questions) > 1:
+		if client.ISBETA and (not ctx):
+			return
+			
 		questioni = randint(1, len(questions)-1)
 		question = questions[questioni]
 		if "?" not in question:
@@ -79,11 +82,15 @@ async def qotdask(client, ctx=None):
 		guild = get(client.guilds, id=836936601824788520)
 		channel = get(guild.text_channels, id=856977059132866571)
 
+		cont = ""
+		if ping:
+			cont = "<@&904766106793832518>"
+
 		emb = getEmbed(ctx, "qotdask", "**Question of the day:**", question)
 		if ctx:
-			await ctx.send("<@&904766106793832518>", embed=emb)
+			await ctx.send(cont, embed=emb)
 		else:
-			await channel.send("<@&904766106793832518>", embed=emb)
+			await channel.send(cont, embed=emb)
 
 async def getquestions(client):
 	guild = get(client.guilds, id=879063875469860874)
@@ -104,4 +111,4 @@ async def setquestions(client, questions):
 	await channel.send(message)
 
 def setup(client):
-  client.add_cog(QOTDCog(client))
+	client.add_cog(QOTDCog(client))
