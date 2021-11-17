@@ -1,4 +1,6 @@
 {
+    "empty": "No description :(",
+    
     "help": "Get help on a command or specific command.\n\nCooldown: 1 per 10 seconds per channel.",
     "info": "Get info on the bot and its owner.\n\nCooldown: 1 per 10 seconds per channel.",
     "invite": "Invite AidanBot to your server!\n\nCooldown: 1 per 10 seconds per channel.",
@@ -12,6 +14,9 @@
     "decide": "I'll pick a random result of given options.\n\nCooldown: 1 per 3 seconds per user.",
     "clone": "Make a user say anything you want.\n\nCooldown: 1 per 6 seconds per user.",
     "punish": "**Punish.**\n\nCooldown: 1 per 3 seconds per user.",
+    "embed": "Create a fancy embed. User {prefix}embedhelp for more info!",
+    "embedhelp": "Help for using {prefix}embed.",
+    "poll": "Create a poll.",
 
     "fight": "Fight someone or set 2 others up to fight to the death!!\n\nCooldown: 1 per 30 seconds per channel.",
     "rps": "Classic game of Rock, Paper, Scissors.\n\nCooldown: 1 per 6 seconds per channel.",
@@ -22,6 +27,9 @@
     "clear": "Purges a set of messages in a channel or thread.",
 
     "emoteify": "Create an emote from an image that you can use in the server with NQN.\n\nCooldown: 1 per 10 seconds per channel.",
+    "addcommand": "Adds a custom command.\n\nCooldown: 1 per 6 seconds per guild.",
+    "removecommand": "Removes a custom command.\n\nCooldown: 1 per 6 seconds per guild.",
+    "allcommands": "Returns a list of all custom commands.\n\nCooldown: 1 per 3 seconds per guild.",
 
     "qotdadd": "Submit Question.\n\nCooldown: 1 per 10 seconds per user.",
     "qotdget": "Get All Questions.\n\nCooldown: 1 per 10 seconds per user.",
@@ -32,7 +40,23 @@
     "load": "Loads an extension.",
     "unload": "Unloads an extension.",
     "reload": "Reloads an extension.",
-    "all": "Shows all loaded extensions.",
     "restart": "Restarts the whole bot.",
-    "shutdown": "Shutsdown the bot."
+    "shutdown": "Shutsdown the bot.",
+    "sleep": "Puts me to sleep, i wont listen to any command.",
+    "wake": "Wakes me up, allows me to listen to commands.",
+
+    "_order_" : {
+        "Important": ["help", "info", "invite", "role"],
+        "General": ["echo", "react", "embed", "embedhelp", "clone", "punish"],
+        "Opinion": ["rate", "ask", "percent", "decide", "poll"],
+        "Games": ["fight", "rps"],
+        "Moderation": ["clear", "kick", "ban", "slowmode"],
+        "PP": ["emoteify", "addcommand", "removecommand", "allcommands"],
+        "QOTD": ["qotdget", "qotdadd", "qotdask"],
+        "Owner": ["ping", "eval", "load", "unload", "reload", "restart", "sleep", "wake"]
+    },
+    "_ordernicenames_" : {
+        "PP": ["Pip0n's Palace", "Pip0ns Palace", "Pip0nsPalace"],
+        "QOTD": ["Question Of The Day", "QuestionOfTheDay"]
+    }
 }
