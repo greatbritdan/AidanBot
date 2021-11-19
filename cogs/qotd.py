@@ -67,10 +67,7 @@ class QOTDCog(commands.Cog):
 
 async def qotdask(client, ctx=None, ping=False):
 	questions = await getquestions(client)
-	if len(questions) > 1:
-		if client.ISBETA and (not ctx):
-			return
-			
+	if len(questions) > 1 and not client.ISBETA or ctx:
 		questioni = randint(1, len(questions)-1)
 		question = questions[questioni]
 		if "?" not in question:
