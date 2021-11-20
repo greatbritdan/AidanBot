@@ -43,7 +43,7 @@ class GeneralCog(commands.Cog):
 			return
 		
 		if self.client.PREFIX in message:
-			await Error(ctx, self.client, "No running commands in echo.")
+			await Error(ctx, self.client, "No running commands in clone.")
 			return
 		
 		webhook = await ctx.channel.create_webhook(name=member.name)
