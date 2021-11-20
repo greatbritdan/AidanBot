@@ -42,6 +42,10 @@ class GeneralCog(commands.Cog):
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 		
+		if self.client.prefix in message:
+			await Error(ctx, self.client, "No running commands in echo.")
+			return
+		
 		webhook = await ctx.channel.create_webhook(name=member.name)
 		await webhook.send(message, username=member.name + " (fake)", avatar_url=member.display_avatar.url)
 		await webhook.delete()
