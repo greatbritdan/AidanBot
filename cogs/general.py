@@ -42,7 +42,7 @@ class GeneralCog(commands.Cog):
 			await Error(ctx, self.client, "Missing un-optional argument for command.")
 			return
 		
-		if self.client.prefix in message:
+		if self.client.PREFIX in message:
 			await Error(ctx, self.client, "No running commands in echo.")
 			return
 		
