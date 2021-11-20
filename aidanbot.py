@@ -48,7 +48,7 @@ class AidanBot(commands.Bot):
 		super().__init__(command_prefix=self.getprefix(), case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False))
 
 		for filename in os.listdir('./cogs'):
-			if filename.endswith('.py'):
+			if filename.endswith('.py') and filename != "qotd.py": #QOTD is on break
 				self.load_extension(f'cogs.{filename[:-3]}')
 
 	async def on_ready(self):
