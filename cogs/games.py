@@ -5,18 +5,19 @@ import asyncio
 import math
 from random import randint
 
-from functions import getEmbed, addField, getBar
+from functions import getComEmbed, getBar
 
 import json
-with open('./desc.json') as file:
-    DESC = json.load(file)
+with open('./commanddata.json') as file:
+	temp = json.load(file)
+	DESC = temp["desc"]
 
 class GamesCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
 	@commands.command(description=DESC["fight"])
-	@commands.cooldown(1, 30, commands.BucketType.channel)
+	@commands.cooldown(1, 30)
 	async def fight(self, ctx, user1:discord.Member=None, user2:discord.Member=None):
 		if user1 == None:
 			v1 = ctx.author
@@ -31,7 +32,7 @@ class GamesCog(commands.Cog):
 		await FightNewgame(ctx, self.client, v1, v2, 100, 10)
 
 	@commands.command(description=DESC["rps"])
-	@commands.cooldown(1, 6, commands.BucketType.channel)
+	@commands.cooldown(1, 5)
 	async def rps(self, ctx, rigged:bool=False):
 		options = ["rock", "paper", "scissors"]
 		strtohand = {"rock":"👊", "paper":"✋", "scissors":"✌️"}
@@ -42,7 +43,7 @@ class GamesCog(commands.Cog):
 		if ctx.author.nick:
 			name = ctx.author.nick
 
-		emb = getEmbed(ctx, "Rock, Paper, Scissors", "Choose your choice", "You: `?`   AidanBot: `?`")
+		emb = getComEmbed(ctx, self.client, "Rock, Paper, Scissors", "Choose your choice", "You: `?`   AidanBot: `?`")
 		MSG = await ctx.send(embed=emb, view=discord.ui.View(
 			discord.ui.Button(label="rock", style=discord.ButtonStyle.green, custom_id="rock", emoji="👊"),
 			discord.ui.Button(label="paper", style=discord.ButtonStyle.green, custom_id="paper", emoji="✋"),
@@ -80,7 +81,7 @@ class GamesCog(commands.Cog):
 			elif p1pick == "paper" and p2pick == "scissors":
 				state = "Scissors cuts Paper, I win!!!"
 
-			emb = getEmbed(ctx, "Rock, Paper, Scissors", state, f"You: {strtohand[p1pick]} | AidanBot: {strtohand[p2pick]}")
+			emb = getComEmbed(ctx, self.client, "Rock, Paper, Scissors", state, f"You: {strtohand[p1pick]} | AidanBot: {strtohand[p2pick]}")
 			await MSG.edit(embed=emb, view=discord.ui.View(
 				discord.ui.Button(label="rock", style=discord.ButtonStyle.grey, custom_id="rock", emoji="👊", disabled=True),
 				discord.ui.Button(label="paper", style=discord.ButtonStyle.grey, custom_id="paper", emoji="✋", disabled=True),
@@ -88,7 +89,7 @@ class GamesCog(commands.Cog):
 			))
 
 		except asyncio.TimeoutError:
-			emb = getEmbed(ctx, "Rock, Paper, Scissors (timeout)", "Too slow idiot!", "You: `?` | AidanBot: `?`")
+			emb = getComEmbed(ctx, self.client, "Rock, Paper, Scissors (timeout)", "Too slow idiot!", "You: `?` | AidanBot: `?`")
 			await MSG.edit(embed=emb, view=discord.ui.View(
 				discord.ui.Button(label="rock", style=discord.ButtonStyle.grey, custom_id="rock", emoji="👊", disabled=True),
 				discord.ui.Button(label="paper", style=discord.ButtonStyle.grey, custom_id="paper", emoji="✋", disabled=True),
@@ -138,14 +139,14 @@ async def FightNewgame(ctx, client, p1:discord.Member, p2:discord.Member, mhealt
 		if timeout:
 			command = "Fight (timeout)"
 
-		emb = getEmbed(ctx, command, player["p1"]["name"] + " VS " + player["p2"]["name"], "")
-		addField(emb, player["p1"]["name"] + " Stats:", "`Health:` " + getBar(player["p1"]["health"], maxhealth, 10, True) + " **(" + str(player["p1"]["health"]) + ")**\n`Energy:` " + getBar(player["p1"]["energy"], maxenergy, 5, True) + " (" + str(player["p1"]["energy"]) + ")")
-		addField(emb, player["p2"]["name"] + " Stats:", "`Health:` " + getBar(player["p2"]["health"], maxhealth, 10, True) + " **(" + str(player["p2"]["health"]) + ")**\n`Energy:` " + getBar(player["p2"]["energy"], maxenergy, 5, True) + " (" + str(player["p2"]["energy"]) + ")")
-
+		fields = [
+			[player["p1"]["name"] + " Stats:", "`Health:` " + getBar(player["p1"]["health"], maxhealth, 10, True) + " **(" + str(player["p1"]["health"]) + ")**\n`Energy:` " + getBar(player["p1"]["energy"], maxenergy, 5, True) + " (" + str(player["p1"]["energy"]) + ")"],
+			[player["p2"]["name"] + " Stats:", "`Health:` " + getBar(player["p2"]["health"], maxhealth, 10, True) + " **(" + str(player["p2"]["health"]) + ")**\n`Energy:` " + getBar(player["p2"]["energy"], maxenergy, 5, True) + " (" + str(player["p2"]["energy"]) + ")"]
+		]
 		if action:
-			emb = addField(emb, action[0], action[1])
-
-		emb = addField(emb, player[turn]["name"] + "'s Turn:", "Click a button to submit a move.")
+			fields.append([action[0], action[1]])
+		fields.append(player[turn]["name"] + "'s Turn:", "Click a button to submit a move.")
+		emb = getComEmbed(ctx, client, command, player["p1"]["name"] + " VS " + player["p2"]["name"], fields=fields)
 
 		view = None
 		if not (player["p1"]["bot"] and player["p2"]["bot"]):

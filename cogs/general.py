@@ -1,81 +1,65 @@
 import discord
 from discord.ext import commands
-
 import datetime
 from random import randint
 
-from functions import getEmbed, addField, Error, getIntFromText, getBar
+from functions import ComError, argstodic, getComEmbed
 
 import json
-with open('./desc.json') as file:
-    DESC = json.load(file)
+with open('./commanddata.json') as file:
+	temp = json.load(file)
+	DESC = temp["desc"]
 
 class GeneralCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
+		self.embedargs = {
+			"title":["str", ""],"desc":["str", ""],"colorr":["int", 20],"colorg":["int", 29],"colorb":["int", 37],"footer":["str", None],
+			"footerimg":["str", None],"author":["str", None],"authorimg":["str", None],"showtime":["bool", False],"img":["str", None],
+		}
 
 	@commands.command(description=DESC["echo"])
-	@commands.cooldown(1, 6, commands.BucketType.channel)
-	async def echo(self, ctx, *, text:str="sample text"):
-		if "love" in text:
-			await ctx.send("***no***")
-			return
-			
+	@commands.cooldown(1, 5)
+	async def echo(self, ctx, *, text:str="\*yawn*"):
 		await ctx.message.delete()
 		await ctx.send(text, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
 
 	@commands.command(description=DESC["react"])
-	@commands.cooldown(1, 6, commands.BucketType.channel)
-	async def react(self, ctx, message_id:int=None, reaction:str="👋"):
-		if message_id == None:
-			await Error(ctx, self.client, "Missing un-optional argument for command.")
-			return
+	@commands.cooldown(1, 5)
+	async def react(self, ctx, reaction:str="👋", message_id:int=None):
+		MSG = ""
+		if message_id:
+			MSG = await ctx.channel.fetch_message(message_id)
+		else:
+			yes = False
+			async for message in ctx.channel.history(limit=2):
+				if yes:
+					MSG = message
+				else:
+					yes = True
 
-		MSG = await ctx.channel.fetch_message(message_id)
 		await ctx.message.delete()
 		await MSG.add_reaction(reaction)
 
 	@commands.command(description=DESC["clone"])
-	@commands.cooldown(1, 6, commands.BucketType.user)
+	@commands.cooldown(1, 5)
 	async def clone(self, ctx, member:discord.Member=None, *, message:str=None):
 		if member == None or message == None:
-			await Error(ctx, self.client, "Missing un-optional argument for command.")
+			await ComError(ctx, self.client, "Missing un-optional argument for command.")
 			return
-		
-		if self.client.PREFIX in message:
-			await Error(ctx, self.client, "No running commands in clone.")
+
+		if self.client.prefix in message:
+			await ComError(ctx, self.client, "No running commands in clone.")
 			return
 		
 		webhook = await ctx.channel.create_webhook(name=member.name)
 		await webhook.send(message, username=member.name + " (fake)", avatar_url=member.display_avatar.url)
 		await webhook.delete()
 
-	@commands.command(description=DESC["punish"])
-	@commands.cooldown(1, 3, commands.BucketType.user)
-	async def punish(self, ctx):
-		texts = [
-			"AAAAAAAAAAAAAAAAAHHHHHHH!!!!!", "AAAHHH PLEASE STO-P!!!!", "I'M SORRY AHHHHHHH!!!",
-			"PLEASE!... HAVE MERCY!...", "STOP...   *CRIES*", "AAAAAAHHHH!!!", "I'M SO SORRY.AAA!!!"
-		]
-		text = texts[randint(0, len(texts)-1)]
-		await ctx.send("**" + text + "**")
-
 	@commands.command(description=DESC["embed"])
+	@commands.cooldown(1, 10)
 	async def embed(self, ctx, *args):
-		embedargs = {
-			"title":["str", ""],
-			"desc":["str", ""],
-			"colorr":["int", 20],
-			"colorg":["int", 29],
-			"colorb":["int", 37],
-			"footer":["str", None],
-			"footerimg":["str", None],
-			"author":["str", None],
-			"authorimg":["str", None],
-			"showtime":["bool", False],
-			"img":["str", None],
-		}
-		args = argstodic(args, embedargs)
+		args = argstodic(args, self.embedargs)
 		emb = discord.Embed(
 			title=args["title"].format(author=ctx.author, guild=ctx.guild, channel=ctx.channel),
 			description=args["desc"].format(author=ctx.author, guild=ctx.guild, channel=ctx.channel),
@@ -99,66 +83,23 @@ class GeneralCog(commands.Cog):
 		await ctx.send(embed=emb)
 
 	@commands.command(description=DESC["embedhelp"])
+	@commands.cooldown(1, 10)
 	async def embedhelp(self, ctx):
-		embedargs = {
-			"title":["str", ""],
-			"desc":["str", ""],
-			"colorr":["int", 20],
-			"colorg":["int", 29],
-			"colorb":["int", 37],
-			"footer":["str", None],
-			"footerimg":["str", None],
-			"author":["str", None],
-			"authorimg":["str", None],
-			"showtime":["bool", False],
-			"img":["str", None],
-		}
-		emb = getEmbed(ctx, "Embed Help", 'For each element you want to add, you type title=text or "title=more text" followed by a gap!', "")
 		txt = ""
-		for index in embedargs:
-			default = str(embedargs[index][1])
+		for index in self.embedargs:
+			default = str(self.embedargs[index][1])
 			if default == "":
 				default = "Empty String"
-			txt = txt + "**" + index + ":** <" + embedargs[index][0] + "> (default " + default + ")\n"
-		emb = addField(emb, "**All arguments:**", txt)
+			txt = txt + "**" + index + ":** <" + self.embedargs[index][0] + "> (default " + default + ")\n"
+		emb = getComEmbed(ctx, self.client, "Embed Help", 'For each element you want to add, you type title=text or "title=more text" followed by a gap!', fields=[["**All arguments:**", txt]])
 		await ctx.send(embed=emb)
 
-	# NEW COMMAND TYPE!??!?!?!
-
-	@commands.message_command(name="Copy Content")
-	async def copycontent(self, ctx, message:discord.Message):
-		await ctx.respond(f"Message content: ```\n{message.clean_content}\n```", ephemeral=True)
-
-def argstodic(args, typdic):
-	dic = {}
-	# create the DIC
-	for arg in args:
-		split = arg.split('=', 1)
-		if len(split) == 2:
-			dic[split[0]] = split[1]
-
-	# convert types
-	for index in typdic:
-		if index in dic:
-			if typdic[index][0] == "int":
-				try:
-					dic[index] = int(dic[index])
-				except:
-					print("int conversion error!")
-					dic[index] = 0
-			if typdic[index][0] == "bool":
-				if typdic[index] == "true":
-					typdic[index] = True
-				elif typdic[index] == "false":
-					typdic[index] = False
-				else:
-					typdic[index] = None
-		else:
-			print(index)
-			dic[index] = typdic[index][1]
-
-	# return the DIC
-	return dic
+	@commands.command(description=DESC["punish"])
+	@commands.cooldown(1, 5)
+	async def punish(self, ctx):
+		texts = ["AAAAAAAAAAAAHHHHHHH!!!!!","AAAHH PLEASE STO-P!!!!","I'M SORRY AAHHH!!!","PLEASE!... HAVE MERCY!...","STOP...   *CRIES*","AAAAAAHHHH!!!","I'M SO SORRY.AAA!!!"]
+		text = texts[randint(0, len(texts)-1)]
+		await ctx.send("**" + text + "**")
 
 def setup(client):
 	client.add_cog(GeneralCog(client))

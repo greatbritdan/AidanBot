@@ -1,14 +1,17 @@
+import discord
 from discord.ext import commands, tasks
-from discord.utils import get
 
 import datetime
 from random import randint
 
-from functions import Error, getEmbed
+from discord.ext.commands.core import is_owner
+
+from functions import getComEmbed, ComError
 
 import json
-with open('./desc.json') as file:
-    DESC = json.load(file)
+with open('./commanddata.json') as file:
+	temp = json.load(file)
+	DESC = temp["desc"]
 
 def is_pipon_palace(ctx):
 	return (ctx.guild.id == 836936601824788520)
@@ -20,92 +23,77 @@ class QOTDCog(commands.Cog):
 		self.qotd.start()
 
 	def cog_unload(self):
-		self.qotd.cancel()
-			
-	@tasks.loop(minutes=1)
+		if self.qotd.is_running():
+			self.qotd.cancel()
+
+	@tasks.loop(seconds=59)
 	async def qotd(self):
+		if not self.client.isbeta:
+			self.qotd.stop()
+
 		current_time = datetime.datetime.now().strftime("%H:%M")
-		times = ["14:00", "14:01"]
-		if current_time in times and not self.done:
-			await qotdask(self.client, None, True)	
+		if current_time == "14:00" and not self.done:
+			await self.qotd_ask()
 			self.done = True
-		elif self.done:
+		elif current_time != "14:00" and self.done:
 			self.done = False
-		
-	@commands.command(description=DESC["qotdadd"])
-	@commands.check(is_pipon_palace)
-	@commands.cooldown(1, 10, commands.BucketType.user)
-	async def qotdadd(self, ctx, *, question:str=None):
-		if question == None:
-			await Error(ctx, self.client, "Missing un-optional argument for command.")
-			return
 
-		questions = await getquestions(self.client)
-		questions.append(question)
-		await setquestions(self.client, questions)
+	@qotd.before_loop
+	async def before_qotd(self):
+		await self.client.wait_until_ready()
 
-		emb = getEmbed(ctx, "qotdadd", "**Question added:**", f"```- {question}```")
-		await ctx.send(embed=emb)
+	async def qotd_ask(self, ctx=None):
+		chan = ctx.channel if ctx else self.client.qotd_channel
 
-	@commands.command(description=DESC["qotdget"])
-	@commands.check(is_pipon_palace)
-	@commands.cooldown(1, 10, commands.BucketType.user)
-	async def qotdget(self, ctx):
-		questions = await getquestions(self.client)
-		questions.pop(0)
-		split = "\n- "
-		questions = split.join(questions)
+		emb = None
+		questions = await self.qotd_questions("get")
+		if len(questions) > 1:	
+			questioni = randint(1, len(questions)-1)
+			question = questions[questioni]
+			question += "?" if "?" not in question else ""
+			questions.pop(questioni)
+			await self.qotd_questions("set", questions)
 
-		emb = getEmbed(ctx, "qotdget", "**Questions:**", f"```- {questions}```")
-		await ctx.send(embed=emb)
-
-	@commands.command(name="qotdask", description=DESC["qotdask"])
-	@commands.check(is_pipon_palace)
-	@commands.is_owner()
-	async def qotdask_(self, ctx, ping:int=False):
-		await qotdask(self.client, ctx, ping)
-
-async def qotdask(client, ctx=None, ping=False):
-	questions = await getquestions(client)
-	if len(questions) > 1 and not client.ISBETA or ctx:
-		questioni = randint(1, len(questions)-1)
-		question = questions[questioni]
-		if "?" not in question:
-			question = question + "?"
-
-		questions.pop(questioni)
-		await setquestions(client, questions)
-
-		guild = get(client.guilds, id=836936601824788520)
-		channel = get(guild.text_channels, id=856977059132866571)
-
-		cont = ""
-		if ping:
-			cont = "<@&904766106793832518>"
-
-		emb = getEmbed(ctx, "qotdask", "**Question of the day:**", question)
-		if ctx:
-			await ctx.send(cont, embed=emb)
+			emb = getComEmbed(ctx, self.client, "qotdask", "**Question of the day:**", question)
 		else:
-			await channel.send(cont, embed=emb)
+			emb = getComEmbed(ctx, self.client, "qotdask", "**All out of questions!**", "Use qotdadd to add some new ones!")
 
-async def getquestions(client):
-	guild = get(client.guilds, id=879063875469860874)
-	channel = get(guild.text_channels, id=895727615573360650)
-	message = await channel.fetch_message(channel.last_message_id)
-	message = message.content
+		await chan.send(embed=emb)
 
-	qs = message.split("\n")
-	return qs
+	async def qotd_questions(self, action, data=None):
+		chan = self.client.qotd_store_channel
+		last = await chan.fetch_message(chan.last_message_id)
+		if action == "get":
+			data = last.content
+			return data.split("\n")
+		elif action == "set":
+			await last.delete()
+			new = "\n".join(data)
+			await chan.send(new)
 
-async def setquestions(client, questions):
-	guild = get(client.guilds, id=879063875469860874)
-	channel = get(guild.text_channels, id=895727615573360650)
-	await channel.purge(limit=1)
-
-	message = "\n"
-	message = message.join(questions)
-	await channel.send(message)
+	@commands.command(name="qotd", description="sasd")
+	@commands.cooldown(1, 5)
+	@commands.check(is_pipon_palace)
+	async def qotd_(self, ctx, action="get", *, extra=None):
+		questions = await self.qotd_questions("get")
+		if action == "get":
+			questions.pop(0)
+			questions = "\n- ".join(questions)
+			emb = getComEmbed(ctx, self.client, "qotd get", "**Questions:**", f"```- {questions}```")
+			if len(questions) == 0:
+				emb = getComEmbed(ctx, self.client, "qotd get", "**Questions:**", f"```None yet, Use 'qotd add' to add some new ones!```")
+			await ctx.send(embed=emb)
+		elif action == "add":
+			if extra:
+				questions.append(extra)
+				await self.qotd_questions("set", questions)
+				emb = getComEmbed(ctx, self.client, "qotd add", "**Question added:**", f"```{extra}```\nRemember not to answer it yet! wait until it's asked by me.")
+				await ctx.send(embed=emb)
+			else:
+				await ComError(ctx, self.client, "Missing un-optional argument for command.")
+				return
+		elif action == "ask" and self.client.is_owner(ctx.author):
+			await self.qotd_ask()
 
 def setup(client):
 	client.add_cog(QOTDCog(client))

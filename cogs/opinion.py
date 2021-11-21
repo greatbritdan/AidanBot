@@ -6,18 +6,19 @@ import random
 import asyncio
 from random import seed, randint
 
-from functions import getEmbed, addField, Error, getIntFromText, getBar
+from functions import getComEmbed, ComError, getIntFromText, getBar
 
 import json
-with open('./desc.json') as file:
-    DESC = json.load(file)
+with open('./commanddata.json') as file:
+	temp = json.load(file)
+	DESC = temp["desc"]
 
 class OpinionCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
 	@commands.command(description=DESC["rate"])
-	@commands.cooldown(1, 6, commands.BucketType.user)
+	@commands.cooldown(1, 5)
 	async def rate(self, ctx, *, thing=None):
 		if thing.lower() == "me":
 			thing = ctx.author.name
@@ -68,7 +69,7 @@ class OpinionCog(commands.Cog):
 		# if it's aidanbot/aidanbetabot or aidan, respond differently
 		index = randint(0, 12)
 		thung = thing.lower()
-		if self.client.ISBETA:
+		if self.client.isbeta:
 			if thung == "aidanbetabot" or thung == "me":
 				index = 13
 			elif thung == "aidanbot":
@@ -82,15 +83,14 @@ class OpinionCog(commands.Cog):
 		txt = responces[index][0]
 		rating = randint(responces[index][1][0], responces[index][1][1])
 
-		emb = getEmbed(ctx, "Rate", txt.format(thing), "")
-		emb = addField(emb, "Score", "`{0}/10`".format(rating))
+		emb = getComEmbed(ctx, self.client, "Rate", txt.format(thing), fields=[["Score", "`{0}/10`".format(rating)]])
 		await ctx.reply(embed=emb, mention_author=False)
 
 	@commands.command(description=DESC["ask"])
-	@commands.cooldown(1, 6, commands.BucketType.user)
+	@commands.cooldown(1, 5)
 	async def ask(self, ctx, *, question:str=None):
 		if question == None:
-			await Error(ctx, self.client, "Missing un-optional argument for command.")
+			await ComError(ctx, self.client, "Missing un-optional argument for command.")
 			return
 
 		starts = []
@@ -157,14 +157,14 @@ class OpinionCog(commands.Cog):
 		fullans = start + answer
 		allbutone = len(fullans)-1
 		fullans = fullans[:-allbutone].capitalize() + fullans[1:]
-		emb = getEmbed(ctx, "Ask", fullans, "")
+		emb = getComEmbed(ctx, self.client, "Ask", fullans)
 		await ctx.reply(embed=emb, mention_author=False)
 
 	@commands.command(description=DESC["percent"])
-	@commands.cooldown(1, 6, commands.BucketType.user)
+	@commands.cooldown(1, 5)
 	async def percent(self, ctx, something:str=None, *, person:str=None):
 		if something == None:
-			await Error(ctx, self.client, "Missing un-optional argument for command.")
+			await ComError(ctx, self.client, "Missing un-optional argument for command.")
 			return
 		if person == None:
 			seed(getIntFromText(something.lower() + ctx.author.name))
@@ -174,23 +174,24 @@ class OpinionCog(commands.Cog):
 		value = randint(0,100)
 		end = getBar(value, 100, 10, True)
 		if person == None:
-			emb = getEmbed(ctx, "Percent", f"You are **{str(value)}%** {something}.", end)
+			emb = getComEmbed(ctx, self.client, "Percent", f"You are **{str(value)}%** {something}.", end)
 		else:
-			emb = getEmbed(ctx, "Percent", f"{person} is **{str(value)}%** {something}.", end)
+			emb = getComEmbed(ctx, self.client, "Percent", f"{person} is **{str(value)}%** {something}.", end)
 		await ctx.reply(embed=emb, mention_author=False)
 
 	@commands.command(description=DESC["decide"])
-	@commands.cooldown(1, 3, commands.BucketType.user)
+	@commands.cooldown(1, 5)
 	async def decide(self, ctx, *decisions):
 		if decisions == None:
-			await Error(ctx, self.client, "Missing un-optional argument for command.")
+			await ComError(ctx, self.client, "Missing un-optional argument for command.")
 			return
 
 		# decisions = decisions.split(" ")
-		emb = getEmbed(ctx, "Decide", "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]), "")
+		emb = getComEmbed(ctx, self.client, "Decide", "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]))
 		await ctx.reply(embed=emb, mention_author=False)
 
 	@commands.command(description=DESC["poll"])
+	@commands.cooldown(1, 5)
 	async def poll(self, ctx, question, *options):
 		total = 0
 		strmax = 0
@@ -218,9 +219,9 @@ class OpinionCog(commands.Cog):
 				buts.append( discord.ui.Button(label=options[i], style=discord.ButtonStyle.blurple, custom_id=options[i], disabled=timeout) )
 			desc = desc + f"**Total votes**: {total}"
 			if timeout:
-				emb = getEmbed(ctx, "Poll (timeout)", question, desc)
+				emb = getComEmbed(ctx, self.client, "Poll (timeout)", question, desc)
 			else:
-				emb = getEmbed(ctx, "Poll", question, desc)
+				emb = getComEmbed(ctx, self.client, "Poll", question, desc)
 			buttons = discord.ui.View(*buts)
 			return emb, buttons
 
