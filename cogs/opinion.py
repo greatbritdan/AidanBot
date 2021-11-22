@@ -19,7 +19,7 @@ class OpinionCog(commands.Cog):
 
 	@commands.command(description=DESC["rate"])
 	@commands.cooldown(1, 5)
-	async def rate(self, ctx, *, thing=None):
+	async def rate(self, ctx, *, thing):
 		if thing.lower() == "me":
 			thing = ctx.author.name
 		elif thing.lower() == "this server":
