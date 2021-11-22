@@ -90,7 +90,7 @@ class QOTDCog(commands.Cog):
 				emb = getComEmbed(ctx, self.client, "qotd add", "**Question added:**", f"```{extra}```\nRemember not to answer it yet! wait until it's asked by me.")
 				await ctx.send(embed=emb)
 			else:
-				await ComError(ctx, self.client, "Missing un-optional argument for command.")
+				await ComError(ctx, self.client, "Needs question.")
 				return
 		elif action == "ask" and self.client.is_owner(ctx.author):
 			await self.qotd_ask()

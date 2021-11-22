@@ -4,7 +4,7 @@ from discord.ext import commands
 import time
 import random
 import asyncio
-from random import seed, randint
+from random import seed, choice, randint
 
 from functions import getComEmbed, ComError, getIntFromText, getBar
 
@@ -88,11 +88,7 @@ class OpinionCog(commands.Cog):
 
 	@commands.command(description=DESC["ask"])
 	@commands.cooldown(1, 5)
-	async def ask(self, ctx, *, question:str=None):
-		if question == None:
-			await ComError(ctx, self.client, "Missing un-optional argument for command.")
-			return
-
+	async def ask(self, ctx, *, question):
 		starts = []
 		answers = []
 		answer = ""
@@ -162,10 +158,7 @@ class OpinionCog(commands.Cog):
 
 	@commands.command(description=DESC["percent"])
 	@commands.cooldown(1, 5)
-	async def percent(self, ctx, something:str=None, *, person:str=None):
-		if something == None:
-			await ComError(ctx, self.client, "Missing un-optional argument for command.")
-			return
+	async def percent(self, ctx, something, *, person=None):
 		if person == None:
 			seed(getIntFromText(something.lower() + ctx.author.name))
 		else:
@@ -183,11 +176,10 @@ class OpinionCog(commands.Cog):
 	@commands.cooldown(1, 5)
 	async def decide(self, ctx, *decisions):
 		if decisions == None:
-			await ComError(ctx, self.client, "Missing un-optional argument for command.")
+			await ComError(ctx, self.client, "Decision needs more than 0 choices.")
 			return
-
-		# decisions = decisions.split(" ")
-		emb = getComEmbed(ctx, self.client, "Decide", "I choose... {0}".format(decisions[randint(0, len(decisions)-1)]))
+			
+		emb = getComEmbed(ctx, self.client, "Decide", f"I choose... {choice(decisions)}")
 		await ctx.reply(embed=emb, mention_author=False)
 
 	@commands.command(description=DESC["poll"])

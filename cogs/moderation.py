@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-from functions import ComError
-
 import json
 with open('./commanddata.json') as file:
 	temp = json.load(file)
@@ -22,22 +20,14 @@ class ModerationCog(commands.Cog):
 	@commands.command(description=DESC["kick"])
 	@commands.cooldown(1, 5)
 	@commands.has_permissions(kick_members=True)
-	async def kick(self, ctx, user:discord.Member=None, *, reason:str=None):
-		if user == None:
-			await ComError(ctx, self.client, "Please spesify a member.")
-			return
-
+	async def kick(self, ctx, user:discord.Member, *, reason=None):
 		await ctx.guild.kick(user, reason=reason)
 		await ctx.send(f"Kicked {user.mention}.")
 	
 	@commands.command(description=DESC["ban"])
 	@commands.cooldown(1, 5)
 	@commands.has_permissions(ban_members=True)
-	async def ban(self, ctx, user:discord.Member=None, days:int=0, *, reason:str=None):
-		if user == None:
-			await ComError(ctx, self.client, "Please spesify a member.")
-			return
-
+	async def ban(self, ctx, user:discord.Member, days:int=0, *, reason=None):
 		await ctx.guild.ban(user, reason=reason, delete_message_days=days)
 		await ctx.send(f"Banned {user.mention}.")
 

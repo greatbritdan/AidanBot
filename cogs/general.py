@@ -43,11 +43,7 @@ class GeneralCog(commands.Cog):
 
 	@commands.command(description=DESC["clone"])
 	@commands.cooldown(1, 5)
-	async def clone(self, ctx, member:discord.Member=None, *, message:str=None):
-		if member == None or message == None:
-			await ComError(ctx, self.client, "Missing un-optional argument for command.")
-			return
-
+	async def clone(self, ctx, member:discord.Member, *, message):
 		if self.client.prefix in message:
 			await ComError(ctx, self.client, "No running commands in clone.")
 			return

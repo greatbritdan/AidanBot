@@ -6,7 +6,7 @@ from discord.utils import find
 
 import asyncio
 
-from functions import getComEmbed, ComError
+from functions import getComEmbed
 
 import json
 with open('./commanddata.json') as file:
@@ -123,11 +123,7 @@ class ImportantCog(commands.Cog):
 
 	@commands.command(description=DESC["role"])
 	@commands.cooldown(1, 10)
-	async def role(self, ctx, *, name=None):
-		if name == None:
-			await ComError(ctx, self.client, "Missing un-optional argument for command.")
-			return
-
+	async def role(self, ctx, *, name):
 		r = find(lambda m: name.lower() in m.name.lower(), ctx.guild.roles)
 		if r == None:
 			await ctx.reply("Try again, i couldn't find this role.", mention_author=False)
