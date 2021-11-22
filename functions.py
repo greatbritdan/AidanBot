@@ -23,6 +23,8 @@ async def ComError(ctx, client, error):
 	await ctx.send(embed=getComEmbed(ctx, client, "Error", "AidanBot Encountered an error and your command was cancelled.", error, Color.from_rgb(220, 29, 37)))
 async def CooldownError(ctx, client, error):
 	await ctx.send(embed=getComEmbed(ctx, client, "Cooldown", error, None, Color.from_rgb(145, 29, 37)))
+async def ParamError(ctx, client, error):
+	await ctx.send(embed=getComEmbed(ctx, client, "Error", "AidanBot Encountered an error and your command was cancelled.", f"Missing required argument for {client.prefix}{ctx.command}: **{error.param}**\n```{client.prefix}{ctx.command} {ctx.command.signature}```", Color.from_rgb(145, 29, 37)))
 async def SendDM(client, title, description):
 	aidan = await client.fetch_user(384439774972215296)
 	emb = getComEmbed(None, client, "System Message", title, description, Color.from_rgb(70, 29, 37))

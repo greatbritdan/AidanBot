@@ -5,7 +5,7 @@ from discord.utils import get
 
 from random import choice, randint
 
-from functions import ComError, CooldownError, SendDM
+from functions import ComError, CooldownError, ParamError, SendDM
 
 import json
 with open('./profiles.json') as file:
@@ -72,6 +72,10 @@ class AidanBot(commands.Bot):
 		# cooldown
 		if isinstance(error, commands.CommandOnCooldown):
 			await CooldownError(ctx, self, "Command on cooldown!! Try again in {:.2f} seconds".format(error.retry_after))
+			return False
+		# missoing params
+		if isinstance(error, commands.MissingRequiredArgument):
+			await ParamError(ctx, self, error)
 			return False
 		# ones that should have uniqe message
 		err = ""
