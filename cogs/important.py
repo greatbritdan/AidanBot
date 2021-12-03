@@ -107,20 +107,6 @@ class ImportantCog(commands.Cog):
 					await MSG.edit(embed=emb, view=buttons)
 					return
 
-	@commands.command(description=DESC["info"])
-	@commands.cooldown(1, 10)
-	async def info(self, ctx):
-		emb = getComEmbed(ctx, self.client, "Info", f"Hey, I am {self.client.name}!", self.client.desc, fields=[["Version:", self.client.version]])
-		await ctx.reply(f"```css\n[ {self.client.prefix}info will be retired start of Decemeber ]\n```" ,embed=emb, mention_author=False)
-
-	@commands.command(description=DESC["invite"])
-	@commands.cooldown(1, 10)
-	async def invite(self, ctx):
-		if self.client.isbeta:
-			await ctx.reply(f"```css\n[ {self.client.prefix}invite will be retired start of Decemeber ]\n```\nI'm a test bot so you can't add me sorry, my brother would love to join your server tho! run `$invite`", mention_author=False)
-		else:
-			await ctx.reply(f"```css\n[ {self.client.prefix}invite will be retired start of Decemeber ]\n```\nY- you want me on your server??? I'd love too!!! {self.client.invite}", mention_author=False)
-
 	@commands.command(description=DESC["role"])
 	@commands.cooldown(1, 10)
 	async def role(self, ctx, *, name):
