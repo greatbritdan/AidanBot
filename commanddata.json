@@ -1,8 +1,6 @@
 {
     "desc": {
         "help": "Get help on a command or specific command.\n\nCooldown: 1 per 10 seconds.",
-        "info": "Gte bot info.\n\nCooldown: 1 per 10 seconds.",
-        "invite": "Invite AidanBot to your server!\n\nCooldown: 1 per 10 seconds.",
         "role": "Get any role that starts with [r]\nUsers with `manage_roles` permission can add and remove any role below their top.\n\nCooldown: 1 per 10 seconds.",
     
         "echo": "Make me say something.\n\nCooldown: 1 per 5 seconds.",
