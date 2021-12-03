@@ -32,7 +32,7 @@
         "restart": "Restarts the whole bot."
     },
     "order" : {
-        "Important": ["help", "info", "invite", "role"],
+        "Important": ["help", "role"],
         "Moderation": ["clear", "kick", "ban", "slowmode"],
         "General": ["echo", "react", "embed", "embedhelp", "clone", "punish"],
         "Opinion": ["rate", "ask", "percent", "decide", "poll"],
