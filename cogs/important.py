@@ -1,5 +1,3 @@
-from datetime import time
-from logging import disable
 import discord
 from discord.ext import commands
 from discord.utils import find
@@ -43,6 +41,7 @@ class ImportantCog(commands.Cog):
 				"General": ["General bot commands.", "📄"],
 				"Opinion": ["The fun commands.", "📣"],
 				"Games": ["The game commands.", "🎮"],
+				"Image": ["Image manipulation commands.", "🖌️"],
 				"Pip0ns Palace": ["Commands exclusive to Pip0n's palace", "<:UpPipe:836997889234042910>"],
 				"Owner": ["Commands only Aidan can use.", "<:AidanSmug:837001740947161168>"]
 			}
@@ -106,7 +105,7 @@ class ImportantCog(commands.Cog):
 					emb, buttons = getHelpEmbed("timeout")
 					await MSG.edit(embed=emb, view=buttons)
 					return
-
+					
 	@commands.command(description=DESC["role"])
 	@commands.cooldown(1, 10)
 	async def role(self, ctx, *, name):

@@ -1,6 +1,8 @@
 from discord.ext import commands
 from discord.utils import get
 
+from random import choice
+
 from functions import ComError
 
 import json
@@ -20,8 +22,9 @@ class PPCog(commands.Cog):
 		if member.guild.id != 836936601824788520 or self.client.isbeta:
 			return
 
+		msgs = ["Make sure to take off your shoes.", "Enjoy your stay!", "Cursed Goomba hopes you enjoy your stay", "||Help i'm being forced to say this||"]
 		channel = get(member.guild.channels, id=836936602281705482) #general-chat
-		await channel.send(f"**Welcome to the server** {member.mention}, enjoy your stay!!! <a:Pip0nSpeen:837000733441130567> ")
+		await channel.send(f"**Welcome to the server** {member.mention}, {choice(msgs)} <a:Pip0nSpeen:837000733441130567>")
 
 	@commands.command(description=DESC["emoteify"])
 	@commands.check(is_pipon_palace)

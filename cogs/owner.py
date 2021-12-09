@@ -1,16 +1,8 @@
-import os
 import discord
 from discord.ext import commands
 
-import time
-import asyncio
-import contextlib
-import io
-import textwrap
-import sys
+import os, time, asyncio, contextlib, io, textwrap, sys
 from traceback import format_exception
-
-from discord.ui import view
 
 from functions import getComEmbed
 
@@ -58,9 +50,9 @@ class OwnerCog(commands.Cog):
 			emb = getComEmbed(ctx, self.client, "Eval", "Results:", f"```\n{result}\n```")
 			await ctx.send(embed=emb)
 
-	@commands.command(description=DESC["update"])
+	@commands.command(description=DESC["reload"])
 	@commands.is_owner()
-	async def update(self, ctx, extension):
+	async def reload(self, ctx, extension):
 		if len(extension) == 1:
 			if extension == "g":
 				extension = "general"
@@ -71,8 +63,7 @@ class OwnerCog(commands.Cog):
 
 		if extension and extension == "owner":
 			MSG = await ctx.send(f'```if it crashes you wont be able to load or reload, are you sure?\n(make sure to check you are reloading, not unloading)```', view=discord.ui.View(
-				discord.ui.Button(label="Yes", style=discord.ButtonStyle.red, custom_id="accept"),
-				discord.ui.Button(label="No Actually", style=discord.ButtonStyle.green, custom_id="deny")
+				discord.ui.Button(label="Yes", style=discord.ButtonStyle.red, custom_id="accept"), discord.ui.Button(label="No Actually", style=discord.ButtonStyle.green, custom_id="deny")
 			))
 			def check(interaction):
 				return (interaction.user.id == self.client.owner_id and interaction.message.id == MSG.id and (interaction.data["custom_id"] == "accept" or interaction.data["custom_id"] == "deny"))

@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 
-import asyncio
-import math
+import asyncio, math
 from random import randint
 
 from functions import getComEmbed, getBar
@@ -33,7 +32,7 @@ class GamesCog(commands.Cog):
 
 	@commands.command(description=DESC["rps"])
 	@commands.cooldown(1, 5)
-	async def rps(self, ctx, rigged:bool=False):
+	async def rps(self, ctx):
 		options = ["rock", "paper", "scissors"]
 		strtohand = {"rock":"👊", "paper":"✋", "scissors":"✌️"}
 		p1pick = ""
@@ -56,14 +55,6 @@ class GamesCog(commands.Cog):
 		try:
 			interaction = await self.client.wait_for("interaction", timeout=30, check=check)
 			p1pick = interaction.data["custom_id"]
-
-			if rigged:
-				if p1pick == "rock":
-					p2pick = "paper"
-				elif p1pick == "paper":
-					p2pick = "scissors"
-				elif p1pick == "scissors":
-					p2pick = "rock"
 
 			state = "Something broke lol, i'm gonna blame you. <:AidanSmug:837001740947161168>"
 			if p1pick == p2pick:

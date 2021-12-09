@@ -1,9 +1,7 @@
 import discord
 from discord.ext import commands
 
-import time
-import random
-import asyncio
+import time, random, asyncio
 from random import seed, choice, randint
 
 from functions import getComEmbed, ComError, getIntFromText, getBar
@@ -178,17 +176,17 @@ class OpinionCog(commands.Cog):
 		if decisions == None:
 			await ComError(ctx, self.client, "Decision needs more than 0 choices.")
 			return
-			
+
 		emb = getComEmbed(ctx, self.client, "Decide", f"I choose... {choice(decisions)}")
 		await ctx.reply(embed=emb, mention_author=False)
 
 	@commands.command(description=DESC["poll"])
-	@commands.cooldown(1, 5)
+	@commands.cooldown(1, 12)
 	async def poll(self, ctx, question, *options):
 		total = 0
 		strmax = 0
 		results = []
-		usersvoted = []
+		usersvoted = {}
 		for op in options:
 			if len(op) > strmax:
 				strmax = len(op)
@@ -209,11 +207,15 @@ class OpinionCog(commands.Cog):
 				desc = desc + f"`{txt}:` {bar} **({str(percent)}%) ({results[i]} votes)**\n"
 
 				buts.append( discord.ui.Button(label=options[i], style=discord.ButtonStyle.blurple, custom_id=options[i], disabled=timeout) )
+			
+			buts.append( discord.ui.Button(label="End Poll (Author only)", style=discord.ButtonStyle.red, custom_id="_end_", disabled=timeout, row=2) )
+
 			desc = desc + f"**Total votes**: {total}"
 			if timeout:
 				emb = getComEmbed(ctx, self.client, "Poll (timeout)", question, desc)
 			else:
 				emb = getComEmbed(ctx, self.client, "Poll", question, desc)
+
 			buttons = discord.ui.View(*buts)
 			return emb, buttons
 
@@ -225,15 +227,23 @@ class OpinionCog(commands.Cog):
 
 		while True:
 			try:
-				interaction = await self.client.wait_for("interaction", timeout=60, check=check)
+				interaction = await self.client.wait_for("interaction", timeout=300, check=check)
 
-				if interaction.user.id not in usersvoted:
-					usersvoted.append(interaction.user.id)
-					for i in range(0, len(results)):
-						if options[i] == interaction.data["custom_id"]:
-							results[i] += 1
-							total += 1
-							break
+				if interaction.data["custom_id"] == "_end_" and interaction.user == ctx.author:
+					emb, buttons = getPollEmbed(True)
+					await MSG.edit(embed=emb, view=buttons)
+					return
+
+				if str(interaction.user.id) in usersvoted: # change vote
+					results[usersvoted[str(interaction.user.id)]] -= 1
+				else: # first vote
+					total += 1
+
+				for i in range(0, len(results)):
+					if options[i] == interaction.data["custom_id"]:
+						usersvoted[str(interaction.user.id)] = i
+						results[i] += 1
+						break
 
 				emb, buttons = getPollEmbed()
 				await MSG.edit(embed=emb, view=buttons)
