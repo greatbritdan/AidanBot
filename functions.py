@@ -1,6 +1,6 @@
 from discord import Embed, Color
-import datetime
-import math
+
+import datetime, math
 
 # EMBED STUFF #
 def getEmbed(title, desc, col, fields):
@@ -18,16 +18,24 @@ def getComEmbed(ctx=None, client=None, command="N/A", title=Embed.Empty, desc=Em
 		emb.set_footer(text=f"(no ctx provided)")
 	emb.set_author(name=f"{client.name} > {command}", icon_url=client.pfp)
 	return emb
+def getComEmbedSimple(title=Embed.Empty, desc=Embed.Empty):
+	emb = getEmbed(title=title, desc=desc, col=Color.from_rgb(20, 29, 37), fields=[])
+	return emb
 
+async def ClientError(ctx, client, error): # not used for now
+    await ctx.send(embed=getComEmbed(ctx, client, "Client Error", "Looks like something's wrong with AidanBot's client. Please try again. If you're having trouble figuring out what it is, see error.", error, Color.from_rgb(220, 29, 37)))
 async def ComError(ctx, client, error):
-	await ctx.send(embed=getComEmbed(ctx, client, "Error", "AidanBot Encountered an error and your command was cancelled.", error, Color.from_rgb(220, 29, 37)))
-async def CooldownError(ctx, client, error):
-	await ctx.send(embed=getComEmbed(ctx, client, "Cooldown", error, None, Color.from_rgb(145, 29, 37)))
+    await ctx.send(embed=getComEmbed(ctx, client, "Error", "AidanBot has ran into an error. Please try your command again. See error for more info. Contact the bot owner if this error can't be fixed in any way whatsoever that you tried.", f"```{error}```", Color.from_rgb(220, 29, 37)))
+async def ExistError(ctx, client):
+    await ctx.send(embed=getComEmbed(ctx, client, "Error", "This command doesn't seem to exist, make sure you typed it right.", "", Color.from_rgb(220, 29, 37)))
 async def ParamError(ctx, client, error):
-	await ctx.send(embed=getComEmbed(ctx, client, "Error", "AidanBot Encountered an error and your command was cancelled.", f"Missing required argument for {client.prefix}{ctx.command}: **{error.param}**\n```{client.prefix}{ctx.command} {ctx.command.signature}```", Color.from_rgb(145, 29, 37)))
+    await ctx.send(embed=getComEmbed(ctx, client, "Parameter Error", "AidanBot has encountered an error and your command was cancelled. See error for more info. This error occurred because either a missing parameter or argument was detected: ", f"Missing required argument for {client.prefix}{ctx.command}: **{error.param}**\n```{client.prefix}{ctx.command} {ctx.command.signature}```", Color.from_rgb(145, 29, 37)))
+async def CooldownError(ctx, client, error):
+	await ctx.send(embed=getComEmbed(ctx, client, "Cooldown Error", "Command on cooldown!! ```Try again in {:.2f} seconds.```".format(error.retry_after), "", Color.from_rgb(145, 29, 37)))
+
 async def SendDM(client, title, description):
 	aidan = await client.fetch_user(384439774972215296)
-	emb = getComEmbed(None, client, "System Message", title, description, Color.from_rgb(70, 29, 37))
+	emb = await getComEmbed(None, client, "System Message", title, description, Color.from_rgb(70, 29, 37))
 	await aidan.send(embed=emb)
 
 # OTHER #
