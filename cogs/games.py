@@ -136,7 +136,7 @@ async def FightNewgame(ctx, client, p1:discord.Member, p2:discord.Member, mhealt
 		]
 		if action:
 			fields.append([action[0], action[1]])
-		fields.append(player[turn]["name"] + "'s Turn:", "Click a button to submit a move.")
+		fields.append([player[turn]["name"] + "'s Turn:", "Click a button to submit a move."])
 		emb = getComEmbed(ctx, client, command, player["p1"]["name"] + " VS " + player["p2"]["name"], fields=fields)
 
 		view = None
