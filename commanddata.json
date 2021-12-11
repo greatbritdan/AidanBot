@@ -12,7 +12,6 @@
         "react": "Make me react to a message.\n\nCooldown: 1 per 5 seconds.",
         "clone": "Make a user say anything you want.\n\nCooldown: 1 per 5 seconds.",
         "punish": "**Punish.**\n\nCooldown: 1 per 5 seconds.",
-        "meme": "Fresh may may's, how you doing fellow kids\n\nCooldown: 1 per 3 seconds.",
 
         "rate": "I'll rate something, all my opinions are fact.\n\nCooldown: 1 per 5 seconds.",
         "ask": "Got a question? AidanBot will answer it, it'll probably be wrong tho.\n\nCooldown: 1 per 5 seconds.",
