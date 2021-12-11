@@ -123,15 +123,6 @@ class GeneralCog(commands.Cog):
 		meme = getComEmbedSimple(data['title'], "")
 		meme.set_image(url=data['url'])
 		await ctx.send(embed=meme)
-
-	@commands.command()
-	@commands.cooldown(1, 3)
-	async def reddit(self, ctx, name="cleanmemes"):
-		content = get(f"https://meme-api.herokuapp.com/gimme/{name}").text
-		data = json.loads(content,)
-		meme = getComEmbedSimple(data['title'], "")
-		meme.set_image(url=data['url'])
-		await ctx.send(embed=meme)
 		
 def setup(client):
 	client.add_cog(GeneralCog(client))
