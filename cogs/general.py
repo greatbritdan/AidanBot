@@ -114,15 +114,6 @@ class GeneralCog(commands.Cog):
 		emb = getComEmbed(ctx, self.client, "Bucket", "Buket", "")
 		emb.set_image(url=choice(urls))
 		await ctx.send(embed=emb)
-
-	@commands.command(description=DESC["meme"])
-	@commands.cooldown(1, 3)
-	async def meme(self, ctx):
-		content = get("https://meme-api.herokuapp.com/gimme").text
-		data = json.loads(content,)
-		meme = getComEmbedSimple(data['title'], "")
-		meme.set_image(url=data['url'])
-		await ctx.send(embed=meme)
 		
 def setup(client):
 	client.add_cog(GeneralCog(client))
