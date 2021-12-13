@@ -109,7 +109,7 @@ class GeneralCog(commands.Cog):
 
 	@commands.command(hidden=True)
 	async def bucket(self, ctx):
-		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333693094547566/cd805_y_bucket-yellow.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333695162343424/cd807_y_bucket-red.webp"]
+		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333693094547566/cd805_y_bucket-yellow.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333695162343424/cd807_y_bucket-red.webp", "https://cdn.discordapp.com/attachments/885203191485050941/919900798132056084/CD806-1.jpg"]
 
 		emb = getComEmbed(ctx, self.client, "Bucket", "Buket", "")
 		emb.set_image(url=choice(urls))
