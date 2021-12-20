@@ -21,7 +21,7 @@ class OwnerCog(commands.Cog):
 		start_time = time.time()
 		message = await ctx.reply("Testing Ping...", mention_author=False)
 		end_time = time.time()
-		await message.edit(content=f"Ping Pong mother||fuck||er!\nBot: {round(self.client.latency * 1000)}ms\nAPI: {round((end_time - start_time) * 1000)}ms")
+		await message.edit(content=f"Ping Pong motherfliper!\nBot: {round(self.client.latency * 1000)}ms\nAPI: {round((end_time - start_time) * 1000)}ms")
 
 	@commands.command(name="eval", description=DESC["eval"])
 	@commands.is_owner()
