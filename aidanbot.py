@@ -84,7 +84,7 @@ class AidanBot(commands.Bot):
 	async def status_loop(self):
 		phrases = [
 			"MOM GET THE CAMERA!", "Imagine using {other}.", "Almost 1 year old.",
-			"HOW?!?!", "Go f{prefix}{prefix}k yourself..", "{prefix} for help... please?",
+			"HOW?!?!", "{prefix} for help... please?", "aaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			"king of hearts, all in. it's not a sin to wanna win.", "offline", "only true OG's remeber {prefix}wake",
 			"trans rights!", "{name} > {other}", "reject reactions, embrace buttons!","who am i??? no please tell me.",
 			"Wanted for bot warcrimes - WilliamFrog", "Only occasionally pissing off god.", ":mmaker:",
