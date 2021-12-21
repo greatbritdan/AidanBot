@@ -12,6 +12,7 @@
         "react": "Make me react to a message.\n\nCooldown: 1 per 5 seconds.",
         "clone": "Make a user say anything you want.\n\nCooldown: 1 per 5 seconds.",
         "punish": "**Punish.**\n\nCooldown: 1 per 5 seconds.",
+        "fact": "Very cool facts! (wowzas!)\n\nCooldown: 1 per 5 seconds.",
 
         "rate": "I'll rate something, all my opinions are fact.\n\nCooldown: 1 per 5 seconds.",
         "ask": "Got a question? AidanBot will answer it, it'll probably be wrong tho.\n\nCooldown: 1 per 5 seconds.",
@@ -20,9 +21,9 @@
         "poll": "Create a poll.\n\nCooldown: 1 per 12 seconds.",
     
         "fight": "Fight someone or set 2 others up to fight to the death!!\n\nCooldown: 1 per 30 seconds.",
-        "rps": "Classic game of Rock, Paper, Scissors.\n\nCooldown: 1 per 5 seconds.",
+        "rps": "Classic game of Rock, Paper, Scissors.\n\nCooldown: 1 per 10 seconds.",
 
-        "emu": "Adds emulogic text to an image.\n\nCooldown: 1 per 5 seconds.\n\nCooldown: 1 per 5 seconds.",
+        "emu": "Adds emulogic text to an image.\n\nCooldown: 1 per 5 seconds.",
         "killoverlay": "Adds a deathscreen overlay to an image. Currently have minecraft, darksouls, gta and ass.\n\nCooldown: 1 per 5 seconds.",
         "quoted": "Create a fake quote of yourself.\n\nCooldown: 1 per 5 seconds.",
         "quotel": "Create a fake quote of yourself. Now in light mode!\n\nCooldown: 1 per 5 seconds.",
@@ -37,7 +38,7 @@
     "order" : {
         "Important": ["help", "role"],
         "Moderation": ["clear", "kick", "ban", "slowmode"],
-        "General": ["echo", "react", "clone", "punish", "meme"],
+        "General": ["echo", "react", "clone", "punish", "fact"],
         "Opinion": ["rate", "ask", "percent", "decide", "poll"],
         "Games": ["fight", "rps"],
         "Image": ["emu", "killoverlay", "quoted", "quotel"],

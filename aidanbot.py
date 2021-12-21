@@ -4,7 +4,7 @@ from discord.ext import commands, tasks
 import os, traceback, sys
 from random import choice, randint
 
-from functions import ComError, CooldownError, ExistError, ParamError, SendDM
+from functions import ClientError, ComError, CooldownError, ExistError, ParamError, SendDM
 
 import json
 with open('./profiles.json') as file:
@@ -19,19 +19,15 @@ class AidanBot(commands.Bot):
 
 	def getprefix(self, selfagain, message):
 		return self.prefix
-	def is_pipon_palace(ctx):
-		if ctx.guild:
-			return (ctx.guild.id == 836936601824788520)
-		return False
 
 	def __init__(self):
-		self.version = "V1.2 (Rewrite)"
+		self.version = "V1.3 (Rewrite)"
 
 		intents = discord.Intents.all()
 		super().__init__(command_prefix=self.getprefix, case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False))
 
 		for filename in os.listdir('./cogs'):
-			if filename.endswith('.py'):
+			if filename.endswith('.py') and not filename.startswith('_'):
 				self.load_extension(f'cogs.{filename[:-3]}')
 
 	async def on_ready(self):
@@ -65,15 +61,14 @@ class AidanBot(commands.Bot):
 		await SendDM(self.client, "SOMEONE DID WHAT?!?!", f"Removed from {guild.name}!")
 
 	async def on_command_error(self, ctx, error):
-		if isinstance(error, commands.CommandOnCooldown):
+		if isinstance(error, discord.ClientException):
+			await ClientError(ctx, self, error)
+		elif isinstance(error, commands.CommandOnCooldown):
 			await CooldownError(ctx, self, error)
-			return False
 		elif isinstance(error, commands.MissingRequiredArgument):
 			await ParamError(ctx, self, error)
-			return False
 		elif isinstance(error, commands.CommandNotFound):
 			await ExistError(ctx, self)
-			return False
 		else:
 			await ComError(ctx, self, error)
 			if self.is_owner(ctx.author):
@@ -84,7 +79,7 @@ class AidanBot(commands.Bot):
 	async def status_loop(self):
 		phrases = [
 			"MOM GET THE CAMERA!", "Imagine using {other}.", "Almost 1 year old.",
-			"HOW?!?!", "{prefix} for help... please?", "aaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			"HOW?!?!", "Go f{prefix}{prefix}k yourself..", "{prefix} for help... please?",
 			"king of hearts, all in. it's not a sin to wanna win.", "offline", "only true OG's remeber {prefix}wake",
 			"trans rights!", "{name} > {other}", "reject reactions, embrace buttons!","who am i??? no please tell me.",
 			"Wanted for bot warcrimes - WilliamFrog", "Only occasionally pissing off god.", ":mmaker:",
