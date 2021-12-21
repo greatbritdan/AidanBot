@@ -4,6 +4,7 @@ from discord.ext import commands
 from PIL import Image, ImageFont, ImageDraw, ImageOps, ImageEnhance
 
 import io, datetime, math
+from copy import deepcopy
 
 from functions import ComError
 
@@ -15,6 +16,16 @@ with open('./commanddata.json') as file:
 class ImageCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
+
+	@commands.command()
+	async def giftest(self, ctx):
+		frames = await getFrames(ctx)
+
+		for index, frame in enumerate(frames):
+			draw = ImageDraw.Draw(frames[index])
+			draw.rectangle([(0,0),(32,32)], fill=(150,50,50), outline=(75,25,25))
+
+		await sendFrames(ctx, frames)
 
 	@commands.command(description=DESC["emu"])
 	@commands.cooldown(1, 5)
@@ -31,9 +42,9 @@ class ImageCog(commands.Cog):
 			await ComError(ctx, self.client, "Image too small, try to make it bigger!")
 			return
 
+		gap = textsize/8
 		font = ImageFont.truetype("assets/emulogic.ttf", textsize)
 		draw = ImageDraw.Draw(image)
-		gap = textsize/8
 
 		top, bottom = (gap*5), h-(gap*16)
 		pos = (w/2)-((len(text)*textsize)/2)
@@ -77,12 +88,12 @@ class ImageCog(commands.Cog):
 
 		await sendImage(ctx, image.convert("RGB"))
 
-	@commands.command(aliases=["quote"], description=DESC["quoted"])
+	@commands.command(description=DESC["quoted"], aliases=["quote", "darkquote", "darkmodequote", "quotedark"])
 	@commands.cooldown(1, 5)
 	async def quoted(self, ctx, *, text="text"):
 		await self.gen_quote(ctx, ctx.author, text, False)
 
-	@commands.command(description=DESC["quotel"])
+	@commands.command(description=DESC["quotel"], aliases=["lightquote", "lightmodequote", "quotelight"])
 	@commands.cooldown(1, 5)
 	async def quotel(self, ctx, *, text="text"):
 		await self.gen_quote(ctx, ctx.author, text, True)
@@ -160,3 +171,43 @@ async def sendImage(ctx, image):
 
 def setup(client):
 	client.add_cog(ImageCog(client))
+
+### GIF FUNCTIONS (TODO)
+
+async def getFrames(ctx):
+	img = ""
+	if len(ctx.message.attachments) > 0:
+		img = await ctx.message.attachments[0].read()
+	elif ctx.message.reference is not None:
+		if ctx.message.reference.message_id:
+			msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+			if len(msg.attachments) > 0:
+				img = await msg.attachments[0].read()
+	else:
+		img = await ctx.author.display_avatar.read()
+
+	img = Image.open(io.BytesIO(img))
+	frames = []
+	if img and img == "":
+		# await ComError(ctx, self.client, "No image was provided!")
+		print("No image was provided!")
+		return False
+	elif img.is_animated:
+		for frame in range(0,img.n_frames):
+			img.seek(frame)
+			frames.append(deepcopy(img).convert("RGB"))
+	else:
+		frames.append(img.convert("RGBA"))
+
+	return frames
+
+async def sendFrames(ctx, frames):
+	b = io.BytesIO()
+	if len(frames) == 1:
+		frames[0].save(b, format="png")
+		b.seek(0)
+		await ctx.send(file=discord.File(b, "converted_image.png"))
+	else:
+		frames[0].save(b, format="gif", save_all=True, append_images=frames[1:], duration=40, loop=0)
+		b.seek(0)
+		await ctx.send(file=discord.File(b, "converted_gif.gif"))

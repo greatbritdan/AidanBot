@@ -1,5 +1,8 @@
+from functions import argsToTime
 import discord
 from discord.ext import commands
+
+import datetime
 
 import json
 with open('./commanddata.json') as file:
@@ -36,6 +39,16 @@ class ModerationCog(commands.Cog):
 	@commands.has_permissions(manage_messages=True)
 	async def clear(self, ctx, limit:int=1):
 		await ctx.channel.purge(limit=limit+1)
+
+	'''@commands.command(description=DESC["timeout"])
+	@commands.cooldown(1, 5)
+	@commands.has_permissions(moderate_members=True)
+	async def timeout(self, ctx, user:discord.Member, *times):
+		time = datetime.datetime.now()
+		t, txt = argsToTime(times)
+		time += datetime.timedelta( seconds=t["s"], minutes=t["m"], hours=t["h"], days=t["d"] )
+		await user.timeout(time)
+		await ctx.send(f"Timed out {user.mention} for {txt}.")'''
 
 def setup(client):
 	client.add_cog(ModerationCog(client))

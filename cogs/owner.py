@@ -4,7 +4,7 @@ from discord.ext import commands
 import os, time, asyncio, contextlib, io, textwrap, sys
 from traceback import format_exception
 
-from functions import getComEmbed
+from functions import SendDM, getComEmbed
 
 import json
 with open('./commanddata.json') as file:
@@ -21,7 +21,7 @@ class OwnerCog(commands.Cog):
 		start_time = time.time()
 		message = await ctx.reply("Testing Ping...", mention_author=False)
 		end_time = time.time()
-		await message.edit(content=f"Ping Pong motherfliper!\nBot: {round(self.client.latency * 1000)}ms\nAPI: {round((end_time - start_time) * 1000)}ms")
+		await message.edit(content=f"Ping Pong mother||fuck||er!\nBot: {round(self.client.latency * 1000)}ms\nAPI: {round((end_time - start_time) * 1000)}ms")
 
 	@commands.command(name="eval", description=DESC["eval"])
 	@commands.is_owner()
@@ -36,6 +36,13 @@ class OwnerCog(commands.Cog):
 			"guild": ctx.guild,
 		}
 		stdout = io.StringIO()
+
+		bannedwords = ["ban", "kick", "delete"]
+		for bword in bannedwords:
+			if bword in code:
+				await ctx.send(f"**You attempted to run banned word in eval.** `{bword}`\n\nIf you need to use this for any reason make a command instead as it's more safe.")
+				return
+	
 		try:
 			with contextlib.redirect_stdout(stdout):
 				exec(f"async def func():\n{textwrap.indent(code, '    ')}", local_variables)
@@ -62,7 +69,7 @@ class OwnerCog(commands.Cog):
 				extension = "important"
 
 		if extension and extension == "owner":
-			MSG = await ctx.send(f'```if it crashes you wont be able to load or reload, are you sure?\n(make sure to check you are reloading, not unloading)```', view=discord.ui.View(
+			MSG = await ctx.send(f'```if it crashes you wont be able to reload, are you sure?```', view=discord.ui.View(
 				discord.ui.Button(label="Yes", style=discord.ButtonStyle.red, custom_id="accept"), discord.ui.Button(label="No Actually", style=discord.ButtonStyle.green, custom_id="deny")
 			))
 			def check(interaction):
@@ -74,8 +81,7 @@ class OwnerCog(commands.Cog):
 					return
 			except asyncio.TimeoutError:
 				await MSG.edit("```Timeout.```", view=discord.ui.View(
-					discord.ui.Button(label="Yes", style=discord.ButtonStyle.red, custom_id="accept", disabled=True),
-					discord.ui.Button(label="No Actually", style=discord.ButtonStyle.green, custom_id="deny", disabled=True)
+					discord.ui.Button(label="Yes", style=discord.ButtonStyle.red, custom_id="accept", disabled=True), discord.ui.Button(label="No Actually", style=discord.ButtonStyle.green, custom_id="deny", disabled=True)
 				))
 				return
 		

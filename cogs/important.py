@@ -16,7 +16,7 @@ class ImportantCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(description=DESC["help"])
+	@commands.command(description=DESC["help"], aliases=["helpmeh"])
 	@commands.cooldown(1, 10)
 	async def help(self, ctx, name:str=None):
 		prefix = self.client.prefix
@@ -25,10 +25,19 @@ class ImportantCog(commands.Cog):
 			command = await getCommand(ctx, self.client, name)
 			if command != "NotWork": # Get help on a spesific command
 				name = f"{prefix}{command.name}"
-				if command.aliases:
-					name += f" (or {prefix}{command.aliases[0]})"
+				if len(command.aliases) > 0:
+					allist = []
+					for al in command.aliases:
+						allist.append(f"{prefix}{al}")
+					tlist = ", ". join(allist)
+					name += f" `AKA {tlist}`"
 
-				emb = getComEmbed(ctx, self.client, f"Help > {prefix}{command.name}", f"{name} - {command.signature}", command.description.format(prefix=prefix))
+				fs = [
+					["Args:", f"{prefix}{command.name} {command.signature}"],
+					["Description:", command.description.format(prefix=prefix)]
+				]
+
+				emb = getComEmbed(ctx, self.client, f"Help > {prefix}{command.name}", name, "*<> is required, [] is optional, [blabla=value] means default argument is value.*", fields=fs)
 				await ctx.reply(embed=emb, mention_author=False)
 			else:
 				await ctx.send("Couldn't find command with that name :/")
@@ -130,6 +139,8 @@ async def getCommand(ctx, client, commandparam):
 	com = None
 	for command in client.commands:
 		if command.name.lower() == commandparam.lower():
+			com = command
+		elif command.aliases and commandparam.lower() in command.aliases:
 			com = command
 	if not com or com.hidden:
 		return "NotWork"

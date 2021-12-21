@@ -25,21 +25,17 @@ class OpinionCog(commands.Cog):
 
 		words = thing.split(" ")
 		newords = []
+		convertwords = {"your":"my", "you":"me", "yourself":"myself", "my":"your", "me":"you", "i":"you", "myself":"yourself","this":"that","these":"those","that":"this","those":"these"}
+		removelist = [".",",","/","!","?","'",'"']
 		for word in words:
-			if word == "your":
-				newords.append("my")
-			elif word == "you":
-				newords.append("me")
-			elif word == "yourself":
-				newords.append("myself")
-			elif word == "my":
-				newords.append("your")
-			elif word == "me" or word == "i":
-				newords.append("you")
-			elif word == "myself":
-				newords.append("yourself")
-			else:
-				newords.append(word)
+			w = word.lower()
+			for l in removelist:
+				w = w.replace(l, "")
+
+			if w in convertwords:
+				word = word.lower().replace(w, convertwords[w])
+			
+			newords.append(word)
 
 		thing = " "
 		thing = thing.join(newords)
@@ -115,7 +111,7 @@ class OpinionCog(commands.Cog):
 			else:
 				answer = random_date("1/1/2000 12:00 AM", "1/1/2021 12:00 AM")
 		elif question.startswith("what command"):
-			prefix = self.client.PREFIX
+			prefix = self.client.prefix
 			starts = ["i'll go for... ", "100% ", "Yeah that has to be ", "hmm... ", "that's easy, ", ""]
 			coms = []
 			for command in self.client.commands:

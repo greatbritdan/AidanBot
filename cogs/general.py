@@ -2,11 +2,10 @@ import discord
 from discord.ext import commands
 from discord.utils import find
 
-import datetime
-from requests import get
+import randfacts
 from random import randint, choice
 
-from functions import ComError, getComEmbed, getComEmbedSimple
+from functions import ComError, getComEmbed
 
 import json
 with open('./commanddata.json') as file:
@@ -107,13 +106,20 @@ class GeneralCog(commands.Cog):
 		text = texts[randint(0, len(texts)-1)]
 		await ctx.send("**" + text + "**")
 
+	@commands.command(description=DESC["fact"])
+	@commands.cooldown(1, 5)
+	async def fact(self, ctx):
+		fact = randfacts.get_fact()
+		await ctx.send(f"Did you know, {fact}")
+
 	@commands.command(hidden=True)
+	@commands.cooldown(1, 5)
 	async def bucket(self, ctx):
-		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333693094547566/cd805_y_bucket-yellow.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333695162343424/cd807_y_bucket-red.webp", "https://cdn.discordapp.com/attachments/885203191485050941/919900798132056084/CD806-1.jpg"]
+		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333693094547566/cd805_y_bucket-yellow.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333695162343424/cd807_y_bucket-red.webp"]
 
 		emb = getComEmbed(ctx, self.client, "Bucket", "Buket", "")
 		emb.set_image(url=choice(urls))
 		await ctx.send(embed=emb)
-		
+
 def setup(client):
 	client.add_cog(GeneralCog(client))
