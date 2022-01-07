@@ -90,7 +90,8 @@ class AidanBot(commands.Bot):
 			"That was legitness.", "Add to Server or else.", "Physicly dead inside.",
 			"Only idiots complain about the logo change.", "Knock Konck", "https://discord.gg/KXrDUZfBpq",
 			"I can post animated emotes for free!", "NFT more like en ef pee *dabs*", "Why can't bots be in group DM's?",
-			"?????????", "Yeah ok", "Sussy Sussy Sussy", "Lorem ipsum dolor sit amet"
+			"?????????", "Yeah ok", "Sussy Sussy Sussy", "Lorem ipsum dolor sit amet",
+			"if mee6 is next to me make sure to put them in the trash where NFT supporters belong."
 		]
 		allphrases = [*phrases, *self.botphrases]
 		phrase = choice(allphrases)
