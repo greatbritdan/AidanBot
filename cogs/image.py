@@ -17,21 +17,11 @@ class ImageCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command()
-	async def giftest(self, ctx):
-		frames = await getFrames(ctx)
-
-		for index, frame in enumerate(frames):
-			draw = ImageDraw.Draw(frames[index])
-			draw.rectangle([(0,0),(32,32)], fill=(150,50,50), outline=(75,25,25))
-
-		await sendFrames(ctx, frames)
-
 	@commands.command(description=DESC["emu"])
 	@commands.cooldown(1, 5)
 	async def emu(self, ctx, text="text", text2=None):
-		image = await getImage(ctx)
-		w, h = image.size
+		frames, duration = await getFrames(ctx)
+		w, h = frames[0].size
 		textsize = 128
 		while ((w/4)*3 < len(text)*textsize) or ((h/8) < textsize):
 			textsize -= 8
@@ -44,16 +34,18 @@ class ImageCog(commands.Cog):
 
 		gap = textsize/8
 		font = ImageFont.truetype("assets/emulogic.ttf", textsize)
-		draw = ImageDraw.Draw(image)
 
-		top, bottom = (gap*5), h-(gap*16)
-		pos = (w/2)-((len(text)*textsize)/2)
-		draw = backtext(draw, pos, top, text, gap, font)
-		if text2:
-			pos2 = (w/2)-((len(text2)*textsize)/2)
-			draw = backtext(draw, pos2, bottom, text2, gap, font)
+		for index, frame in enumerate(frames):
+			draw = ImageDraw.Draw(frames[index])
 
-		await sendImage(ctx, image)
+			top, bottom = (gap*5), h-(gap*16)
+			pos = (w/2)-((len(text)*textsize)/2)
+			draw = backtext(draw, pos, top, text, gap, font)
+			if text2:
+				pos2 = (w/2)-((len(text2)*textsize)/2)
+				draw = backtext(draw, pos2, bottom, text2, gap, font)
+
+		await sendFrames(ctx, frames, duration)
 
 	@commands.command(description=DESC["killoverlay"])
 	@commands.cooldown(1, 5)
@@ -66,27 +58,28 @@ class ImageCog(commands.Cog):
 			await ComError(ctx, self.client, "Not a valid type!")
 			return
 		
-		image = await getImage(ctx)
+		frames, duration = await getFrames(ctx)
 		over = Image.open(f"assets/deathoverlay{typ}.png")
 
-		nwidth = math.ceil(image.width/(image.height/over.height))
-		image = image.resize((nwidth, over.height))
-		if typ == 2:
-			image = ImageEnhance.Color(image).enhance(0.35)
-		if typ == 4:
-			image = ImageEnhance.Color(image).enhance(0)
+		nwidth = math.ceil(frames[0].width/(frames[0].height/over.height))
+		for index, frame in enumerate(frames):
+			frames[index] = frames[index].resize((nwidth, over.height))
+			if typ == 2:
+				frames[index] = ImageEnhance.Color(frames[index]).enhance(0.35)
+			if typ == 4:
+				frames[index] = ImageEnhance.Color(frames[index]).enhance(0)
 
-		image.paste(over, (-math.ceil((over.width-nwidth)/2),0), over)
-		if nwidth > over.width:
-			overcopy = Image.open(f"assets/deathoverlay{typ}.png")
-			overcopy = overcopy.crop((0,0,12,over.height))
-			overcopy = overcopy.resize((math.ceil((image.width-over.width)/2), over.height))
+			frames[index].paste(over, (-math.ceil((over.width-nwidth)/2),0), over)
+			if nwidth > over.width:
+				overcopy = Image.open(f"assets/deathoverlay{typ}.png")
+				overcopy = overcopy.crop((0,0,12,over.height))
+				overcopy = overcopy.resize((math.ceil((frames[index].width-over.width)/2), over.height))
 
-			# extra = Image.new("RGBA", (math.ceil((image.width-over.width)/2), over.height), (191,0,0,127))
-			image.paste(overcopy, (0,0), overcopy)
-			image.paste(overcopy, (image.width-math.ceil((image.width-over.width)/2),0), overcopy)
+				# extra = Image.new("RGBA", (math.ceil((image.width-over.width)/2), over.height), (191,0,0,127))
+				frames[index].paste(overcopy, (0,0), overcopy)
+				frames[index].paste(overcopy, (frames[index].width-math.ceil((frames[index].width-over.width)/2),0), overcopy)
 
-		await sendImage(ctx, image.convert("RGB"))
+		await sendFrames(ctx, frames, duration)
 
 	@commands.command(description=DESC["quoted"], aliases=["quote", "darkquote", "darkmodequote", "quotedark"])
 	@commands.cooldown(1, 5)
@@ -188,26 +181,28 @@ async def getFrames(ctx):
 
 	img = Image.open(io.BytesIO(img))
 	frames = []
+	duration = 0
 	if img and img == "":
 		# await ComError(ctx, self.client, "No image was provided!")
 		print("No image was provided!")
 		return False
 	elif img.is_animated:
+		duration = img.info['duration']
 		for frame in range(0,img.n_frames):
 			img.seek(frame)
-			frames.append(deepcopy(img).convert("RGB"))
+			frames.append(deepcopy(img).convert("RGBA"))
 	else:
 		frames.append(img.convert("RGBA"))
 
-	return frames
+	return frames, duration
 
-async def sendFrames(ctx, frames):
+async def sendFrames(ctx, frames, duration):
 	b = io.BytesIO()
 	if len(frames) == 1:
 		frames[0].save(b, format="png")
 		b.seek(0)
 		await ctx.send(file=discord.File(b, "converted_image.png"))
 	else:
-		frames[0].save(b, format="gif", save_all=True, append_images=frames[1:], duration=40, loop=0)
+		frames[0].save(b, format="gif", save_all=True, append_images=frames[1:], duration=duration, loop=0)
 		b.seek(0)
 		await ctx.send(file=discord.File(b, "converted_gif.gif"))
