@@ -7,6 +7,7 @@
         "kick": "Kicks a given member.\n\nCooldown: 1 per 5 seconds.",
         "ban": "Bans a given member and can delete a certon days worth of messages.\n\nCooldown: 1 per 5 seconds.",
         "clear": "Purges a set of messages in a channel or thread.\n\nCooldown: 1 per 5 seconds.",
+        "timeout": "Timesout a given user from anywhere from seconds to 4 weeks.\n\nCooldown: 1 per 5 seconds.",
 
         "echo": "Make me say something.\n\nCooldown: 1 per 5 seconds.",
         "react": "Make me react to a message.\n\nCooldown: 1 per 5 seconds.",
@@ -37,7 +38,7 @@
     },
     "order" : {
         "Important": ["help", "role"],
-        "Moderation": ["clear", "kick", "ban", "slowmode"],
+        "Moderation": ["clear", "kick", "ban", "slowmode", "timeout"],
         "General": ["echo", "react", "clone", "punish", "fact"],
         "Opinion": ["rate", "ask", "percent", "decide", "poll"],
         "Games": ["fight", "rps"],
