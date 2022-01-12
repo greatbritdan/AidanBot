@@ -21,7 +21,7 @@ class AidanBot(commands.Bot):
 		return self.prefix
 
 	def __init__(self):
-		self.version = "V1.3 (Rewrite)"
+		self.version = "V1.3.1 (Rewrite)"
 
 		intents = discord.Intents.all()
 		super().__init__(command_prefix=self.getprefix, case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False))
