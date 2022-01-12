@@ -40,7 +40,7 @@ class ModerationCog(commands.Cog):
 	async def clear(self, ctx, limit:int=1):
 		await ctx.channel.purge(limit=limit+1)
 
-	'''@commands.command(description=DESC["timeout"])
+	@commands.command(description=DESC["timeout"])
 	@commands.cooldown(1, 5)
 	@commands.has_permissions(moderate_members=True)
 	async def timeout(self, ctx, user:discord.Member, *times):
@@ -48,7 +48,7 @@ class ModerationCog(commands.Cog):
 		t, txt = argsToTime(times)
 		time += datetime.timedelta( seconds=t["s"], minutes=t["m"], hours=t["h"], days=t["d"] )
 		await user.timeout(time)
-		await ctx.send(f"Timed out {user.mention} for {txt}.")'''
+		await ctx.send(f"Timed out {user.mention} for {txt}.")
 
 def setup(client):
 	client.add_cog(ModerationCog(client))
