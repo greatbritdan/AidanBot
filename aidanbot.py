@@ -6,7 +6,7 @@ from discord.utils import get
 import os, traceback, sys
 from random import choice, randint
 
-from functions import ClientError, ComError, CooldownError, ExistError, ParamError, SendDM, strtolist, listtostr
+from functions import ClientError, ComError, CooldownError, ExistError, ParamError, SendDM
 
 import json
 with open('./profiles.json') as file:
