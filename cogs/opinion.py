@@ -1,4 +1,6 @@
+from enum import unique
 import discord
+from discord import voice_client
 from discord.ext import commands
 
 import time, random, asyncio
@@ -165,7 +167,7 @@ class OpinionCog(commands.Cog):
 		else:
 			emb = getComEmbed(ctx, self.client, "Percent", f"{person} is **{str(value)}%** {something}.", end)
 		await ctx.reply(embed=emb, mention_author=False)
-		
+
 	@commands.command(description=DESC["decide"], aliases=["choose"])
 	@commands.cooldown(1, 5)
 	async def decide(self, ctx, *decisions):

@@ -4,7 +4,7 @@ from discord.utils import find
 
 import asyncio
 
-from functions import getComEmbed
+from functions import getComEmbed, getEmbed
 
 import json
 with open('./commanddata.json') as file:
@@ -134,6 +134,76 @@ class ImportantCog(commands.Cog):
 				await ctx.reply(f"Added {r.name}", mention_author=False)
 		else:
 			await ctx.reply(f"{r.name} is not a role that can be added by anyone", mention_author=False)
+
+	@commands.command(description=DESC["config"])
+	@commands.cooldown(1, 5)
+	@commands.has_permissions(administrator=True)
+	async def config(self, ctx, typ=None, name=None, *, value=None):
+		edited = False
+		exists = self.client.get_all(ctx.guild)
+		if not exists:
+			self.client.values[str(ctx.guild.id)] = {}
+			edited = True
+
+		for n in self.client.default_values:
+			if n not in self.client.values[str(ctx.guild.id)]:
+				self.client.values[str(ctx.guild.id)][n] = self.client.default_values[n]
+				edited = True
+
+		txt, txt2 = "Please provide a valid action. (Actions are `list`, `get`, `set` or `info`)", ""
+		if typ:
+			if typ == "list":
+				list = self.client.get_all(ctx.guild)
+				txt = f"List of all values for {ctx.guild.name}"
+				txt2 = "```"
+				for item in list:
+					if item != "id":
+						txt2 += f"\n{item} = {str(list[item])}"
+				txt2 += "\n```"
+			elif typ == "get":
+				if not name:
+					txt = f"Please provide a name."
+				else:
+					value = self.client.get_value(ctx.guild, name)
+					txt = f"{name} is `{value}`."
+			elif typ == "set":
+				if not name:
+					txt = f"Please provide a name."
+				elif not value:
+					txt = f"Please provide a value."
+				else:
+					if value.lower() == "true":
+						value = True
+					elif value.lower() == "false":
+						value = False
+					else:
+						try:
+							value = int(value)
+						except ValueError:
+							value = value
+
+					suc = await self.client.set_value(ctx.guild, name, value)
+					if suc:
+						txt = f"{name} has been set to `{str(value)}`."
+						edited = True
+					else:
+						txt = f"{name} cannot be set."
+			elif typ == "info":
+				if not name:
+					txt = f"Please provide a name."
+				else:
+					if name in self.client.desc_values:
+						txt = ""
+						print(name)
+						txt2 = self.client.desc_values[name]
+					else:
+						txt = f"{name} cannot be set."
+
+		emb = getComEmbed(ctx, self.client, "Values", txt, txt2)
+		await ctx.reply(embed=emb, mention_author=False)
+
+		if edited:
+			await self.client.values_msgupdate("save")
 
 async def getCommand(ctx, client, commandparam):
 	com = None

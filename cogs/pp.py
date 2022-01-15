@@ -18,15 +18,6 @@ class PPCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.Cog.listener()
-	async def on_member_join(self, member):
-		if member.guild.id != 836936601824788520 or self.client.isbeta:
-			return
-
-		msgs = ["Make sure to take off your shoes.", "Enjoy your stay!", "Cursed Goomba hopes you enjoy your stay", "||Help i'm being forced to say this||"]
-		channel = get(member.guild.channels, id=836936602281705482) #general-chat
-		await channel.send(f"**Welcome to the server** {member.mention}, {choice(msgs)} <a:Pip0nSpeen:837000733441130567>")
-
 	@commands.command(description=DESC["emoteify"])
 	@commands.check(is_pipon_palace)
 	@commands.cooldown(1, 10)
@@ -42,6 +33,6 @@ class PPCog(commands.Cog):
 		image = await ctx.message.attachments[0].read()
 		emoji = await guild.create_custom_emoji(name=name, image=image)
 		await ctx.send(emoji)
-
+		
 def setup(client):
 	client.add_cog(PPCog(client))
