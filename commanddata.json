@@ -2,6 +2,7 @@
     "desc": {
         "help": "Get help on a command or specific command.\n\nCooldown: 1 per 10 seconds.",
         "role": "Get any role that starts with [r]\nUsers with `manage_roles` permission can add and remove any role below their top.\n\nCooldown: 1 per 10 seconds.",
+        "config": "Get all values or set spesific ones. Giving you more control over my actions.\n\nCooldown: 1 per 5 seconds.",
     
         "slowmode": "Set the slowmode of the channel or thread.\n\nCooldown: 1 per 5 seconds.",
         "kick": "Kicks a given member.\n\nCooldown: 1 per 5 seconds.",
@@ -37,8 +38,8 @@
         "restart": "Restarts the whole bot."
     },
     "order" : {
-        "Important": ["help", "role"],
-        "Moderation": ["clear", "kick", "ban", "slowmode", "timeout"],
+        "Important": ["help", "role", "config"],
+        "Moderation": ["clear", "kick", "ban", "slowmode"],
         "General": ["echo", "react", "clone", "punish", "fact"],
         "Opinion": ["rate", "ask", "percent", "decide", "poll"],
         "Games": ["fight", "rps"],
