@@ -22,11 +22,7 @@ class LoggingCog(commands.Cog):
             return
         chan = self.client.get_value(guild, "logs_channel")
         if chan:
-            self.channel = False
-            if type(chan) == int:
-                self.channel = get(guild.channels, id=chan)
-            elif type(chan) == str:
-                self.channel = get(guild.channels, name=chan)
+            self.channel = self.client.getvaluechannel(guild, chan)
             if self.channel:
                 return True
         return False
