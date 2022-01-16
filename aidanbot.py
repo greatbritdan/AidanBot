@@ -69,7 +69,7 @@ class AidanBot(commands.Bot):
 		if not self.is_ready():
 			return
 
-		if (not self.client.isbeta) and "discord.gg" in message.content.lower() and self.get_value(message.guild, "remove_invites"):
+		if (not self.isbeta) and "discord.gg" in message.content.lower() and self.get_value(message.guild, "remove_invites"):
 			channel = self.getvaluechannel(message.guild, self.get_value(message.guild, "allow_invites_channel"))
 			if (not channel) or message.channel != channel:
 				await message.delete()
@@ -86,7 +86,7 @@ class AidanBot(commands.Bot):
 		await self.invoke(ctx)
 
 	async def on_member_join(self, member):
-		if self.client.isbeta:
+		if self.isbeta:
 			return
 		chan = self.get_value(member.guild, "welcome_message_channel")
 		if chan:
