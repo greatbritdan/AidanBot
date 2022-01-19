@@ -146,6 +146,7 @@ class OpinionCog(commands.Cog):
 	@commands.cooldown(1, 12)
 	async def poll(self, ctx, question, *options):
 		total, strmax = 0, 0
+		results = []
 		if len(options) < 2:
 			await ComError(ctx, self.client, "Poll needs at least 2 options.")
 			return
