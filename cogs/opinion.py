@@ -95,10 +95,6 @@ class OpinionCog(commands.Cog):
 			num = str(randint(0, 20))
 			starts = ["OH! ", "my stupid heart tells me ", "uhhhhh, ", "imho, ", "", "", ""]
 			answers = [f"100% not {num}!", f"at least {num} idfk...", f"{num}, take it or leave it.", f"i know this one, {num}."]
-		elif question.startswith("who"):
-			starts = ["i'll go for... ", "100% ", "Yeah that has to be ", "hmm... ", "that's easy, ", ""]
-			member = ctx.guild.members[randint(0, len(ctx.guild.members)-1)]
-			answer = member.display_name
 		elif question.startswith("why"):
 			if "you" in question:
 				answers = ["i did no such thing.", "no comment.", "that's crazy and false... yeah."]
@@ -112,29 +108,6 @@ class OpinionCog(commands.Cog):
 				answer = random_date("1/1/2022 12:00 AM", "1/1/2122 12:00 AM")
 			else:
 				answer = random_date("1/1/2000 12:00 AM", "1/1/2021 12:00 AM")
-		elif question.startswith("what command"):
-			prefix = self.client.prefix
-			starts = ["i'll go for... ", "100% ", "Yeah that has to be ", "hmm... ", "that's easy, ", ""]
-			coms = []
-			for command in self.client.commands:
-				coms.append(command.name)
-			answer = prefix + coms[randint(0, len(coms)-1)]
-			getseed = False
-		elif question.startswith("what role"):
-			starts = ["i'll go for... ", "100% ", "Yeah that has to be ", "hmm... ", "that's easy, ", ""]
-			roles = []
-			for role in ctx.guild.roles:
-				roles.append(role.name)
-			answer = roles[randint(0, len(roles)-1)]
-			getseed = False
-		elif question.startswith("what channel"):
-			starts = ["i'll go for... ", "100% ", "Yeah that has to be ", "hmm... ", "that's easy, ", ""]
-			channels = []
-			for channel in ctx.guild.text_channels:
-				if not (channel.category.name.lower() == "archive" or channel.category.name.lower() == "the hidden ones"):
-					channels.append(channel.name)
-			answer = channels[randint(0, len(channels)-1)]
-			getseed = False
 		else:
 			starts = ["how do i put this... ", "my stupid heart tells me ", "uhhhhh, ", "actually. ", "", "", ""]
 			answers = ["ye.", "no.", "absolutely not!", "HAH, NO WAY AT ALL.", "maybe, probably...", "uhhh, it's unlikely", "i can't tell, sorry."]
