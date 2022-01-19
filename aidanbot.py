@@ -127,7 +127,8 @@ class AidanBot(commands.Bot):
 			await ExistError(ctx, self)
 		else:
 			await ComError(ctx, self, error)
-			if self.is_owner(ctx.author):
+			owner = await self.is_owner(ctx.author)
+			if owner:
 				print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
 				traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
