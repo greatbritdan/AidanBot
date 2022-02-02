@@ -4,3 +4,4 @@ async-timeout==3.0.1
 Pillow==9.0.0
 requests==2.26.0
 randfacts==0.15.0
+youtube_dl==2021.12.17
