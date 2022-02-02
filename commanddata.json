@@ -30,7 +30,17 @@
         "quoted": "Create a fake quote of yourself.\n\nCooldown: 1 per 5 seconds.",
         "quotel": "Create a fake quote of yourself. Now in light mode!\n\nCooldown: 1 per 5 seconds.",
 
-        "emoteify": "Create an emote from an image that you can use in the server with NQN.\n\nCooldown: 1 per 10 seconds.",
+        "join": "Joins the authors currnet VC if not in use.",
+        "leave": "Leaves its current VC.",
+        "now": "Show what song is currently playing.",
+        "pause": "Pauses the current song.",
+        "resume": "Resumes the current song is paused.",
+        "stop": "Stops the song.",
+        "skip": "skip the current song.",
+        "queue": "Shows all songs in the queue.",
+        "remove": "Removes a song from the queue.",
+        "loop": "Loops the current song, run again to unpause.",
+        "play": "Play a song or add a song to queue if in use.",
 
         "ping": "Gets bot/api latency.",
         "eval": "Run python code in discord.",
@@ -44,7 +54,7 @@
         "Opinion": ["rate", "ask", "percent", "decide", "poll"],
         "Games": ["fight", "rps"],
         "Image": ["emu", "killoverlay", "quoted", "quotel"],
-        "Pip0ns Palace": ["emoteify"],
+        "Music": ["join", "leave", "play", "now", "pause", "resume", "stop", "skip", "queue", "remove", "loop"],
         "Owner": ["ping", "eval", "reload", "restart"]
     }
 }

@@ -23,7 +23,7 @@ class AidanBot(commands.Bot):
 		return self.prefix
 
 	def __init__(self):
-		self.version = "V1.3 (Rewrite)"
+		self.version = "V1.4 (Rewrite)"
 		self.values = {}
 		self.valid_values = ["welcome_message", "welcome_message_channel","logs_channel","remove_invites","allow_invites_channel"]
 		self.default_values = {"welcome_message":"Please welcome {name}!","welcome_message_channel":False,"logs_channel":False,"remove_invites":False,"allow_invites_channel":False}
@@ -86,7 +86,7 @@ class AidanBot(commands.Bot):
 		await self.invoke(ctx)
 
 	async def on_member_join(self, member):
-		if self.isbeta:
+		if self.client.isbeta:
 			return
 		chan = self.get_value(member.guild, "welcome_message_channel")
 		if chan:
@@ -127,8 +127,7 @@ class AidanBot(commands.Bot):
 			await ExistError(ctx, self)
 		else:
 			await ComError(ctx, self, error)
-			owner = await self.is_owner(ctx.author)
-			if owner:
+			if self.is_owner(ctx.author):
 				print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
 				traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
@@ -173,7 +172,7 @@ class AidanBot(commands.Bot):
 	@tasks.loop(minutes=10)
 	async def status_loop(self):
 		phrases = [
-			"MOM GET THE CAMERA!", "Imagine using {other}.", "1 year old yeeeeahh!!!",
+			"MOM GET THE CAMERA!", "Imagine using {other}.",
 			"HOW?!?!", "Go f{prefix}{prefix}k yourself..", "{prefix} for help... please?",
 			"king of hearts, all in. it's not a sin to wanna win.", "offline", "only true OG's remeber {prefix}wake",
 			"trans rights!", "{name} > {other}", "reject reactions, embrace buttons!","who am i??? no please tell me.",
@@ -188,5 +187,5 @@ class AidanBot(commands.Bot):
 			"?????????", "Yeah ok", "Sussy Sussy Sussy", "Lorem ipsum dolor sit amet", "if mee6 is next to me make sure to put it in the trash where NFT supporters belong."
 		]
 		allphrases = [*phrases, *self.botphrases]
-		phrase = "1 year old yeeeeahh!!!" #choice(allphrases)
+		phrase = choice(allphrases)
 		await self.change_presence(activity=discord.Activity(name=phrase.format(name=self.name, other=self.other, prefix=self.prefix, rand=randint(5,20)),type=discord.ActivityType.playing))
