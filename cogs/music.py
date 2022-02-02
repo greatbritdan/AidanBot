@@ -11,6 +11,12 @@ from functions import getComEmbed
 
 youtube_dl.utils.bug_reports_message = lambda: ""
 
+# fuck ffmpeg
+import ctypes
+import ctypes.util
+find_opus = ctypes.util.find_library('opus')
+discord.opus.load_opus(find_opus)
+
 class VoiceError(Exception):
     pass
 class YTDLError(Exception):
