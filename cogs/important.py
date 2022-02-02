@@ -51,7 +51,7 @@ class ImportantCog(commands.Cog):
 				"Opinion": ["The fun commands.", "📣"],
 				"Games": ["The game commands.", "🎮"],
 				"Image": ["Image manipulation commands.", "🖌️"],
-				"Pip0ns Palace": ["Commands exclusive to Pip0n's palace", "<:UpPipe:836997889234042910>"],
+				"Music": ["Music bot commands.", "🎤"],
 				"Owner": ["Commands only Aidan can use.", "<:AidanSmug:837001740947161168>"]
 			}
 			categories = {
