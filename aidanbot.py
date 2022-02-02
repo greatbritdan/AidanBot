@@ -23,7 +23,7 @@ class AidanBot(commands.Bot):
 		return self.prefix
 
 	def __init__(self):
-		self.version = "V1.4 (Rewrite)"
+		self.version = "V1.3.5 (Rewrite)"
 		self.values = {}
 		self.valid_values = ["welcome_message", "welcome_message_channel","logs_channel","remove_invites","allow_invites_channel"]
 		self.default_values = {"welcome_message":"Please welcome {name}!","welcome_message_channel":False,"logs_channel":False,"remove_invites":False,"allow_invites_channel":False}
