@@ -36,7 +36,7 @@ class AidanBot(commands.Bot):
 		}
 
 		intents = discord.Intents(
-			guilds=True, members=True, bans=True, emojis_and_stickers=False, integrations=False, webhooks=False,
+			guilds=True, members=True, bans=True, emojis_and_stickers=False, integrations=False, webhooks=True,
 			invites=False, voice_states=False, presences=False, messages=True, reactions=False, typing=False, scheduled_events=False
 		)
 		super().__init__(command_prefix=self.getprefix, case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False))
