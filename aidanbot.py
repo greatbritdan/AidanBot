@@ -35,7 +35,10 @@ class AidanBot(commands.Bot):
 			"allow_invites_channel":"The channel that invites are allowed in,\nFalse means off, String means channel name, Integer means channel id.\n**Type:** False/String/Integer",
 		}
 
-		intents = discord.Intents.all()
+		intents = discord.Intents(
+			guilds=True, members=True, bans=True, emojis_and_stickers=False, integrations=False, webhooks=False,
+			invites=False, voice_states=False, presences=False, messages=True, reactions=False, typing=False, scheduled_events=False
+		)
 		super().__init__(command_prefix=self.getprefix, case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False))
 
 		for filename in os.listdir('./cogs'):
