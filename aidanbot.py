@@ -1,16 +1,16 @@
 import discord
-from discord.ext import commands, tasks
-from discord.message import Attachment
+from discord.ext import commands
 from discord.utils import find, get
 
 import os, traceback, sys
-from random import choice, randint
 
 from functions import ClientError, ComError, CooldownError, ExistError, ParamError, SendDM, getComEmbed
 
 import json
-with open('./profiles.json') as file:
+with open('./data/profiles.json') as file:
 	PROFILES = json.load(file)
+with open('./data/values.json') as file:
+	VALUES = json.load(file)
 
 # My Son.
 class AidanBot(commands.Bot):
@@ -23,23 +23,10 @@ class AidanBot(commands.Bot):
 		return self.prefix
 
 	def __init__(self):
-		self.version = "V1.3.5 (Rewrite)"
-		self.values = {}
-		self.valid_values = ["welcome_message", "welcome_message_channel","logs_channel","remove_invites","allow_invites_channel"]
-		self.default_values = {"welcome_message":"Please welcome {name}!","welcome_message_channel":False,"logs_channel":False,"remove_invites":False,"allow_invites_channel":False}
-		self.desc_values = {
-			"welcome_message":"The message that sends when a user joins your server, only works if `welcome_message_channel` is set.\n**Type:** String",
-			"welcome_message_channel":"The channel that receives a message when a user joins your server,\nFalse means off, String means channel name, Integer means channel id.\n**Type:** False/String/Integer",
-			"logs_channel":"The channel that receives a message when your server is edited,\nFalse means off, String means channel name, Integer means channel id.\n**Type:** False/String/Integer",
-			"remove_invites":"If invites are removed.\n**Type:** Boolean",
-			"allow_invites_channel":"The channel that invites are allowed in,\nFalse means off, String means channel name, Integer means channel id.\n**Type:** False/String/Integer",
-		}
+		self.version = "V1.4.5 (Rewrite)"
 
-		intents = discord.Intents(
-			guilds=True, members=True, bans=True, emojis_and_stickers=False, integrations=False, webhooks=True,
-			invites=False, voice_states=False, presences=False, messages=True, reactions=False, typing=False, scheduled_events=False
-		)
-		super().__init__(command_prefix=self.getprefix, case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False))
+		intents = discord.Intents( guilds=True, members=True, bans=True, emojis_and_stickers=False, integrations=False, webhooks=False, invites=False, voice_states=False, presences=False, messages=True, reactions=False, typing=False, scheduled_events=False )
+		super().__init__(command_prefix=self.getprefix, case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
 
 		for filename in os.listdir('./cogs'):
 			if filename.endswith('.py') and not filename.startswith('_'):
@@ -62,23 +49,28 @@ class AidanBot(commands.Bot):
 				self[name] = PROFILES["beta"][name]
 		else:
 			print("< client not recognised >")
+			return
+
+		self.values = {}
+		self.valid_values = []
+		self.default_values = {}
+		self.desc_values = {}
+		for val in VALUES:
+			self.valid_values.append(val)
+			self.default_values[val] = VALUES[val]["default"]
+			self.desc_values[val] = VALUES[val]["help"]
 		
 		await self.values_msgupdate("load")
 		await self.change_presence(activity=discord.Activity(name=f"{self.prefix}help for help!",type=discord.ActivityType.playing))
-		print(f'Logged in: {self.user.name}')
+		print(f"< Logged in: {self.user.name} >")
+
+	# events #
 
 	async def on_message(self, message):
 		if not self.is_ready():
 			return
-
-		if (not self.isbeta) and "discord.gg" in message.content.lower() and self.get_value(message.guild, "remove_invites"):
-			channel = self.getvaluechannel(message.guild, self.get_value(message.guild, "allow_invites_channel"))
-			if (not channel) or message.channel != channel:
-				await message.delete()
-				if channel:
-					await message.channel.send(f"No posting invites outside of {channel.name}. >:(")
-				else:
-					await message.channel.send("No posting invites in this server. >:(")
+		if (not self.isbeta) and await self.handle_invites(message):
+			return
 
 		ctx = await self.get_context(message)
 		owner = await self.is_owner(ctx.author)
@@ -87,8 +79,17 @@ class AidanBot(commands.Bot):
 
 		await self.invoke(ctx)
 
+	async def handle_invites(self, message):
+		if "discord.gg" in message.content.lower() and self.get_value(message.guild, "remove_invites"):
+			channel = self.getvaluechannel(message.guild, self.get_value(message.guild, "allow_invites_channel"))
+			if ((not channel) or message.channel != channel) and (not message.channel.permissions_for(message.author).ban_members):
+				await message.delete()
+				if channel:
+					return await message.channel.send(f"No posting invites outside of {channel.name}. >:(")
+				return await message.channel.send("No posting invites in this server. >:(")
+
 	async def on_member_join(self, member):
-		if self.isbeta:
+		if self.client.isbeta:
 			return
 		chan = self.get_value(member.guild, "welcome_message_channel")
 		if chan:
@@ -109,7 +110,7 @@ class AidanBot(commands.Bot):
 					chan = c
 					break
 		if chan:
-			emb = getComEmbed(None, self, "Welcome!", f"Hello world!.. oh uhh i meant {guild.name}!", "I'm AidanBot, a dumb bot made by Aidan#8883 (that mari0 guy).\nI'm a general bot that has many features and prides myself on not having premium.\n\nFrom useless commands like $ask and $rate, to moderation features like a $timeout command. and everything imbetween. I'll make a great addition to the server.\n\nBefore we get started, you might want to read my [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service) and [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy). As well as chck out my User guide (Coming soon).", fields=[])
+			emb = getComEmbed(None, self, "Welcome!", f"Hello world!.. oh uhh i meant {guild.name}!", f"I'm {self.name}, a dumb bot made by Aidan#8883 (that mari0 guy).\nI'm a general bot that has many features and prides myself on not having premium.\n\nFrom useless commands like $ask and $rate, to moderation features like a $timeout command. and everything imbetween. I'll make a great addition to the server.\n\nBefore we get started, you might want to read my [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service) and [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy). As well as chck out my User guide (Coming soon).", fields=[])
 			await chan.send(embed=emb)
 
 	async def on_guild_remove(self, guild):
@@ -132,6 +133,8 @@ class AidanBot(commands.Bot):
 			if self.is_owner(ctx.author):
 				print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
 				traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+
+	# epic values #
 
 	async def values_msgupdate(self, typ):
 		guild = get(self.guilds, id=879063875469860874)
@@ -165,7 +168,7 @@ class AidanBot(commands.Bot):
 			return self.default_values[name]
 		return False
 
-	async def set_value(self, guild, name, value):
+	def set_value(self, guild, name, value):
 		if str(guild.id) in self.values and name in self.valid_values:
 			self.values[str(guild.id)][name] = value
 			return True
