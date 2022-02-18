@@ -2,12 +2,12 @@ import discord
 from discord.ext import commands
 from discord.utils import find
 
-import asyncio
+import asyncio, time
 
-from functions import getComEmbed, getEmbed
+from functions import getComEmbed
 
 import json
-with open('./commanddata.json') as file:
+with open('./data/commanddata.json') as file:
 	temp = json.load(file)
 	DESC = temp["desc"]
 	ORDER = temp["order"]
@@ -16,11 +16,17 @@ class ImportantCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
+	@commands.command(description=DESC["ping"])
+	async def ping(self, ctx):
+		start_time = time.time()
+		message = await ctx.reply("Testing Ping...", mention_author=False)
+		apitime = start_time - time.time()
+		await message.edit(content="Ping Pong motherfliper!```\nBOT: {:.2f} seconds\nAPI: {:.2f} seconds\n```".format(self.client.latency, apitime))
+
 	@commands.command(description=DESC["help"], aliases=["helpmeh"])
 	@commands.cooldown(1, 10)
 	async def help(self, ctx, name:str=None):
 		prefix = self.client.prefix
-
 		if name: 
 			command = await getCommand(ctx, self.client, name)
 			if command != "NotWork": # Get help on a spesific command
@@ -51,7 +57,6 @@ class ImportantCog(commands.Cog):
 				"Opinion": ["The fun commands.", "📣"],
 				"Games": ["The game commands.", "🎮"],
 				"Image": ["Image manipulation commands.", "🖌️"],
-				"Music": ["Music bot commands.", "🎤"],
 				"Owner": ["Commands only Aidan can use.", "<:AidanSmug:837001740947161168>"]
 			}
 			categories = {
@@ -182,7 +187,7 @@ class ImportantCog(commands.Cog):
 						except ValueError:
 							value = value
 
-					suc = await self.client.set_value(ctx.guild, name, value)
+					suc = self.client.set_value(ctx.guild, name, value)
 					if suc:
 						txt = f"{name} has been set to `{str(value)}`."
 						edited = True

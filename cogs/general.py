@@ -3,28 +3,18 @@ from discord.ext import commands
 from discord.utils import find
 
 import randfacts
-from random import randint, choice
+from random import randint
 
-from functions import ComError, getComEmbed
+from functions import ComError
 
 import json
-with open('./commanddata.json') as file:
+with open('./data/commanddata.json') as file:
 	temp = json.load(file)
 	DESC = temp["desc"]
 
 class GeneralCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
-		self.embedargs = {
-			"title":["str", ""],"desc":["str", ""],"colorr":["int", 20],"colorg":["int", 29],"colorb":["int", 37],"footer":["str", None],
-			"footerimg":["str", None],"author":["str", None],"authorimg":["str", None],"showtime":["bool", False],"img":["str", None],
-		}
-
-	@commands.command(description=DESC["echo"])
-	@commands.cooldown(1, 5)
-	async def echo(self, ctx, *, text:str="\*yawn*"):
-		await ctx.message.delete()
-		await ctx.send(text, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
 
 	@commands.command(description=DESC["react"])
 	@commands.cooldown(1, 5)
@@ -45,6 +35,7 @@ class GeneralCog(commands.Cog):
 
 	@commands.command(description=DESC["clone"])
 	@commands.cooldown(1, 5)
+	@commands.has_permissions(manage_webhooks=True)
 	async def clone(self, ctx, name, *, message):
 		if self.client.prefix in message:
 			await ComError(ctx, self.client, "No running commands in clone.")
@@ -76,15 +67,6 @@ class GeneralCog(commands.Cog):
 					"name": member.display_name,
 					"pfp": member.display_avatar.url
 				}
-		if not temp:
-			emote = find(lambda m: name.lower() == m.name.lower(), ctx.guild.emojis)
-			if not emote:
-				emote = find(lambda m: name.lower() in m.name.lower(), ctx.guild.emojis)
-			if emote:
-				temp = {
-					"name": emote.name,
-					"pfp": emote.url
-				}
 
 		if temp:
 			hook = ""
@@ -111,15 +93,6 @@ class GeneralCog(commands.Cog):
 	async def fact(self, ctx):
 		fact = randfacts.get_fact()
 		await ctx.send(f"Did you know, {fact}")
-
-	@commands.command(hidden=True)
-	@commands.cooldown(1, 5)
-	async def bucket(self, ctx):
-		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333693094547566/cd805_y_bucket-yellow.webp", "https://cdn.discordapp.com/attachments/880033942420484157/882333695162343424/cd807_y_bucket-red.webp"]
-
-		emb = getComEmbed(ctx, self.client, "Bucket", "Buket", "")
-		emb.set_image(url=choice(urls))
-		await ctx.send(embed=emb)
 
 def setup(client):
 	client.add_cog(GeneralCog(client))

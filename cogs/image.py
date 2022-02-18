@@ -1,15 +1,14 @@
 import discord
 from discord.ext import commands
 
-from PIL import Image, ImageFont, ImageDraw, ImageOps, ImageEnhance
-
-import io, datetime, math
+import io, math
+from PIL import Image, ImageFont, ImageDraw, ImageEnhance
 from copy import deepcopy
 
 from functions import ComError
 
 import json
-with open('./commanddata.json') as file:
+with open('./data/commanddata.json') as file:
 	temp = json.load(file)
 	DESC = temp["desc"]
 
@@ -80,58 +79,6 @@ class ImageCog(commands.Cog):
 				frames[index].paste(overcopy, (frames[index].width-math.ceil((frames[index].width-over.width)/2),0), overcopy)
 
 		await sendFrames(ctx, frames, duration)
-
-	@commands.command(description=DESC["quoted"], aliases=["quote", "darkquote", "darkmodequote", "quotedark"])
-	@commands.cooldown(1, 5)
-	async def quoted(self, ctx, *, text="text"):
-		await self.gen_quote(ctx, ctx.author, text, False)
-
-	@commands.command(description=DESC["quotel"], aliases=["lightquote", "lightmodequote", "quotelight"])
-	@commands.cooldown(1, 5)
-	async def quotel(self, ctx, *, text="text"):
-		await self.gen_quote(ctx, ctx.author, text, True)
-
-	@commands.command()
-	@commands.is_owner()
-	async def quoteo(self, ctx, text="text", user:discord.Member=None, light:bool=False):
-		if not user:
-			user = ctx.author
-		await self.gen_quote(ctx, user, text, light)
-
-	async def gen_quote(self, ctx, user, text, lightmode=False):
-		backcol, textcol, alttextcol = (54,57,63), (255,255,255), (116, 127, 141)
-		if lightmode:
-			backcol, textcol, alttextcol = (255,255,255), (46, 51, 56), (114, 118, 125)
-
-		font = ImageFont.truetype("assets/whitneymedium.ttf", 16)
-		fontbold = ImageFont.truetype("assets/whitneysemibold.ttf", 16)
-		fontsmall = ImageFont.truetype("assets/whitneymedium.ttf", 10)
-		time = datetime.datetime.now()
-
-		col = user.color
-		name = user.display_name
-		textsize = font.getsize(text)[0]
-		namesize = fontbold.getsize(name)[0]
-
-		maxwidth = textsize
-		if maxwidth < namesize:
-			maxwidth = namesize
-
-		image = Image.new("RGBA", (40+(12*3)+maxwidth,40+(12*2)), backcol)
-		pfp = Image.open(io.BytesIO(await user.display_avatar.read())).resize((40,40))
-
-		mask = Image.open("assets/mask.png").convert("L").resize((40,40))
-		newpfp = ImageOps.fit(pfp, (40,40), centering=(0.5, 0.5))
-		newpfp.putalpha(mask)
-
-		draw = ImageDraw.Draw(image)
-
-		image.paste(newpfp, (12, 12), newpfp)
-		draw.text((12+40+16, 9), name, font=fontbold, fill=(col.r, col.g, col.b))
-		draw.text((12+40+namesize+24, 15), text="Today at " + time.strftime("%H:%M"), font=fontsmall, fill=alttextcol)
-		draw.text((12+40+16, 33), text=text, font=font, fill=textcol)
-
-		await sendImage(ctx, image)
 
 def backtext(draw, x, y, text, gap, font):
 	draw.text((x-gap, y), text, font=font, fill="black")

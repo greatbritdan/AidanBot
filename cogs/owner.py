@@ -1,13 +1,13 @@
 import discord
 from discord.ext import commands
 
-import os, time, asyncio, contextlib, io, textwrap, sys
+import os, asyncio, contextlib, io, textwrap, sys
 from traceback import format_exception
 
-from functions import SendDM, getComEmbed
+from functions import getComEmbed
 
 import json
-with open('./commanddata.json') as file:
+with open('./data/commanddata.json') as file:
 	temp = json.load(file)
 	DESC = temp["desc"]
 
@@ -15,13 +15,11 @@ class OwnerCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(description=DESC["ping"])
+	@commands.command(description=DESC["echo"])
 	@commands.is_owner()
-	async def ping(self, ctx):
-		start_time = time.time()
-		message = await ctx.reply("Testing Ping...", mention_author=False)
-		end_time = time.time()
-		await message.edit(content=f"Ping Pong mother||fuck||er!\nBot: {round(self.client.latency * 1000)}ms\nAPI: {round((end_time - start_time) * 1000)}ms")
+	async def echo(self, ctx, *, text:str="\*yawn*"):
+		await ctx.message.delete()
+		await ctx.send(text, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
 
 	@commands.command(name="eval", description=DESC["eval"])
 	@commands.is_owner()
@@ -36,12 +34,6 @@ class OwnerCog(commands.Cog):
 			"guild": ctx.guild,
 		}
 		stdout = io.StringIO()
-
-		bannedwords = ["ban", "kick", "delete"]
-		for bword in bannedwords:
-			if bword in code:
-				await ctx.send(f"**You attempted to run banned word in eval.** `{bword}`\n\nIf you need to use this for any reason make a command instead as it's more safe.")
-				return
 	
 		try:
 			with contextlib.redirect_stdout(stdout):

@@ -7,7 +7,7 @@ from random import randint, choice
 from functions import getComEmbed, getBar
 
 import json
-with open('./commanddata.json') as file:
+with open('./data/commanddata.json') as file:
 	temp = json.load(file)
 	DESC = temp["desc"]
 

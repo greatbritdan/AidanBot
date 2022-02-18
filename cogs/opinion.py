@@ -7,7 +7,7 @@ from random import seed, choice, randint
 from functions import getComEmbed, ComError, getIntFromText, getBar
 
 import json
-with open('./commanddata.json') as file:
+with open('./data/commanddata.json') as file:
 	temp = json.load(file)
 	DESC = temp["desc"]
 
@@ -31,12 +31,15 @@ class OpinionCog(commands.Cog):
 			w = word.lower()
 			for l in removelist:
 				w = w.replace(l, "")
+
 			if w in convertwords:
 				word = word.lower().replace(w, convertwords[w])
 			
 			newords.append(word)
 
-		thing = " ".join(newords)
+		thing = " "
+		thing = thing.join(newords)
+
 		seed(getIntFromText(thing.lower()))
 
 		responces = [
@@ -80,8 +83,11 @@ class OpinionCog(commands.Cog):
 	@commands.command(description=DESC["ask"])
 	@commands.cooldown(1, 5)
 	async def ask(self, ctx, *, question):
-		starts, answers = [], []
-		start, answer = "", ""
+		starts = []
+		answers = []
+		answer = ""
+		start = ""
+		getseed = True
 		question = question.lower()
 		if question.startswith("how many"):
 			num = str(randint(0, 20))
@@ -104,7 +110,8 @@ class OpinionCog(commands.Cog):
 			starts = ["how do i put this... ", "my stupid heart tells me ", "uhhhhh, ", "actually. ", "", "", ""]
 			answers = ["ye.", "no.", "absolutely not!", "HAH, NO WAY AT ALL.", "maybe, probably...", "uhhh, it's unlikely", "i can't tell, sorry."]
 
-		seed(getIntFromText(question.lower()))
+		if getseed:
+			seed(getIntFromText(question.lower()))
 		if len(answers) > 0:
 			answer = answers[randint(0, len(answers)-1)]
 		if len(starts) > 0:
@@ -145,12 +152,9 @@ class OpinionCog(commands.Cog):
 	@commands.command(description=DESC["poll"])
 	@commands.cooldown(1, 12)
 	async def poll(self, ctx, question, *options):
-		total, strmax = 0, 0
+		total = 0
+		strmax = 0
 		results = []
-		if len(options) < 2:
-			await ComError(ctx, self.client, "Poll needs at least 2 options.")
-			return
-		
 		usersvoted = {}
 		for op in options:
 			if len(op) > strmax:
