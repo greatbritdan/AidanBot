@@ -89,7 +89,7 @@ class AidanBot(commands.Bot):
 				return await message.channel.send("No posting invites in this server. >:(")
 
 	async def on_member_join(self, member):
-		if self.client.isbeta:
+		if self.isbeta:
 			return
 		chan = self.get_value(member.guild, "welcome_message_channel")
 		if chan:
