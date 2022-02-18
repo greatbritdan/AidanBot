@@ -1,0 +1,19 @@
+{
+    "836936601824788520": {
+        "welcome_message": "**welcome to the server** {mention}, enjoy your stay. <a:Pip0nSpeen:837000733441130567>",
+        "welcome_message_channel": 836936602281705482,
+        "logs_channel": 931948056876838944,
+        "remove_invites": true,
+        "allow_invites_channel": 836942838755098624
+    },
+    "879063875469860874": {
+        "welcome_message": "Please welcome {name}!",
+        "welcome_message_channel": false,
+        "logs_channel": false
+    },
+    "760987756985843733": {
+        "welcome_message": "Please welcome {name}!",
+        "welcome_message_channel": false,
+        "logs_channel": "guild-logs"
+    }
+}
