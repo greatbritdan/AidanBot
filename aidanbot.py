@@ -25,7 +25,7 @@ class AidanBot(commands.Bot):
 	def __init__(self):
 		self.version = "V1.4.5 (Rewrite)"
 
-		intents = discord.Intents( guilds=True, members=True, bans=True, emojis_and_stickers=False, integrations=False, webhooks=False, invites=False, voice_states=False, presences=False, messages=True, reactions=False, typing=False, scheduled_events=False )
+		intents = discord.Intents( guilds=True, members=True, bans=True, emojis_and_stickers=False, integrations=False, webhooks=False, invites=False, voice_states=False, presences=False, messages=True, message_content=True, reactions=False, typing=False, scheduled_events=False )
 		super().__init__(command_prefix=self.getprefix, case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
 
 		for filename in os.listdir('./cogs'):
