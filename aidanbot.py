@@ -91,12 +91,10 @@ class AidanBot(commands.Bot):
 	async def on_member_join(self, member):
 		if self.isbeta:
 			return
-		chan = self.get_value(member.guild, "welcome_message_channel")
-		if chan:
-			channel = self.getvaluechannel(member.guild, chan)
-			if channel:
-				msg = self.get_value(member.guild, "welcome_message")
-				await channel.send(msg.format(name=member.name, mention=member.mention, user=member, member=member, server=member.guild, guild=member.guild))
+		channel = self.getvaluechannel(member.guild, self.get_value(member.guild, "welcome_message_channel"))
+		msg = self.get_value(member.guild, "welcome_message")
+		if channel and msg:
+			await channel.send(msg.format(name=member.name, mention=member.mention, user=member, member=member, server=member.guild, guild=member.guild))
 
 	async def on_guild_join(self, guild):
 		await SendDM(self, "SOMEONE DID WHAT?!?!", f"Added to {guild.name}!")
