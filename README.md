@@ -32,3 +32,6 @@ Under this license you may not:
 For futhuer information, contact me directly on discord (Aidan#8883).
 
 # User Guide (Coming soon)
+
+# Unstable commands
+This command is currently unstable, issues, bugs and errors are likely to occour and you shouldn't rely on them just yet, if you'd like to help test this command I'd be very happy, make an issue with all the issues you find and that'll help speed up its development and get it removed from here.
