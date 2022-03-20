@@ -7,16 +7,11 @@ from copy import deepcopy
 
 from functions import ComError
 
-import json
-with open('./data/commanddata.json') as file:
-	temp = json.load(file)
-	DESC = temp["desc"]
-
 class ImageCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(description=DESC["emu"])
+	@commands.command()
 	@commands.cooldown(1, 5)
 	async def emu(self, ctx, text="text", text2=None):
 		frames, duration = await getFrames(ctx)
@@ -46,7 +41,7 @@ class ImageCog(commands.Cog):
 
 		await sendFrames(ctx, frames, duration)
 
-	@commands.command(description=DESC["killoverlay"])
+	@commands.command()
 	@commands.cooldown(1, 5)
 	async def killoverlay(self, ctx, name="minecraft"):
 		types = ["minecraft", "darksouls", "ass", "gta"]

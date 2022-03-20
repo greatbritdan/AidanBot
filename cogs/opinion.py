@@ -6,17 +6,12 @@ from random import seed, choice, randint
 
 from functions import getComEmbed, ComError, getIntFromText, getBar
 
-import json
-with open('./data/commanddata.json') as file:
-	temp = json.load(file)
-	DESC = temp["desc"]
-
 class OpinionCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(description=DESC["rate"])
-	@commands.cooldown(1, 5)
+	@commands.command()
+	@commands.cooldown(1, 1)
 	async def rate(self, ctx, *, thing):
 		if thing.lower() == "me":
 			thing = ctx.author.name
@@ -80,8 +75,8 @@ class OpinionCog(commands.Cog):
 		emb = getComEmbed(ctx, self.client, "Rate", txt.format(thing), fields=[["Score", "`{0}/10`".format(rating)]])
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description=DESC["ask"])
-	@commands.cooldown(1, 5)
+	@commands.command()
+	@commands.cooldown(1, 1)
 	async def ask(self, ctx, *, question):
 		starts = []
 		answers = []
@@ -123,8 +118,8 @@ class OpinionCog(commands.Cog):
 		emb = getComEmbed(ctx, self.client, "Ask", fullans)
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description=DESC["percent"])
-	@commands.cooldown(1, 5)
+	@commands.command()
+	@commands.cooldown(1, 1)
 	async def percent(self, ctx, something, *, person=None):
 		if person == None:
 			seed(getIntFromText(something.lower() + ctx.author.name))
@@ -139,18 +134,19 @@ class OpinionCog(commands.Cog):
 			emb = getComEmbed(ctx, self.client, "Percent", f"{person} is **{str(value)}%** {something}.", end)
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description=DESC["decide"], aliases=["choose"])
-	@commands.cooldown(1, 5)
+	@commands.command(aliases=["choose"])
+	@commands.cooldown(1, 1)
 	async def decide(self, ctx, *decisions):
 		if decisions == None:
-			await ComError(ctx, self.client, "Decision needs more than 0 choices.")
-			return
+			return await ComError(ctx, self.client, "Decision needs more than 0 choices.")
+		elif len(decisions) == 1:
+			return await ctx.reply(embed=getComEmbed(ctx, self.client, "Decide", f"What- what do you expect me to say??? The only choise is {decisions[0]} so {decisions[0]}.\nDumba- oh wait be familiy friendly, you poopoo.."), mention_author=False)
 
 		emb = getComEmbed(ctx, self.client, "Decide", f"I choose... {choice(decisions)}")
 		await ctx.reply(embed=emb, mention_author=False)
 
-	@commands.command(description=DESC["poll"])
-	@commands.cooldown(1, 12)
+	@commands.command()
+	@commands.cooldown(1, 10)
 	async def poll(self, ctx, question, *options):
 		total = 0
 		strmax = 0

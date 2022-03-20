@@ -1,27 +1,22 @@
 import discord
 from discord.ext import commands
 
-import os, asyncio, contextlib, io, textwrap, sys
+import os, contextlib, io, textwrap, sys
 from traceback import format_exception
 
-from functions import getComEmbed
-
-import json
-with open('./data/commanddata.json') as file:
-	temp = json.load(file)
-	DESC = temp["desc"]
+from functions import getComEmbed, areyousure
 
 class OwnerCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command(description=DESC["echo"])
+	@commands.command()
 	@commands.is_owner()
-	async def echo(self, ctx, *, text:str="\*yawn*"):
+	async def echo(self, ctx, *, text:str="*yawn*"):
 		await ctx.message.delete()
 		await ctx.send(text, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
 
-	@commands.command(name="eval", description=DESC["eval"])
+	@commands.command(name="eval")
 	@commands.is_owner()
 	async def _eval(self, ctx, *, code:str):
 		code = clean_code(code)
@@ -37,7 +32,7 @@ class OwnerCog(commands.Cog):
 	
 		try:
 			with contextlib.redirect_stdout(stdout):
-				exec(f"async def func():\n{textwrap.indent(code, '    ')}", local_variables)
+				exec(f"import discord\n\nasync def func():\n{textwrap.indent(code, '    ')}", local_variables)
 				obj = await local_variables["func"]()
 				if obj and obj == "NoSend":
 					return
@@ -49,7 +44,7 @@ class OwnerCog(commands.Cog):
 			emb = getComEmbed(ctx, self.client, "Eval", "Results:", f"```\n{result}\n```")
 			await ctx.send(embed=emb)
 
-	@commands.command(description=DESC["reload"])
+	@commands.command()
 	@commands.is_owner()
 	async def reload(self, ctx, extension):
 		if len(extension) == 1:
@@ -59,23 +54,11 @@ class OwnerCog(commands.Cog):
 				extension = "opinion"
 			elif extension == "i":
 				extension = "important"
+			elif extension == "m":
+				extension = "moderation"
 
 		if extension and extension == "owner":
-			MSG = await ctx.send(f'```if it crashes you wont be able to reload, are you sure?```', view=discord.ui.View(
-				discord.ui.Button(label="Yes", style=discord.ButtonStyle.red, custom_id="accept"), discord.ui.Button(label="No Actually", style=discord.ButtonStyle.green, custom_id="deny")
-			))
-			def check(interaction):
-				return (interaction.user.id == self.client.owner_id and interaction.message.id == MSG.id and (interaction.data["custom_id"] == "accept" or interaction.data["custom_id"] == "deny"))
-			try:
-				interaction = await self.client.wait_for("interaction", timeout=10, check=check)
-				await MSG.delete()
-				if interaction.data["custom_id"] == "deny":
-					return
-			except asyncio.TimeoutError:
-				await MSG.edit("```Timeout.```", view=discord.ui.View(
-					discord.ui.Button(label="Yes", style=discord.ButtonStyle.red, custom_id="accept", disabled=True), discord.ui.Button(label="No Actually", style=discord.ButtonStyle.green, custom_id="deny", disabled=True)
-				))
-				return
+			await areyousure(self.client, ctx, f'```if it crashes you wont be able to reload, are you sure?```')
 		
 		if f"cogs.{extension}" in self.client.extensions:
 			self.client.unload_extension(f'cogs.{extension}')
@@ -85,7 +68,7 @@ class OwnerCog(commands.Cog):
 			self.client.load_extension(f'cogs.{extension}')
 			await ctx.send('```{} loaded!```'.format(extension))
 
-	@commands.command(description=DESC["restart"])
+	@commands.command()
 	@commands.is_owner()
 	async def restart(self, ctx):
 		await ctx.send("Restarting bot...")
