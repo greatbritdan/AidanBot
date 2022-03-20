@@ -7,6 +7,7 @@
         "default":false,
         "help":"The channel that receives a message when a user joins your server,\nFalse means off, String means channel name, Integer means channel id.\n**Type:** False/String/Integer"
     },
+
     "remove_invites": {
         "default":false,
         "help":"If invites are removed.\n**Type:** Boolean"
@@ -14,5 +15,33 @@
     "allow_invites_channel": {
         "default":false,
         "help":"The channel that invites are allowed in,\nFalse means off, String means channel name, Integer means channel id.\n**Type:** False/String/Integer"
+    },
+
+    "prefix": {
+        "default":false,
+        "help":"The prefix the bot will use in this server,\nFalse means use default ($), and string means custom prefix (duh).\n**Type:** False/String"
+    },
+
+    "birthday_announcement_channel": {
+        "default":false,
+        "help":"The channel that receives a message when it's a users birthday,\nFalse means off, String means channel name, Integer means channel id.\n**Type:** False/String/Integer"
+    },
+    "birthday_announcement_message": {
+        "default":"Happy Birthday {name}!",
+        "help":"The message that sends when it's a users birthday, only works if `birthday_announcement_channel` is set.\n**Type:** String"
+    },
+    "birthday_role": {
+        "default":false,
+        "help":"The role that members get if it's their birthday,\nFalse means off, String means role name, Integer means role id.\n**Type:** False/String/Integer"
+    },
+
+    "qotd_channel": {
+        "default":false,
+        "help":"The channel that question of the day questions are posted,\nFalse means off, String means channel name, Integer means channel id.\n**Type:** False/String/Integer"
+    },
+    "questions": {
+        "default":[],
+        "help":"Question of the day questions.\n**Type:** Array",
+        "restricted":true
     }
 }
