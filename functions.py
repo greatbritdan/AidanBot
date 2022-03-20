@@ -1,20 +1,25 @@
+import discord
 from discord import Embed, Color
 
-import datetime, math
+import datetime, math, asyncio
 
 # EMBED STUFF #
-def getEmbed(title, desc, col, fields, timestamp=True):
+def getEmbed(title, desc, col, fields, timestamp=True, inline=False):
 	emb = Embed(title=title, description=desc, color=col)
 	if timestamp:
 		emb.timestamp = datetime.datetime.utcnow()
 	for f in fields:
-		emb.add_field(name=f[0], value=f[1], inline=False)
+		inline = inline
+		emb.add_field(name=f[0], value=f[1], inline=inline)
 	return emb
 
-def getComEmbed(ctx=None, client=None, command="N/A", title=Embed.Empty, desc=Embed.Empty, col=Color.from_rgb(20, 29, 37), fields=[]):
-	emb = getEmbed(title=title, desc=desc, col=col, fields=fields)
+def getComEmbed(ctx=None, client=None, command="N/A", title=Embed.Empty, desc=Embed.Empty, col=Color.from_rgb(20, 29, 37), fields=[], inline=False):
+	emb = getEmbed(title=title, desc=desc, col=col, fields=fields, inline=inline)
 	if ctx:
-		emb.set_footer(text=f"Requested by {ctx.author} in #{ctx.channel}")
+		if isinstance(ctx.channel, discord.channel.DMChannel):
+			emb.set_footer(text=f"Requested by {ctx.author} in a private DM")
+		else:
+			emb.set_footer(text=f"Requested by {ctx.author} in #{ctx.channel}")
 	emb.set_author(name=f"{client.name} > {command}", icon_url=client.pfp)
 	return emb
 def getComEmbedSimple(title=Embed.Empty, desc=Embed.Empty, color=Color.from_rgb(20, 29, 37)):
@@ -28,7 +33,7 @@ async def ComError(ctx, client, error):
 async def ExistError(ctx, client):
     await ctx.send(embed=getComEmbed(ctx, client, "Error", "This command doesn't seem to exist, make sure you typed it right.", "", Color.from_rgb(220, 29, 37)))
 async def ParamError(ctx, client, error):
-    await ctx.send(embed=getComEmbed(ctx, client, "Parameter Error", f"{client.name} has encountered an error and your command was cancelled. See error for more info. This error occurred because either a missing parameter or argument was detected: ", f"Missing required argument for {client.prefix}{ctx.command}: **{error.param}**\n```{client.prefix}{ctx.command} {ctx.command.signature}```", Color.from_rgb(145, 29, 37)))
+    await ctx.send(embed=getComEmbed(ctx, client, "Parameter Error", f"{client.name} has encountered an error and your command was cancelled. See error for more info. This error occurred because either a missing parameter or argument was detected: ", f"Missing required argument for {client.getprefix(client, ctx.message)}{ctx.command}: **{error.param}**\n```{client.getprefix(client, ctx.message)}{ctx.command} {ctx.command.signature}```", Color.from_rgb(145, 29, 37)))
 async def CooldownError(ctx, client, error):
 	await ctx.send(embed=getComEmbed(ctx, client, "Cooldown Error", "Command on cooldown!! ```Try again in {:.2f} seconds.```".format(error.retry_after), "", Color.from_rgb(145, 29, 37)))
 
@@ -36,6 +41,31 @@ async def SendDM(client, title, description):
 	aidan = await client.fetch_user(384439774972215296)
 	emb = getComEmbed(None, client, "System Message", title, description, Color.from_rgb(70, 29, 37))
 	await aidan.send(embed=emb)
+
+# INTERACTIONS #
+
+async def areyousure(client, ctx, txt):
+	MSG = await ctx.send(txt, view=discord.ui.View(
+		discord.ui.Button(label="Yes", style=discord.ButtonStyle.green, custom_id="accept"), discord.ui.Button(label="No", style=discord.ButtonStyle.red, custom_id="deny")
+	))
+	def check(interaction):
+		return (interaction.user.id == client.owner_id and interaction.message.id == MSG.id and (interaction.data["custom_id"] == "accept" or interaction.data["custom_id"] == "deny"))
+	try:
+		interaction = await client.wait_for("interaction", timeout=10, check=check)
+		await MSG.delete()
+		if interaction.data["custom_id"] == "deny":
+			return False
+		else:
+			return True
+	except asyncio.TimeoutError:
+		await MSG.delete()
+		return False
+
+async def userPostedRecently(channel, user, limit):
+	async for msg in channel.history(limit=limit):
+		if msg.author == user:
+			return True
+	return False
 
 # OTHER #
 
@@ -113,3 +143,16 @@ def argsToTime(args):
 
 	timetxt = ",".join(timetxt)
 	return timelist, timetxt
+
+def dateToStr(day, month):
+	months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+	m, d = months[month-1], day
+	if day == 1 or day == 21 or day == 31:
+		d = f"{d}st"
+	elif day == 2 or day == 22:
+		d = f"{d}nd"
+	elif day == 3 or day == 23:
+		d = f"{d}rd"
+	else:
+		d = f"{d}th"
+	return d + " of " + m

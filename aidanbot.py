@@ -1,16 +1,17 @@
 import discord
 from discord.ext import commands
-from discord.utils import find, get
+from discord.utils import find
 
 import os, traceback, sys
 
 from functions import ClientError, ComError, CooldownError, ExistError, ParamError, SendDM, getComEmbed
 
+from replybot import replyBot
+from config import ConfigManager
+
 import json
 with open('./data/profiles.json') as file:
 	PROFILES = json.load(file)
-with open('./data/values.json') as file:
-	VALUES = json.load(file)
 
 # My Son.
 class AidanBot(commands.Bot):
@@ -20,25 +21,35 @@ class AidanBot(commands.Bot):
 		return getattr(self, key)
 
 	def getprefix(self, selfagain, message):
+		if not self.isbeta:
+			prefix = self.CON.get_value(message.guild, "prefix")
+			if prefix:
+				return prefix
+		return self.prefix
+
+	# same as above but just guild. useful when message or ctx is unavalable
+	def getprefixguild(self, guild):
+		if not self.isbeta:
+			prefix = self.CON.get_value(guild, "prefix")
+			if prefix:
+				return prefix
 		return self.prefix
 
 	def __init__(self):
-		self.version = "V1.4.5 (Rewrite)"
+		self.version = "V2 Full"
+		self.replybot = replyBot(self)
+		self.CON = ConfigManager(self, ctype="guild") # guild config
+		self.UCON = ConfigManager(self, ctype="user") # user config
 
-		intents = discord.Intents( guilds=True, members=True, bans=True, emojis_and_stickers=False, integrations=False, webhooks=False, invites=False, voice_states=False, presences=False, messages=True, message_content=True, reactions=False, typing=False, scheduled_events=False )
+		intents = discord.Intents( 
+			guilds=True, members=True, bans=False, emojis_and_stickers=False, integrations=False, webhooks=False, invites=False,
+			voice_states=False, presences=False, messages=True, message_content=True, reactions=False, typing=False, scheduled_events=False
+		)
 		super().__init__(command_prefix=self.getprefix, case_insensitive=True, help_command=None, intents=intents, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
 
 		for filename in os.listdir('./cogs'):
 			if filename.endswith('.py') and not filename.startswith('_'):
 				self.load_extension(f'cogs.{filename[:-3]}')
-
-	def getvaluechannel(self, guild, chan):
-		channel = False
-		if type(chan) == int:
-			channel = get(guild.channels, id=chan)
-		elif type(chan) == str:
-			channel = get(guild.channels, name=chan)
-		return channel
 
 	async def on_ready(self):
 		if self.user.id == 804319602292949013:
@@ -49,50 +60,42 @@ class AidanBot(commands.Bot):
 				self[name] = PROFILES["beta"][name]
 		else:
 			print("< client not recognised >")
+			await self.close()
 			return
-
-		self.values = {}
-		self.valid_values = []
-		self.default_values = {}
-		self.desc_values = {}
-		for val in VALUES:
-			self.valid_values.append(val)
-			self.default_values[val] = VALUES[val]["default"]
-			self.desc_values[val] = VALUES[val]["help"]
 		
-		await self.values_msgupdate("load")
+		await self.CON.ready()
+		await self.UCON.ready()
 		await self.change_presence(activity=discord.Activity(name=f"{self.prefix}help for help!",type=discord.ActivityType.playing))
 		print(f"< Logged in: {self.user.name} >")
+
+		await dict(self.cogs)["BirthdayCog"].ready()
+		await dict(self.cogs)["QOTDCog"].ready()
 
 	# events #
 
 	async def on_message(self, message):
-		if not self.is_ready():
-			return
-		if (not self.isbeta) and await self.handle_invites(message):
-			return
-
 		ctx = await self.get_context(message)
+		if (not self.is_ready()) or message.webhook_id:
+			return
+		if (not self.isbeta) and await self.handle_invites(message): # remove invites
+			return
+		if (not isinstance(ctx.channel, discord.channel.DMChannel)) and (not message.clean_content.startswith(self.getprefix(self, message))) and message.channel.name == "aidanbot-talk" and not message.author.bot: # replybot
+			return await self.replybot.on_message(message)
+		if self.user.mentioned_in(message):
+			emb = getComEmbed(None, self, "That is me!", f"Hey, ya pingd me! I assume you want to know my current prefix huh, it's **{self.getprefix(self, message)}**.")
+			return await message.reply(embed=emb, mention_author=False)
+
 		owner = await self.is_owner(ctx.author)
 		if ctx.command and ctx.command.is_on_cooldown(ctx) and owner:
 			ctx.command.reset_cooldown(ctx)
 
 		await self.invoke(ctx)
 
-	async def handle_invites(self, message):
-		if "discord.gg" in message.content.lower() and self.get_value(message.guild, "remove_invites"):
-			channel = self.getvaluechannel(message.guild, self.get_value(message.guild, "allow_invites_channel"))
-			if ((not channel) or message.channel != channel) and (not message.channel.permissions_for(message.author).ban_members):
-				await message.delete()
-				if channel:
-					return await message.channel.send(f"No posting invites outside of {channel.name}. >:(")
-				return await message.channel.send("No posting invites in this server. >:(")
-
 	async def on_member_join(self, member):
 		if self.isbeta:
 			return
-		channel = self.getvaluechannel(member.guild, self.get_value(member.guild, "welcome_message_channel"))
-		msg = self.get_value(member.guild, "welcome_message")
+		channel = self.CON.get_channel(member.guild, "welcome_message_channel", member.guild)
+		msg = self.CON.get_value(member.guild, "welcome_message")
 		if channel and msg:
 			await channel.send(msg.format(name=member.name, mention=member.mention, user=member, member=member, server=member.guild, guild=member.guild))
 
@@ -114,8 +117,8 @@ class AidanBot(commands.Bot):
 	async def on_guild_remove(self, guild):
 		await SendDM(self, "SOMEONE DID WHAT?!?!", f"Removed from {guild.name}!")
 
-		self.remove_all(guild)
-		await self.values_msgupdate("save")
+		self.CON.remove_all(guild)
+		await self.CON.values_msgupdate("save")
 
 	async def on_command_error(self, ctx, error):
 		if isinstance(error, discord.ClientException):
@@ -128,46 +131,15 @@ class AidanBot(commands.Bot):
 			await ExistError(ctx, self)
 		else:
 			await ComError(ctx, self, error)
-			if self.is_owner(ctx.author):
+			if await self.is_owner(ctx.author):
 				print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
 				traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
-	# epic values #
-
-	async def values_msgupdate(self, typ):
-		guild = get(self.guilds, id=879063875469860874)
-		channel = get(guild.channels, id=931917513128828960)
-		message = await channel.fetch_message(channel.last_message_id)
-		if typ == "load":
-			byte = await message.attachments[0].read()
-			txt = byte.decode("utf-8")
-			self.values = json.loads(txt)
-		elif typ == "save":
-			await message.delete()
-			with open("temp.json", "w") as f:
-				json.dump(self.values, f, indent=4)
-			await channel.send(file=discord.File("temp.json", "values.json"))
-
-	def remove_all(self, guild):
-		if str(guild.id) in self.values:
-			self.values[str(guild.id)] = None
-			return True
-		return False
-
-	def get_all(self, guild):
-		if str(guild.id) in self.values:
-			return self.values[str(guild.id)]
-		return False
-		
-	def get_value(self, guild, name):
-		if str(guild.id) in self.values and name in self.values[str(guild.id)]:
-			return self.values[str(guild.id)][name]
-		if name in self.default_values:
-			return self.default_values[name]
-		return False
-
-	def set_value(self, guild, name, value):
-		if str(guild.id) in self.values and name in self.valid_values:
-			self.values[str(guild.id)][name] = value
-			return True
-		return False
+	async def handle_invites(self, message):
+		if "discord.gg" in message.content.lower() and self.CON.get_value(message.guild, "remove_invites"):
+			channel = self.CON.get_channel(message.guild, "allow_invites_channel", message.guild)
+			if ((not channel) or message.channel != channel) and (not message.channel.permissions_for(message.author).ban_members):
+				await message.delete()
+				if channel:
+					return await message.channel.send(f"No posting invites outside of {channel.name}. >:(")
+				return await message.channel.send("No posting invites in this server. >:(")
