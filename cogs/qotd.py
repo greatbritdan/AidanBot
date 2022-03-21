@@ -51,7 +51,6 @@ class QOTDCog(commands.Cog):
         while True:
             target_time = datetime.datetime.combine(now.date(), when)
             seconds_until_target = (target_time - now).total_seconds()
-            print(seconds_until_target)
             await asyncio.sleep(seconds_until_target)
             await self.changeDay()
             tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
