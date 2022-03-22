@@ -49,6 +49,7 @@ class QOTDCog(commands.Cog):
             seconds = (tomorrow - now).total_seconds()
             await asyncio.sleep(seconds)
         while True:
+            now = datetime.datetime.utcnow()
             target_time = datetime.datetime.combine(now.date(), when)
             seconds_until_target = (target_time - now).total_seconds()
             await asyncio.sleep(seconds_until_target)
