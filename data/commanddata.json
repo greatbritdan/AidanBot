@@ -38,6 +38,7 @@
 
         "qotdadd":           ["Adds a question to the QOTD. Wont work if QOTD is not configured.", "5", false, false],
         "qotdlist":          ["Lists all questions for QOTD. Wont work if QOTD is not configured.", "3", false, false],
+        "qotdremove":        ["Remove all or spesific questions from the QOTD, using 'all' will remove them all. using a number will remove one at a spesific index (starts at 1), and string will find questions with matches.", "3", "manage_messages", false],
 
         "echo":              ["Make me say something.", false, "be owner lo", false],
         "eval":              ["Run python code in discord.", false, "be owner lo", false],
@@ -53,7 +54,7 @@
         "Games":      ["Games!", ":joystick:", ["fight", "fighthelp", "rps", "worble", "worblehelp"]],
         "Image":      ["Image Manipulation Commands!", ":paintbrush:", ["emu", "killoverlay", "quoted", "quotel"]],
         "Birthday":   ["Birthday Based Commands!", ":birthday_cake:", ["setbirthday", "upcomingbirthdays"]],
-        "QOTD":       ["Question Of The Day!", ":red_question_mark:", ["qotdadd", "qotdlist"]],
+        "QOTD":       ["Question Of The Day!", ":red_question_mark:", ["qotdadd", "qotdlist", "qotdremove"]],
         "Owner":      ["You'll never use these (Owner)", "<:AidanSmug:837001740947161168>", ["echo", "eval", "reload", "restart"]]
     }
 }
