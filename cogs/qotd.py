@@ -85,5 +85,43 @@ class QOTDCog(commands.Cog):
         else:
             await ctx.send("This server doesn't have QOTD set up, consider asking an Admin as there may be another bot in charge of qotd!")
 
+    @commands.command()
+    @commands.cooldown(1, 3)
+    @commands.has_permissions(manage_messages=True)
+    async def qotdremove(self, ctx, val):
+        channel = self.client.CON.get_channel(ctx.guild, "qotd_channel", ctx.guild)
+        if channel:
+            total = 0
+            questions = self.client.CON.get_value(ctx.guild, "questions")
+            if val == "all": # all of em
+                total = len(questions)
+                questions = []
+            else:
+                try:
+                    val = int(val)
+                except ValueError:
+                    val = val # not an int pog!!!
+
+                print(val)
+                if type(val) == int and val > 0 and val <= len(questions): # index
+                    total = 1
+                    questions.pop(val-1)
+                elif type(val) == str: # spesific question
+                    newquestions, total = [], len(questions)
+                    for q in questions:
+                        if val not in q:
+                            newquestions.append(q)
+                            total -= 1
+                    questions = newquestions
+  
+            if total > 0:
+                self.client.CON.set_value_force(ctx.guild, "questions", questions)
+                await self.client.CON.values_msgupdate("save")
+                await ctx.send(f"Removed {total} question(s)!")
+            else:
+                await ctx.send(f"No questions removed, this may be because there are no matches or you entered an invalid value")
+        else:
+            await ctx.send("This server doesn't have QOTD set up, consider asking an Admin as there may be another bot in charge of qotd!")
+
 def setup(client):
     client.add_cog(QOTDCog(client))
