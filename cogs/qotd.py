@@ -67,7 +67,9 @@ class QOTDCog(commands.Cog):
             questions.append(question)
             self.client.CON.set_value_force(ctx.guild, "questions", questions)
             await self.client.CON.values_msgupdate("save")
+
             await ctx.send("Question added to qotd!")
+            await ctx.message.delete()
         else:
             await ctx.send("This server doesn't have QOTD set up, consider asking an Admin as there may be another bot in charge of qotd!")
 
