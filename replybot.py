@@ -39,7 +39,7 @@ class replyBot():
         self.states["unsad"] = replyBotState( matchwords=["sad","cry","depressed","depression",":("], reply=["Aww, everything will be ok","I'm here for you",":heart:","chear up :p"] )
         self.states["thanks"] = replyBotState( matchwords=["thanks","thank you"], reply=["yw","you're welcome","anytime",":thumbsup:"] )
 
-        self.statemanager = ["hello|bye|sorry|respond|questionwhendid|questionwhen","*funny|uwu|like|love|hate|unsad|thanks"]
+        self.statemanager = ["hello|bye|sorry|respond", "^questionwhendid|questionwhen", "*funny|uwu|like|love|hate|unsad|thanks"]
 
         self.punctuation = [".",",","!","?",":"]
         self.endpunctuation = [".","!"]
@@ -95,8 +95,9 @@ class replyBot():
 
                         if dontmerge:
                             finished = True
-            if finished:
-                break
+                # this is going in my cringe collection
+                if finished:
+                    break
 
         if laststate and self.states[laststate].endpunc and (not self.ends_in_punct(txt)) and randint(1,2) == 2:
             txt += choice(self.endpunctuation)
