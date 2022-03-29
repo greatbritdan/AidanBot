@@ -90,7 +90,7 @@ class ImportantCog(commands.Cog):
 					title = f"Help ({page})"
 
 				if page == "Info":
-					emb = getComEmbed(ctx, self.client, title, f"Hello, i'm {self.client.name}!", self.client.desc)
+					emb = getComEmbed(ctx, self.client, title, f"Hello, i'm {self.client.name}!", self.client.desc, fields=[["Version:", self.client.version]])
 				else:
 					emb = getComEmbed(ctx, self.client, title, f"All {page} Commands:", f"Run {prefix}help <command> to get more help on a command!\n\n{categorycommands[page]}")
 
