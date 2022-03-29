@@ -93,7 +93,7 @@ class replyBot():
                         if stateobj.replyafter:
                             txt += choice(stateobj.replyafter)
 
-                        if dontmerge:
+                        if canmerge or dontmerge:
                             finished = True
                 # this is going in my cringe collection
                 if finished:
