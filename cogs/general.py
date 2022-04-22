@@ -76,7 +76,7 @@ class GeneralCog(commands.Cog):
 
 	@commands.command()
 	@commands.cooldown(1, 5)
-	@commands.has_permissions(manage_webhooks=True)
+	@commands.bot_has_permissions(manage_webhooks=True)
 	async def clone(self, ctx, name, *, message):
 		if message.startswith(self.client.getprefix(None, ctx.message)):
 			await ComError(ctx, self.client, "No running commands in clone.")
