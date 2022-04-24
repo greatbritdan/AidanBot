@@ -1,6 +1,6 @@
 ﻿git+https://github.com/Pycord-Development/pycord
 dnspython==1.16.0
-async-timeout==3.0.1
+async-timeout==4.0.2
 Pillow==9.0.1
 randfacts==0.15.0
 emoji==1.7.0
