@@ -74,17 +74,22 @@ class AidanBot(commands.Bot):
 	# events #
 
 	async def on_message(self, message):
-		ctx = await self.get_context(message)
+		ctx = await self.get_context(message) # Not out of context
+
+		# don't post if not ready or a webhook
 		if (not self.is_ready()) or message.webhook_id:
 			return
-		if (not self.isbeta) and await self.handle_invites(message): # remove invites
+		# remove invites
+		if (not self.isbeta) and await self.handle_invites(message):
 			return
-		if (not isinstance(ctx.channel, discord.channel.DMChannel)) and (not message.clean_content.startswith(self.getprefix(self, message))) and message.channel.name == "aidanbot-talk" and not message.author.bot: # replybot
+		# replybot stufvs
+		if (not isinstance(ctx.channel, discord.channel.DMChannel)) and (not message.clean_content.startswith(self.getprefix(self, message))) and message.channel.name == "aidanbot-talk" and not message.author.bot:
 			return await self.replybot.on_message(message)
-		if self.user.mentioned_in(message):
+		# ping pong
+		if (not ctx.command) and self.user.mentioned_in(message):
 			emb = getComEmbed(None, self, "That is me!", f"Hey, ya pingd me! I assume you want to know my current prefix huh, it's **{self.getprefix(self, message)}**.")
 			return await message.reply(embed=emb, mention_author=False)
-
+		# i'm too cool for cooldowns
 		owner = await self.is_owner(ctx.author)
 		if ctx.command and ctx.command.is_on_cooldown(ctx) and owner:
 			ctx.command.reset_cooldown(ctx)
