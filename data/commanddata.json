@@ -17,6 +17,7 @@
         "clone":              ["Make a user say anything you want.", "5", false, false],
         "punish":             ["**Punish.**", "5", false, false],
         "fact":               ["Very cool facts! (wowzas!)", "5", false, false],
+        "issue":              ["Submit an issue to the AidanBot Github.", "5", false, false],
  
         "rate":               ["I'll rate something, all my opinions are fact.", "1", false, false],
         "ask":                ["Got a question? AidanBot will answer it, it'll probably be wrong tho.", "1", false, false],
@@ -50,7 +51,7 @@
         "Info":       ["About me!", ":bookmark:", []],
         "Important":  ["Core commands!", ":old_key:", ["help", "ping", "guildconfig", "userconfig"]],
         "Moderation": ["Moderation Commands!", ":hammer_and_wrench:", ["slowmode", "kick", "ban", "clear", "timeout", "auditbackup"]],
-        "General":    ["General Commands!", ":page_facing_up:", ["role", "react", "clone", "punish", "fact"]],
+        "General":    ["General Commands!", ":page_facing_up:", ["role", "react", "clone", "punish", "fact", "issue"]],
         "Opinion":    ["Opinion Commands!", ":loudspeaker:", ["rate", "ask", "percent", "decide", "poll"]],
         "Games":      ["Games!", ":joystick:", ["fight", "fighthelp", "rps", "worble", "worblehelp"]],
         "Image":      ["Image Manipulation Commands!", ":paintbrush:", ["emu", "killoverlay", "quoted", "quotel"]],
