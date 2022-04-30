@@ -22,7 +22,7 @@ class BirthdayCog(commands.Cog):
                 if user in guild.members:
                     member = guild.get_member(user.id)
 
-                    role = self.client.CON.get_role(guild, "birthday_role", guild)
+                    role = self.client.CON.get_value(guild, "birthday_role", guild=guild)
                     if role and role in member.roles:
                         await member.remove_roles(role)
 
@@ -33,12 +33,12 @@ class BirthdayCog(commands.Cog):
                 if user in guild.members:
                     member = guild.get_member(user.id)
 
-                    channel = self.client.CON.get_channel(guild, "birthday_announcement_channel", guild)
+                    channel = self.client.CON.get_value(guild, "birthday_announcement_channel", guild=guild)
                     msg = self.client.CON.get_value(guild, "birthday_announcement_message")
                     if channel and msg:
                         await channel.send(msg.format(name=user.name, mention=user.mention, user=user, member=user))
                     
-                    role = self.client.CON.get_role(guild, "birthday_role", guild)
+                    role = self.client.CON.get_value(guild, "birthday_role", guild=guild)
                     if role:
                         await member.add_roles(role)
 
@@ -74,20 +74,18 @@ class BirthdayCog(commands.Cog):
     async def setbirthday(self, ctx, day:int=None, month:int=None):
         if day and month:
             if day >= 1 and (((month == 1 or month == 3 or month == 5 or month == 7 or month == 9 or month == 11) and day <= 31) or ((month == 4 or month == 6 or month == 8 or month == 10 or month == 12) and day <= 30) or (month == 2 and day <= 29)):
-                suc = self.client.UCON.set_value_force(ctx.author, "birthday", f"{day}-{month}")
+                result = await self.client.UCON.set_value(ctx.author, "birthday", f"{day}-{month}")
                 txt = dateToStr(day, month)
-                if suc:
+                if result:
                     await ctx.send(f"Birthday set to the {txt}")
-                    await self.client.UCON.values_msgupdate("save")
                 else:
                     await ctx.send("Seems the value failed to set. Try again later or report the issue if issues persist.")
             else:
                 await ctx.send("Enter a valid date pls.")
         elif not day:
-            suc = self.client.UCON.set_value_force(ctx.author, "birthday", False)
-            if suc:
+            result = await self.client.UCON.set_value_force(ctx.author, "birthday", False)
+            if result:
                 await ctx.send("Remeoved your birthday from the database.")
-                await self.client.UCON.values_msgupdate("save")
             else:
                 await ctx.send("Seems the value failed to set. Try again later or report the issue if issues persist.")
         else:

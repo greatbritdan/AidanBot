@@ -3,7 +3,7 @@ from discord.ext import commands
 
 import asyncio, time, emoji, difflib
 
-from functions import getComEmbed
+from functions import getComEmbed, getComEmbedSimple
 
 import json
 with open('./data/commanddata.json') as file:
@@ -126,80 +126,128 @@ class ImportantCog(commands.Cog):
 	@commands.cooldown(1, 5)
 	@commands.has_permissions(administrator=True)
 	async def guildconfig(self, ctx, typ=None, name=None, *, value=None):
-		await self.config_command(ctx, self.client.CON, ctx.guild, typ, name, value)
+		await self.newconfig_command(ctx, self.client.CON, ctx.guild, "guild")
 
 	@commands.command(aliases=["uconfig"])
 	@commands.cooldown(1, 5)
 	async def userconfig(self, ctx, typ=None, name=None, *, value=None):
-		await self.config_command(ctx, self.client.UCON, ctx.author, typ, name, value)
+		await self.newconfig_command(ctx, self.client.UCON, ctx.author, "user")
 
-	async def config_command(self, ctx, CON, obj, typ, name, value):
-		edited = False
-		exists = CON.get_all(obj)
-		if not exists:
-			CON.values[str(obj.id)] = {}
-			edited = True
+	async def newconfig_command(self, ctx, CON, obj, tname):
+		class mainView(discord.ui.View):
+			@discord.ui.button(label="Set Value", style=discord.ButtonStyle.green, custom_id="set")
+			async def set_callback(self, button, interaction):
+				modal = ConfigModal("set")
+				await interaction.response.send_modal(modal)
+			@discord.ui.button(label="Reset Value", style=discord.ButtonStyle.red, custom_id="reset")
+			async def reset_callback(self, button, interaction):
+				modal = ConfigModal("reset")
+				await interaction.response.send_modal(modal)
+			@discord.ui.button(label="More Info", style=discord.ButtonStyle.gray, custom_id="more")
+			async def more_callback(self, button, interaction):
+				modal = ConfigModal("more")
+				await interaction.response.send_modal(modal)
 
-		for n in CON.default_values:
-			if n not in CON.values[str(obj.id)]:
-				CON.values[str(obj.id)][n] = CON.default_values[n]
-				edited = True
+		class backView(discord.ui.View):
+			@discord.ui.button(label="Go Back", style=discord.ButtonStyle.gray, custom_id="back")
+			async def back_callback(self, button, interaction):
+				a = "a"
 
-		txt, txt2 = "Please provide a valid action. (Actions are `list`, `get`, `set` or `info`)", ""
-		if typ:
-			if typ == "list":
-				list = CON.get_all(obj)
-				txt = f"List of all values for {obj.name}"
-				txt2 = ""
-				for item in list:
-					if item != "id":
-						txt2 += f"\n**- {item}**: `{str(list[item])}`"
-			elif typ == "get":
-				if not name:
-					txt = f"Please provide a name."
+		values = CON.get_group(obj)
+		page = "main"
+		pagename = False
+		pageval = False
+
+		def getconfigembed(timeout=False):
+			com = "config"
+			if timeout:
+				com = com + " (timeout)"
+
+			emb, view = False, False
+			if page == "main":
+				txt = ""
+				for name in values:
+					val = str(values[name])
+					if len(val) > 32:
+						val = val[:32] + "..."
+					if not CON.is_restricted(name):
+						txt += f"\n**- {name}:** `{val}`"
+
+				emb = getComEmbed(ctx, self.client, com, f"{tname} configeration for {obj.name}:", txt)
+				view = mainView()
+			else:
+				realval = CON.get_value(obj, pagename, guild=ctx.guild)
+				if isinstance(realval, discord.TextChannel) or isinstance(realval, discord.VoiceChannel) or isinstance(realval, discord.Role):
+					realval = realval.mention
 				else:
-					value = CON.get_value(obj, name)
-					txt = f"{name} is `{value}`."
-			elif typ == "set":
-				if not name:
-					txt = f"Please provide a name."
-				elif not value:
-					txt = f"Please provide a value."
-				elif CON.is_restricted(name):
-					txt = f"This is a restricted value."
-				else:
-					if value.lower() == "true":
-						value = True
-					elif value.lower() == "false":
-						value = False
+					realval = f"`{realval}`"
+
+				if page == "more":
+					emb = getComEmbed(ctx, self.client, com, f"More info for **{pagename}**:", f"**Value:** {realval}\n**Default Value:** `{CON.default_values[pagename]}`\n**Description:** '{CON.desc_values[pagename]}'\n**Type:** '{CON.type_values[pagename]}'")
+				elif page == "set":
+					emb = getComEmbed(ctx, self.client, com, "", f"Set **{pagename}** to {realval}.")
+				elif page == "setfail":
+					emb = getComEmbed(ctx, self.client, com, "", f"Tried to set **{pagename}** to {realval}.\nThe process unfortunatly failed, make sure the type is right!")
+				elif page == "reset":
+					emb = getComEmbed(ctx, self.client, com, "", f"Reset **{pagename}** to {CON.default_values[pagename]}.")
+				view = backView()
+
+			return emb, view
+
+		emb, view = getconfigembed()
+		MSG = await ctx.send(embed=emb, view=view)
+
+		def check(interaction):
+			return (interaction.user.id == ctx.author.id and interaction.message.id == MSG.id)
+
+		while True:
+			try:
+				interaction = await self.client.wait_for("interaction", timeout=120, check=check)
+				updated = False
+
+				if interaction.data["custom_id"].startswith("configmodel"):
+					page = interaction.data["custom_id"].split("-")[1]
+					pagename = interaction.data["components"][0]["components"][0]["value"]
+					if CON.exists(pagename) and (not CON.is_restricted(pagename)):
+						updated = True
+						if len(interaction.data["components"]) == 2:
+							pageval = interaction.data["components"][1]["components"][0]["value"]
+
+						if page == "set":
+							result = await CON.set_value(obj, pagename, pageval, guild=ctx.guild)
+							if not result:
+								page = "setfail"
+						if page == "reset":
+							await CON.reset_value(obj, pagename)
 					else:
-						try:
-							value = int(value)
-						except ValueError:
-							value = str(value)
+						page = "main"
 
-					suc = CON.set_value(obj, name, value)
-					if suc:
-						txt = f"{name} has been set to `{str(value)}`."
-						edited = True
-					else:
-						txt = f"{name} cannot be set."
-			elif typ == "info":
-				if not name:
-					txt = f"Please provide a name."
-				else:
-					if name in CON.desc_values:
-						txt = ""
-						txt2 = CON.desc_values[name]
-					else:
-						txt = f"{name} cannot be set."
+					await interaction.delete_original_message()
+				elif interaction.data["custom_id"] == "back":
+					updated = True
+					page = "main"
 
-		emb = getComEmbed(ctx, self.client, "Config", txt, txt2)
-		await ctx.reply(embed=emb, mention_author=False)
+				if updated:
+					emb, view = getconfigembed()
+					await MSG.edit(embed=emb, view=view)
 
-		if edited:
-			await CON.values_msgupdate("save")
+			except asyncio.TimeoutError:
+				emb, view = getconfigembed(True)
+				await MSG.edit(embed=emb, view=view)
+				return
 
+class ConfigModal(discord.ui.Modal):
+	def __init__(self, type):
+		self.type = type
+		super().__init__(title="Config manager", custom_id="configmodel-"+self.type)
+
+		self.add_item(discord.ui.InputText(style=discord.InputTextStyle.long, label="Please enter a valid name:", placeholder='welcome_message, prefix, etc', value="", required=True))
+		if self.type == "set":
+			self.add_item(discord.ui.InputText(style=discord.InputTextStyle.long, label="Please enter a new value, be aware of types:", placeholder='for roles and channels, enter a name or id!', value="", required=True))
+
+	async def callback(self, interaction: discord.Interaction):
+		await interaction.response.send_message("Working...")
+		
 async def getCommand(ctx, client, commandparam, getaprox=False):
 	com = None
 	for command in client.commands:

@@ -5,7 +5,7 @@ from discord.utils import find
 import randfacts, asyncio
 from random import randint
 
-from functions import ComError
+from functions import ComError, getComEmbed
 
 class GeneralCog(commands.Cog):
 	def __init__(self, client):
@@ -76,7 +76,7 @@ class GeneralCog(commands.Cog):
 
 	@commands.command()
 	@commands.cooldown(1, 5)
-	@commands.bot_has_permissions(manage_webhooks=True)
+	@commands.has_permissions(manage_webhooks=True)
 	async def clone(self, ctx, name, *, message):
 		if message.startswith(self.client.getprefix(None, ctx.message)):
 			await ComError(ctx, self.client, "No running commands in clone.")
@@ -135,6 +135,79 @@ class GeneralCog(commands.Cog):
 	async def fact(self, ctx):
 		fact = randfacts.get_fact()
 		await ctx.send(f"Did you know, {fact}")
+
+	@commands.command()
+	@commands.cooldown(1, 5)
+	async def issue(self, ctx, title:str="issue pog", body:str=""):
+		if body != "":
+			body = body + "\n\n"
+		body = body + f"[ Submitted by {str(ctx.author)} via $issue ]"
+
+		repon = "Aid0nModder/AidanBot"
+		repo = self.client.GIT.get_repo(repon)
+
+		options = []
+		labels = repo.get_labels()
+		for label in labels:
+			options.append(discord.SelectOption(label=label.name, description=label.description, value=label.name))
+
+		ilabels = []
+		def getissueemb(disable):
+			com = "issue"
+			if disable:
+				com = "issue (timeout)"
+
+			labtext = "None"
+			if len(ilabels) > 0:
+				labtext = ""
+				for lab in ilabels:
+					labtext = labtext + f"{lab.name}, "
+			cont = f"```\nTitle: '{title}'\nBody: '{body}'\n```\n```Labels: {labtext[:-2]}```"
+
+			emb = getComEmbed(ctx, self.client, com, "Looking good, ready to submit?", cont)
+			view = discord.ui.View(
+				discord.ui.Select(placeholder="Choose Tags", options=options, disabled=disable, custom_id="tags", min_values=0, max_values=len(options), row=0),
+				discord.ui.Button(label="Submit", style=discord.ButtonStyle.green, custom_id="submit", disabled=disable, row=1),
+				discord.ui.Button(label="Discard", style=discord.ButtonStyle.red, custom_id="discard", disabled=disable, row=1)
+			)
+			return emb, view
+
+		def check(interaction):
+			return (interaction.user.id == ctx.author.id and interaction.message.id == MSG.id)
+
+		emb, view = getissueemb(False)
+		MSG = await ctx.reply(embed=emb, view=view, mention_author=False)
+
+		while True:
+			try:
+				interaction = await self.client.wait_for("interaction", timeout=120, check=check)
+				if interaction.data["custom_id"] == "tags":
+					ilabels = []
+					for val in interaction.data["values"]:
+						lab = repo.get_label(val)
+						ilabels.append(lab)
+
+					emb, view = getissueemb(False)
+					await MSG.edit(embed=emb)
+
+				elif interaction.data["custom_id"] == "submit":
+					await MSG.delete()
+					if len(ilabels) > 0:
+						issue = repo.create_issue(title=title, body=body, labels=ilabels)
+					else:
+						issue = repo.create_issue(title=title, body=body)
+					await ctx.reply(f"Submitted!\n\nhttps://github.com/{repon}/issues/{issue.number}")
+					return
+
+				elif interaction.data["custom_id"] == "discard":
+					await MSG.delete()
+					await ctx.send("Ok, no issue for you >:(")
+					return
+
+			except asyncio.TimeoutError:
+				emb, view = getissueemb(True)
+				await MSG.edit(embed=emb, view=view)
+				return
 
 def setup(client):
 	client.add_cog(GeneralCog(client))

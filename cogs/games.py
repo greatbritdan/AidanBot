@@ -15,7 +15,7 @@ class GamesCog(commands.Cog):
 
 	async def canPlay(self, ctx, user):
 		# not a bot and dnd enabled and no messages in last 5 messages.
-		if (not user.bot) and self.client.UCON.get_value(user, "dnd") and (not await userPostedRecently(ctx.channel, user, 5)):
+		if (not user.bot) and self.client.UCON.get_value(user, "dnd", guild=ctx.guild) and (not await userPostedRecently(ctx.channel, user, 5)):
 			await ctx.send("This user has DND enabled and hasn't spoken recently (In this channel), this game can not be started, ask them to join you first.")
 			return False
 		return True
@@ -353,7 +353,7 @@ class GamesCog(commands.Cog):
 
 		while True:
 			try:
-				message = await self.client.wait_for("message", timeout=120, check=check)
+				message = await self.client.wait_for("message", timeout=300, check=check)
 				tryword = message.content.lower()
 
 				ret = False
