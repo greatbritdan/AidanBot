@@ -9,6 +9,9 @@ from functions import ClientError, ComError, CooldownError, ExistError, ParamErr
 from replybot import replyBot
 from config import ConfigManager
 
+# github
+from github import Github
+
 import json
 with open('./data/profiles.json') as file:
 	PROFILES = json.load(file)
@@ -26,9 +29,7 @@ class AidanBot(commands.Bot):
 			if prefix:
 				return prefix
 		return self.prefix
-
-	# same as above but just guild. useful when message or ctx is unavalable
-	def getprefixguild(self, guild):
+	def getprefixguild(self, guild): # same as above but just guild. useful when message or ctx is unavalable
 		if not self.isbeta:
 			prefix = self.CON.get_value(guild, "prefix")
 			if prefix:
@@ -40,6 +41,7 @@ class AidanBot(commands.Bot):
 		self.replybot = replyBot(self)
 		self.CON = ConfigManager(self, ctype="guild") # guild config
 		self.UCON = ConfigManager(self, ctype="user") # user config
+		self.GIT = Github("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")
 
 		intents = discord.Intents( 
 			guilds=True, members=True, bans=False, emojis_and_stickers=False, integrations=False, webhooks=False, invites=False,
@@ -99,7 +101,7 @@ class AidanBot(commands.Bot):
 	async def on_member_join(self, member):
 		if self.isbeta:
 			return
-		channel = self.CON.get_channel(member.guild, "welcome_message_channel", member.guild)
+		channel = self.CON.get_value(member.guild, "welcome_message_channel", guild=member.guild)
 		msg = self.CON.get_value(member.guild, "welcome_message")
 		if channel and msg:
 			await channel.send(msg.format(name=member.name, mention=member.mention, user=member, member=member, server=member.guild, guild=member.guild))
@@ -122,8 +124,7 @@ class AidanBot(commands.Bot):
 	async def on_guild_remove(self, guild):
 		await SendDM(self, "SOMEONE DID WHAT?!?!", f"Removed from {guild.name}!")
 
-		self.CON.remove_all(guild)
-		await self.CON.values_msgupdate("save")
+		await self.CON.remove_group(guild)
 
 	async def on_command_error(self, ctx, error):
 		if isinstance(error, discord.ClientException):
@@ -142,7 +143,7 @@ class AidanBot(commands.Bot):
 
 	async def handle_invites(self, message):
 		if "discord.gg" in message.content.lower() and self.CON.get_value(message.guild, "remove_invites"):
-			channel = self.CON.get_channel(message.guild, "allow_invites_channel", message.guild)
+			channel = self.CON.get_value(message.guild, "allow_invites_channel", guild=message.guild)
 			if ((not channel) or message.channel != channel) and (not message.channel.permissions_for(message.author).ban_members):
 				await message.delete()
 				if channel:
