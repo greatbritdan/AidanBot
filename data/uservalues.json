@@ -1,11 +1,13 @@
 {
     "dnd": {
         "default":false,
-        "help":"If people are allowed to challange you in games.\n**Type:** Bool"
+        "help":"If people are allowed to challange you in games.",
+        "type":"boolean"
     },
     "birthday": {
         "default":false,
-        "help":"Your birthday, day then month separated by a dash. Or false for no birthday\n**Type:** False/String",
+        "help":"Your birthday, day then month separated by a dash. Or false for no birthday",
+        "type":"string",
         "restricted":true
     }
 }
