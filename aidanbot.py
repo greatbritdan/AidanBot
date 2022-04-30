@@ -1,3 +1,4 @@
+import os
 import discord
 from discord.ext import commands
 from discord.utils import find
@@ -41,7 +42,7 @@ class AidanBot(commands.Bot):
 		self.replybot = replyBot(self)
 		self.CON = ConfigManager(self, ctype="guild") # guild config
 		self.UCON = ConfigManager(self, ctype="user") # user config
-		self.GIT = Github("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")
+		self.GIT = Github(os.getenv("GITHUB_TOKEN"))
 
 		intents = discord.Intents( 
 			guilds=True, members=True, bans=False, emojis_and_stickers=False, integrations=False, webhooks=False, invites=False,
