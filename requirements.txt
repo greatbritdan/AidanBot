@@ -4,3 +4,4 @@ async-timeout==4.0.2
 Pillow==9.0.1
 randfacts==0.15.0
 emoji==1.7.0
+PyGithub==1.55
