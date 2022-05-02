@@ -110,7 +110,7 @@ class BirthdayCog(commands.Cog):
         notdone = True
         today = str(datetime.date.today()).split("-")
         today = [int(e) for e in today]
-        while notdone:
+        for i in range(1,len(birthlist)): # thanks for wasting my sweet time.
             # if birth month is higher than todays month or month is same and birth day is higher than todays day
             if birthlist[0][2] > today[1] or (birthlist[0][2] == today[1] and birthlist[0][1] > today[2]):
                 notdone = False
