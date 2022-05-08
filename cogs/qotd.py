@@ -39,7 +39,7 @@ class QOTDCog(commands.Cog):
 
     # ????????
     async def background_task(self):
-        when = datetime.time(0,0,0)
+        when = datetime.time(15,0,0)
         now = datetime.datetime.utcnow()
         if now.time() > when:
             tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
