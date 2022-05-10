@@ -1,6 +1,5 @@
 # inspired by NH's reply bot, don't give me any credit for the idea.
 
-from discord.ext import tasks
 import re, emoji
 from random import choice, randint
 
@@ -9,37 +8,40 @@ class replyBot():
         self.client = client
         self.states = {}
 
-        self.states["hello"] = replyBotState(
-            matchwords=["hey","hi","hello","ey"],
-            reply=["Hey","Hi","Hello"], replybefore=["","","","Oh uhh ","Yo! "], replyafter=["","",""," :wave:"," {name}",", ig..."]
-        )
-        self.states["bye"] = replyBotState(
-            matchwords=["bye","goodbye","bubye","cya","gtg"],
-            reply=["Bye","Goodbye","Bubye","Bye","Cya l8r"], replybefore=["","","Awww, "], replyafter=["","",""," :wave:"," {name}"]
-        )
-        self.states["questionwhen"] = replyBotState(
-            findwords=["how long", "when will"],
-            reply=[":soon:","Sooner than you want","Tomorrow","Next week","This year","Not anytime soon","Maybe never","100% never","You can't escape me {name}."], replyafter=["","",""," maybe..."," at least!", " at most."]
-        )
-        self.states["questionwhendid"] = replyBotState(
-            findwords=["how long ago", "when did"],
-            reply=["long ago", "just last month", "last week i thing", "yesterday", "not yet", "not yet, but it'll happen soon..."], replyafter=["","",""," maybe..."," i think."]
-        )
-        self.states["respond"] = replyBotState(
-            findwords=["you sure"],
-            reply=["i know so.", "i think so", "i'm very sure man.", "now that i think about it... i don't know..."]
-        )
+        self.states["hello"] = replyBotState( matchwords=["hey","hi","hello","ey"],
+            reply=["Hey","Hi","Hello"], replybefore=["","","","Oh uhh ","Yo! "], replyafter=["","",""," :wave:"," {name}",", ig..."] )
+        self.states["bye"] = replyBotState( matchwords=["bye","goodbye","bubye","cya","gtg"],
+            reply=["Bye","Goodbye","Bubye","Bye","Cya l8r"], replybefore=["","","Awww, "], replyafter=["","",""," :wave:"," {name}"] )
+        self.states["questionwhen"] = replyBotState( findwords=["how long", "when will"],
+            replytype="reply", reply=[":soon:","Sooner than you want","Tomorrow","Next week","This year","Not anytime soon","Maybe never","100% never","You can't escape me {name}."], replyafter=["","",""," maybe..."," at least!", " at most."] )
+        self.states["questionwhendid"] = replyBotState( findwords=["how long ago", "when did"],
+            replytype="reply", reply=["long ago", "just last month", "last week i thing", "yesterday", "not yet", "not yet, but it'll happen soon..."], replyafter=["","",""," maybe..."," i think."] )
+        self.states["questiondoyou"] = replyBotState( findwords=["do you", "did you"],
+            replytype="reply", reply=["Yes, 100%", "Yep", "I'm sure", "I think so", "uhhh idk", "i donb't think so", "nahhh", "nope", "NEVER!"], replyafter=["","",""," maybe..."," i think."] )
+        self.states["respond"] = replyBotState( findwords=["you sure"],
+            reply=["i know so.", "i think so", "i'm very sure man.", "now that i think about it... i don't know..."] )
 
         self.states["funny"] = replyBotState( matchwords=["lol","lmao","ha"], reply=["lol","lmao","ha","What's so funny?"], noendpunc=True )
         self.states["uwu"] = replyBotState( findwords=["uwu","owo",":3","nya"], reply=["uwu","owo",":3","~nya"], replychance=2 )
-        self.states["sorry"] = replyBotState( matchwords=["sorry","sry"], reply=["it's ok.","All is forgiven :)","fuck you.","fine"] )
-        self.states["like"] = replyBotState( matchwords=["good","like","great","cool"], reply=["Thanks","You too","","You think so?","That's nice of you!"] )
+        self.states["sus"] = replyBotState( findwords=["sus","sussy","amogus","amongus","among us","among","vent"], reply=["AMOGUS!","Oh god... sus","SUSSY BAKA?","Tha's sus","{name} vented."], replychance=2 )
+        self.states["sorry"] = replyBotState( matchwords=["sorry","sry"], reply=["it's ok.","All is forgiven :)","screw you.","fine"] )
+        self.states["like"] = replyBotState( matchwords=["good","like","great","cool"], reply=["Thanks","You too","You think so?","That's nice of you!"] )
         self.states["love"] = replyBotState( matchwords=["love","cute","luve"], reply=["Thanks","You too",":flushed:","You think so?",":heart:","That's nice of you!"] )
         self.states["hate"] = replyBotState( matchwords=["bad","dislike","hate","suck","sucks","ugly","dumbass","stupid"], reply=["That's not nice",":(","Please don't say things like that","Bruh","+ratio",":("] )
         self.states["unsad"] = replyBotState( matchwords=["sad","cry","depressed","depression",":("], reply=["Aww, everything will be ok","I'm here for you",":heart:","chear up :p"] )
         self.states["thanks"] = replyBotState( matchwords=["thanks","thank you"], reply=["yw","you're welcome","anytime",":thumbsup:"] )
 
-        self.statemanager = ["hello|bye|sorry|respond", "^questionwhendid|questionwhen", "*funny|uwu|like|love|hate|unsad|thanks"]
+        self.states["else"] = replyBotState(
+            alwaystrigger=True, replychance=4,
+            replybefore=["","","","Hey, ","Oy, ","Uhh... ","Hear me out. ","Hold up!... "],
+            reply=["Wanna say that to my face?","Wanna repeat yourself?","Who asked lmao.","BRUH","I'm sorry what?","That's cringe","I wish i cared.","What if... You shut up?","LMAO","+ ratio","\*yawn*",""]
+        )
+        self.states["rareelse"] = replyBotState(
+            alwaystrigger=True, replychance=12,
+            reply=["Look, i may be stupid but... what the fuck!?!","This is going in my cringe collection!","Caught yo ass in 4K."]
+        )
+
+        self.statemanager = ["^questionwhendid|questionwhen|questiondoyou", "hello|bye|sorry|respond", "*funny|uwu|sus|like|love|hate|unsad|thanks", "rareelse|else"]
 
         self.punctuation = [".",",","!","?",":"]
         self.endpunctuation = [".","!"]
@@ -47,7 +49,7 @@ class replyBot():
     # what states does the message trigger
     def get_state(self, message):
         message = message.clean_content.lower()
-        messagewords = message.replace("."," ").replace(","," ").replace("!"," ").replace("?"," ").replace(":"," ").split() # dirty but idc
+        messagewords = message.replace("."," ").replace(","," ").replace("!"," ").replace("?"," ").replace(":"," ").split()
 
         states = []
         for name in self.states:
@@ -58,27 +60,27 @@ class replyBot():
     # when message is received, main client handdles channel checking.
     async def on_message(self, message):
         states = self.get_state(message)
-        if len(states) == 0:
-            await self.on_message_noreply(message)
-            return
 
         txt = ""
         laststate = False
-        finished = False
+        breakpls = False
+        replied = False
         for entry in self.statemanager:
-            canmerge, dontmerge = False, False
-            if entry.startswith("*"): # merge key
-                canmerge, entry = True, entry[1:]
-            if entry.startswith("^"): # single key
-                dontmerge, entry = True, entry[1:]
-            if "|" in entry: # split key
+            merge, single = False, False
+            if entry.startswith("*"):
+                merge, entry = True, entry[1:]
+            if entry.startswith("^"):
+                single, entry = True, entry[1:]
+            if "|" in entry:
                 entry = entry.split("|")
             else:
                 entry = [entry]
+
             for state in entry:
-                if state in states and (txt == "" or (canmerge)): # message passed checks for this reply
-                    stateobj = self.states[state]
-                    if (not stateobj.replychance) or randint(1,stateobj.replychance) == 1:
+                if state in states and (txt == "" or merge):
+                    replystate = self.states[state]
+                    if (not replystate.replychance) or randint(1,replystate.replychance) == 1:
+                        replied = True
                         if txt != "":
                             if self.ends_in_punct(txt):
                                 txt += " " # punctuation next to eachover is weird
@@ -86,24 +88,28 @@ class replyBot():
                                 txt += ", "
 
                         laststate = state
+                        if replystate.replybefore:
+                            txt += choice(replystate.replybefore)
+                        txt += choice(replystate.reply)
+                        if replystate.replyafter:
+                            txt += choice(replystate.replyafter)
 
-                        if stateobj.replybefore:
-                            txt += choice(stateobj.replybefore)
-                        txt += choice(stateobj.reply)
-                        if stateobj.replyafter:
-                            txt += choice(stateobj.replyafter)
+                        if merge or single:
+                            breakpls = True
+            if breakpls:
+                break
 
-                        if canmerge or dontmerge:
-                            finished = True
-                # this is going in my cringe collection
-                if finished:
-                    break
-
-        if laststate and self.states[laststate].endpunc and (not self.ends_in_punct(txt)) and randint(1,2) == 2:
-            txt += choice(self.endpunctuation)
-
-        if txt != "":
-            await message.channel.send(txt.format(name=message.author.display_name))
+        if not replied:
+            await self.on_message_noreply(message)
+            return
+        else:
+            if self.states[laststate].endpunc and (not self.ends_in_punct(txt)) and randint(1,2) == 2:
+                txt += choice(self.endpunctuation)
+            ctx = await self.client.get_context(message)
+            if self.states[laststate].replytype == "reply":
+                await ctx.reply(txt.format(name=message.author.display_name), mention_author=False)
+            else:
+                await ctx.send(txt.format(name=message.author.display_name))
 
     # all messages that invoke no reply
     async def on_message_noreply(self, message):
@@ -142,10 +148,16 @@ class replyBotState():
         self.replychance = kwargs.get('replychance',1)
         self.replybefore = kwargs.get('replybefore',False)
         self.replyafter = kwargs.get('replyafter',False)
+        self.replytype = kwargs.get('replytype',"send")
         self.endpunc = kwargs.get('noendpunc',True)
+
+        self.alwaystrigger = kwargs.get('alwaystrigger',False)
 
     # if the message fits the states checks
     def state_match(self, message, messagewords):
+        if self.alwaystrigger:
+            return True
+
         def func_word(word):
             return (word in messagewords)
         def func_find(word):
