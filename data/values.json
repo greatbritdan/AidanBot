@@ -24,7 +24,8 @@
     "prefix": {
         "default":false,
         "help":"The prefix the bot will use in this server,\nFalse means use default ($), and string means custom prefix (duh).",
-        "type":"string"
+        "type":"string",
+        "restricted":true
     },
 
     "birthday_announcement_channel": {
@@ -53,5 +54,11 @@
         "help":"Question of the day questions.",
         "type":"array",
         "restricted":true
+    },
+
+    "replybot_channel": {
+        "default":false,
+        "help":"The channel that allows AidanBot to reply to people [BETA].",
+        "type":"channel"
     }
 }
