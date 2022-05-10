@@ -1,23 +1,21 @@
-import discord
+from discord import Option
 from discord.ext import commands
+from discord.commands import SlashCommandGroup
 
-import time, random, asyncio
-from random import seed, choice, randint
-
-from functions import getComEmbed, ComError, getIntFromText, getBar
+import time
+from random import random, randint, seed, choice
+from functions import getComEmbed, getIntFromText, getBar
 
 class OpinionCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.command()
-	@commands.cooldown(1, 1)
-	async def rate(self, ctx, *, thing):
-		if thing.lower() == "me":
-			thing = ctx.author.name
-		elif thing.lower() == "this server":
-			thing = ctx.guild.name
+	opiniongroup = SlashCommandGroup("opinion", "Opinion based commands.")
 
+	@opiniongroup.command(name="rate", description="AidanBot will rate a thing.")
+	async def rate(self, ctx, 
+		thing:Option(str, "Thing AidanBot will rate.", required=True)
+	):
 		words = thing.split(" ")
 		newords = []
 		convertwords = {"your":"my", "you":"me", "yourself":"myself", "my":"your", "me":"you", "i":"you", "myself":"yourself","this":"that","these":"those","that":"this","those":"these"}
@@ -26,24 +24,19 @@ class OpinionCog(commands.Cog):
 			w = word.lower()
 			for l in removelist:
 				w = w.replace(l, "")
-
 			if w in convertwords:
 				word = word.lower().replace(w, convertwords[w])
-			
 			newords.append(word)
 
-		thing = " "
-		thing = thing.join(newords)
-
+		thing = " ".join(newords)
 		seed(getIntFromText(thing.lower()))
-
 		responces = [
 			["{0} is worse than anything i have ever rated.", [-10, -10]],
 			["{0} is just awful, holy crap!", [-1, 0]],
 			["{0} goes right into F tier.", [0, 2]],
 			["{0} is really bad.", [0, 2]],
+			["{0}? i can't say that with a straight mouth!", [0, 2]],
 			["I have no opinion on {0}.", [2, 2]],
-			["{0}? i can't say that with a straight mout-, uhh hole?", [1, 3]],
 			["{0} is alright, but could be better.", [3, 5]],
 			["{0} is pretty good!", [4, 6]],
 			["{0} is neat!", [4, 6]],
@@ -71,13 +64,32 @@ class OpinionCog(commands.Cog):
 
 		txt = responces[index][0]
 		rating = randint(responces[index][1][0], responces[index][1][1])
+		embed = getComEmbed(ctx, self.client, txt.format(thing), f"**Score:** `{rating}/10`")
+		await ctx.respond(embed=embed)
 
-		emb = getComEmbed(ctx, self.client, "Rate", txt.format(thing), fields=[["Score", "`{0}/10`".format(rating)]])
-		await ctx.reply(embed=emb, mention_author=False)
+	@opiniongroup.command(name="percent", description="AidanBot will say what part of something is something.")
+	async def percent(self, ctx, 
+		something:Option(str, "The something.", required=True),
+		someone:Option(str, "The someone.", default="False")
+	):
+		if someone == "False":
+			seed(getIntFromText(something.lower() + ctx.author.name.lower()))
+		else:
+			seed(getIntFromText(something.lower() + someone.lower()))
+		value = randint(0,100)
+		end = getBar(value, 100, 10, True)
+		
+		embed = False
+		if someone == "False":
+			embed = getComEmbed(ctx, self.client, f"You are **{str(value)}%** {something}.", end)
+		else:
+			embed = getComEmbed(ctx, self.client, f"{someone} is **{str(value)}%** {something}.", end)
+		await ctx.respond(embed=embed)
 
-	@commands.command()
-	@commands.cooldown(1, 1)
-	async def ask(self, ctx, *, question):
+	@opiniongroup.command(name="ask", description="AidanBot will answer your burning questions.")
+	async def ask(self, ctx, 
+		question:Option(str, "The question you ask.", required=True)
+	):
 		starts = []
 		answers = []
 		answer = ""
@@ -111,116 +123,33 @@ class OpinionCog(commands.Cog):
 			answer = answers[randint(0, len(answers)-1)]
 		if len(starts) > 0:
 			start = starts[randint(0, len(starts)-1)]
-
+			
 		fullans = start + answer
 		allbutone = len(fullans)-1
 		fullans = fullans[:-allbutone].capitalize() + fullans[1:]
-		emb = getComEmbed(ctx, self.client, "Ask", fullans)
-		await ctx.reply(embed=emb, mention_author=False)
+		embed = getComEmbed(ctx, self.client, fields=[["Question:", question], ["Answer:", fullans]])
+		await ctx.respond(embed=embed)
 
-	@commands.command()
-	@commands.cooldown(1, 1)
-	async def percent(self, ctx, something, *, person=None):
-		if person == None:
-			seed(getIntFromText(something.lower() + ctx.author.name))
-		else:
-			seed(getIntFromText(something.lower() + person))
-
-		value = randint(0,100)
-		end = getBar(value, 100, 10, True)
-		if person == None:
-			emb = getComEmbed(ctx, self.client, "Percent", f"You are **{str(value)}%** {something}.", end)
-		else:
-			emb = getComEmbed(ctx, self.client, "Percent", f"{person} is **{str(value)}%** {something}.", end)
-		await ctx.reply(embed=emb, mention_author=False)
-
-	@commands.command(aliases=["choose"])
-	@commands.cooldown(1, 1)
-	async def decide(self, ctx, *decisions):
-		if decisions == None:
-			return await ComError(ctx, self.client, "Decision needs more than 0 choices.")
-		elif len(decisions) == 1:
-			return await ctx.reply(embed=getComEmbed(ctx, self.client, "Decide", f"What- what do you expect me to say??? The only choise is {decisions[0]} so {decisions[0]}.\nDumba- oh wait be familiy friendly, you poopoo.."), mention_author=False)
-
-		emb = getComEmbed(ctx, self.client, "Decide", f"I choose... {choice(decisions)}")
-		await ctx.reply(embed=emb, mention_author=False)
-
-	@commands.command()
-	@commands.cooldown(1, 10)
-	async def poll(self, ctx, question, *options):
-		total = 0
-		strmax = 0
-		results = []
-		usersvoted = {}
-		for op in options:
-			if len(op) > strmax:
-				strmax = len(op)
-			results.append(0)
-
-		def getPollEmbed(timeout=False):
-			desc = ""
-			buts = []
-			for i in range(0, len(results)):
-				txt = options[i]
-				while len(txt) < strmax:
-					txt += " "
-				percent = 0
-				if total > 0:
-					percent = round((100/total)*results[i])
-
-				bar = getBar(percent, 100, 10, True)
-				desc = desc + f"`{txt}:` {bar} **({str(percent)}%) ({results[i]} votes)**\n"
-
-				buts.append( discord.ui.Button(label=options[i], style=discord.ButtonStyle.blurple, custom_id=options[i], disabled=timeout) )
-			
-			buts.append( discord.ui.Button(label="End Poll (Author only)", style=discord.ButtonStyle.red, custom_id="_end_", disabled=timeout, row=2) )
-
-			desc = desc + f"**Total votes**: {total}"
-			if timeout:
-				emb = getComEmbed(ctx, self.client, "Poll (timeout)", question, desc)
-			else:
-				emb = getComEmbed(ctx, self.client, "Poll", question, desc)
-
-			buttons = discord.ui.View(*buts)
-			return emb, buttons
-
-		emb, buttons = getPollEmbed()
-		MSG = await ctx.send(embed=emb, view=buttons)
-
-		def check(interaction):
-			return (interaction.message.id == MSG.id)
-
-		while True:
-			try:
-				interaction = await self.client.wait_for("interaction", timeout=300, check=check)
-
-				if interaction.data["custom_id"] == "_end_" and interaction.user == ctx.author:
-					emb, buttons = getPollEmbed(True)
-					await MSG.edit(embed=emb, view=buttons)
-					return
-
-				if str(interaction.user.id) in usersvoted: # change vote
-					results[usersvoted[str(interaction.user.id)]] -= 1
-				else: # first vote
-					total += 1
-
-				for i in range(0, len(results)):
-					if options[i] == interaction.data["custom_id"]:
-						usersvoted[str(interaction.user.id)] = i
-						results[i] += 1
-						break
-
-				emb, buttons = getPollEmbed()
-				await MSG.edit(embed=emb, view=buttons)
-
-			except asyncio.TimeoutError:
-				emb, buttons = getPollEmbed(True)
-				await MSG.edit(embed=emb, view=buttons)
+	@opiniongroup.command(name="decide", description="AidanBot will decide on something for you.")
+	async def decide(self, ctx, 
+		option1:Option(str, "Option 1.", required=True),
+		option2:Option(str, "Option 2.", required=True),
+		option3:Option(str, "Option 3.", required=False),
+		option4:Option(str, "Option 4.", required=False),
+		option5:Option(str, "Option 5.", required=False),
+		option6:Option(str, "Option 6.", required=False),
+		option7:Option(str, "Option 7.", required=False),
+		option8:Option(str, "Option 8.", required=False)
+	):
+		opts = [option1, option2, option3, option4, option5, option6, option7, option8]
+		options = [i for i in opts if i]
+		embed = getComEmbed(ctx, self.client, f"I choose... {choice(options)}")
+		await ctx.respond(embed=embed)
 
 def str_time_prop(start, end, time_format):
     stime = time.mktime(time.strptime(start, time_format))
     etime = time.mktime(time.strptime(end, time_format))
-    ptime = stime + random.random() * (etime - stime)
+    ptime = stime + random() * (etime - stime)
     return time.strftime(time_format, time.localtime(ptime))
 
 def random_date(start, end):
