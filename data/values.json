@@ -61,4 +61,10 @@
         "help":"The channel that allows AidanBot to reply to people [BETA].",
         "type":"channel"
     }
+    "global_channel": {
+        "default":false,
+        "help":"The channel that allows people to read and send messages to a global chat.",
+        "type":"channel",
+        "restricted":true
+    }
 }
