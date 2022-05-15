@@ -6,7 +6,6 @@ import json, os, traceback, sys
 from functions import SendDM, getComEmbed, getErrorEmbed
 
 from replybot import replyBot
-from globalbot import sendGlobalMessage
 from config import ConfigManager
 from github import Github
 
@@ -78,10 +77,7 @@ class AidanBot(commands.Bot):
 				return await self.replybot.on_message(message)
 			elif self.isbeta and message.channel.name == "aidanbetabot-talk":
 				return await self.replybot.on_message(message)
-			channel = self.CON.get_value(ctx.guild, "global_channel", guild=ctx.guild) # I'VE COME TO MAKE AN ANNOUNCEMENT, AIDAN THE DISCORD BOT IS A BITCH ASS MOTHERFUCKER HE PISSED ON MY BOX.
-			if (not ctx.command) and channel and ctx.channel == channel:
-				await sendGlobalMessage(self, ctx)
-
+			
 	async def on_member_join(self, member):
 		if not self.isbeta:
 			return
