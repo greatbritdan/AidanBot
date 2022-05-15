@@ -22,7 +22,7 @@ class QOTDCog(commands.Cog):
 
 	async def ready(self):
 		self.client.loop.create_task(self.background_task())
-	
+
 	async def askQuestion(self, testpost=False, postguild=False):
 		if self.client.isbeta:
 			return

@@ -128,13 +128,13 @@ class CoreCog(commands.Cog):
 			txt = ""
 			for name in values:
 				if not CON.is_restricted(name):
-					txt += f"\n**- {name}:** {CON.display_value(values[name])}"
+					txt += f"\n**- {name}:** {CON.display_value(CON.get_value(obj, name, ctx.guild))}"
 			embed = getComEmbed(ctx, self.client, f"All values for {obj.name}:", txt)
 		elif action == "Info" and name:
 			txt = f"**Value:** {CON.display_value(values[name])}\n**Default Value:** `{CON.default_values[name]}`\n**Description:** '{CON.desc_values[name]}'\n**Type:** `{CON.type_values[name]}`"
 			embed = getComEmbed(ctx, self.client, f"Info for {name}:", txt)
 		elif action == "Reset" and name:
-			await CON.set_value(obj, name, "none", ctx.guild)
+			await CON.reset_value(obj, name)
 			embed = getComEmbed(ctx, self.client, content=f"Reset {name} to `{CON.default_values[name]}`!")
 		elif action == "Set" and name and value:
 			await CON.set_value(obj, name, value, ctx.guild)

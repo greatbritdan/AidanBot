@@ -11,7 +11,7 @@ def tobool(val):
 	if val.lower() == "true":
 		return True
 	return False
-
+	
 class OwnerCog(commands.Cog):
 	def __init__(self, client):
 		self.client = client
