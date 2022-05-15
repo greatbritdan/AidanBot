@@ -6,6 +6,7 @@ import json, os, traceback, sys
 from functions import SendDM, getComEmbed, getErrorEmbed
 
 from replybot import replyBot
+from globalbot import sendGlobalMessage
 from config import ConfigManager
 from github import Github
 
@@ -19,9 +20,9 @@ class AidanBot(commands.Bot):
 	def __getitem__(self, key):
 		return getattr(self, key)
 
-	def __init__(self):
+	def __init__(self, debug_guilds=None):
 		self.settingup = True
-		self.offline = False
+		self.offline = True
 		self.version = "V1 (Slash)"
 		
 		self.GIT = Github(os.getenv("GITHUB_TOKEN"))
@@ -33,7 +34,7 @@ class AidanBot(commands.Bot):
 
 		intents = discord.Intents.all()
 		mentions = discord.AllowedMentions(everyone=False, roles=False)
-		super().__init__(command_prefix="!-/^", intents=intents, allowed_mentions=mentions)
+		super().__init__(debug_guilds=debug_guilds, command_prefix="!-/^", intents=intents, allowed_mentions=mentions)
 
 		if self.offline:
 			self.load_extension(f'cogs.offline')
@@ -73,11 +74,16 @@ class AidanBot(commands.Bot):
 			if (not self.isbeta) and await self.handle_invites(message): # remove invites
 				return
 			channel = self.CON.get_value(ctx.guild, "replybot_channel", guild=ctx.guild) # reply bot uwu
-			if (not ctx.command) and channel and ctx.channel == channel:
+			if (not self.isbeta) and (not ctx.command) and channel and ctx.channel == channel:
 				return await self.replybot.on_message(message)
+			elif self.isbeta and message.channel.name == "aidanbetabot-talk":
+				return await self.replybot.on_message(message)
+			channel = self.CON.get_value(ctx.guild, "global_channel", guild=ctx.guild) # I'VE COME TO MAKE AN ANNOUNCEMENT, AIDAN THE DISCORD BOT IS A BITCH ASS MOTHERFUCKER HE PISSED ON MY BOX.
+			if (not ctx.command) and channel and ctx.channel == channel:
+				await sendGlobalMessage(self, ctx)
 
 	async def on_member_join(self, member):
-		if self.isbeta:
+		if not self.isbeta:
 			return
 		channel = self.CON.get_value(member.guild, "welcome_message_channel", guild=member.guild)
 		msg = self.CON.get_value(member.guild, "welcome_message")
@@ -85,7 +91,7 @@ class AidanBot(commands.Bot):
 			await channel.send(msg.format(name=member.name, mention=member.mention, user=member, member=member, server=member.guild, guild=member.guild))
 
 	async def on_guild_join(self, guild):
-		if self.isbeta:
+		if not self.isbeta:
 			return
 		await SendDM(self, "SOMEONE DID WHAT?!?!", f"Added to {guild.name}!")
 		
@@ -97,7 +103,7 @@ class AidanBot(commands.Bot):
 			await chan.send(embed=emb)
 
 	async def on_guild_remove(self, guild):
-		if self.isbeta:
+		if not self.isbeta:
 			return
 		await self.CON.remove_group(guild)
 

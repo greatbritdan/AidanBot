@@ -1,5 +1,7 @@
 # inspired by NH's reply bot, don't give me any credit for the idea.
 
+from discord.utils import get
+
 import re, emoji
 from random import choice, randint
 
@@ -12,14 +14,20 @@ class replyBot():
             reply=["Hey","Hi","Hello"], replybefore=["","","","Oh uhh ","Yo! "], replyafter=["","",""," :wave:"," {name}",", ig..."] )
         self.states["bye"] = replyBotState( matchwords=["bye","goodbye","bubye","cya","gtg"],
             reply=["Bye","Goodbye","Bubye","Bye","Cya l8r"], replybefore=["","","Awww, "], replyafter=["","",""," :wave:"," {name}"] )
+        self.states["howareyou"] = replyBotState( findwords=["how are you","you ok"],
+            reply=["I'm fine.","Just awful", "I've felt better.", "I'll be fine... soon...", "I have no idea", "All i feel is agony."], replyafter=["","","",""," :slight_smile:"] )
         self.states["questionwhen"] = replyBotState( findwords=["how long", "when will"],
             replytype="reply", reply=[":soon:","Sooner than you want","Tomorrow","Next week","This year","Not anytime soon","Maybe never","100% never","You can't escape me {name}."], replyafter=["","",""," maybe..."," at least!", " at most."] )
         self.states["questionwhendid"] = replyBotState( findwords=["how long ago", "when did"],
             replytype="reply", reply=["long ago", "just last month", "last week i thing", "yesterday", "not yet", "not yet, but it'll happen soon..."], replyafter=["","",""," maybe..."," i think."] )
         self.states["questiondoyou"] = replyBotState( findwords=["do you", "did you"],
             replytype="reply", reply=["Yes, 100%", "Yep", "I'm sure", "I think so", "uhhh idk", "i donb't think so", "nahhh", "nope", "NEVER!"], replyafter=["","",""," maybe..."," i think."] )
+        self.states["questionwhydid"] = replyBotState( findwords=["why did", "why do"],
+            replytype="reply", reply=["I did what i had to do.", "You must never know", "I can't say.", "That wasn't me and you can't prove it.", "Doesn't matter, because you're next {name}...", "I did it for the vine.", "They made NFT's. Anyone would do the same!"], replybefore=["","","","haha... ","HA! ",] )
         self.states["respond"] = replyBotState( findwords=["you sure"],
             reply=["i know so.", "i think so", "i'm very sure man.", "now that i think about it... i don't know..."] )
+        self.states["respond"] = replyBotState( matchwords=["fuck","fucking","fucked","fuk","shit","shitting","shitted","cunt","crap","bitch","dick","cock","penis"], replychance=2,
+            reply=["This is a family friendly server ok. No swearing please.", "if you're gonna swear, bleap them like f##k.", "Time to get the soap...", "$ban @{name}! oh...", "you mother flipper!!!"] )
 
         self.states["funny"] = replyBotState( matchwords=["lol","lmao","ha"], reply=["lol","lmao","ha","What's so funny?"], noendpunc=True )
         self.states["uwu"] = replyBotState( findwords=["uwu","owo",":3","nya"], reply=["uwu","owo",":3","~nya"], replychance=2 )
@@ -32,16 +40,16 @@ class replyBot():
         self.states["thanks"] = replyBotState( matchwords=["thanks","thank you"], reply=["yw","you're welcome","anytime",":thumbsup:"] )
 
         self.states["else"] = replyBotState(
-            alwaystrigger=True, replychance=4,
+            alwaystrigger=True, replychance=6,
             replybefore=["","","","Hey, ","Oy, ","Uhh... ","Hear me out. ","Hold up!... "],
-            reply=["Wanna say that to my face?","Wanna repeat yourself?","Who asked lmao.","BRUH","I'm sorry what?","That's cringe","I wish i cared.","What if... You shut up?","LMAO","+ ratio","\*yawn*",""]
+            reply=["Wanna say that to my face?","Wanna repeat yourself?","Who asked lmao.","BRUH","I'm sorry what?","That's cringe","I wish i cared.","What if... You shut up?","LMAO","+ ratio","\*yawn*"]
         )
         self.states["rareelse"] = replyBotState(
-            alwaystrigger=True, replychance=12,
+            alwaystrigger=True, replychance=15,
             reply=["Look, i may be stupid but... what the fuck!?!","This is going in my cringe collection!","Caught yo ass in 4K."]
         )
 
-        self.statemanager = ["^questionwhendid|questionwhen|questiondoyou", "hello|bye|sorry|respond", "*funny|uwu|sus|like|love|hate|unsad|thanks", "rareelse|else"]
+        self.statemanager = ["^howareyou|questionwhydid|questionwhendid|questionwhen|questiondoyou", "hello|bye|sorry|respond", "*funny|uwu|sus|like|love|hate|unsad|thanks", "rareelse|else"]
 
         self.punctuation = [".",",","!","?",":"]
         self.endpunctuation = [".","!"]
@@ -101,7 +109,6 @@ class replyBot():
 
         if not replied:
             await self.on_message_noreply(message)
-            return
         else:
             if self.states[laststate].endpunc and (not self.ends_in_punct(txt)) and randint(1,2) == 2:
                 txt += choice(self.endpunctuation)
@@ -114,9 +121,10 @@ class replyBot():
     # all messages that invoke no reply
     async def on_message_noreply(self, message):
         emoji = getEmojiFromMsg(self.client, message)
-        if len(emoji) > 0 and emoji[0]:
-            await message.channel.send(emoji[0])
-        return
+        if len(emoji) > 0:
+            return await message.channel.send(emoji[0])
+        if randint(1,8) == 8:
+            await message.channel.send(str(choice(message.guild.emojis)))
 
     def ends_in_punct(self, txt):
         for punc in self.punctuation:

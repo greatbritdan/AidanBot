@@ -6,7 +6,8 @@ def getEmbed(title, content, color, fields):
 	emb = Embed(title=title, description=content, color=color)
 	if fields:
 		for f in fields:
-			emb.add_field(name=f[0], value=f[1], inline=False)
+			inline = True if len(f) > 2 else False
+			emb.add_field(name=f[0], value=f[1], inline=inline)
 	return emb
 
 def getComEmbed(ctx=None, client=None, title=Embed.Empty, content=Embed.Empty, color=Color.from_rgb(20, 29, 37), fields=None):
@@ -46,7 +47,7 @@ async def userPostedRecently(channel, user, limit):
 			return True
 	return False
 
-def getBar(value, maxvalue, size, hashalf=False):
+def getBar(value, maxvalue, size, hashalf=False, color="blue"):
 	valueperseg = maxvalue / size
 	segsfilled = math.ceil(value / valueperseg)
 	ishalf = False
@@ -54,9 +55,21 @@ def getBar(value, maxvalue, size, hashalf=False):
 		ishalf = True
 
 	barmotes = {
-		"left": {"full":"<:left_full:862331445526921287>", "half":"<:left_half:862331445700067328>", "fulls":"<:left_fullsingle:862331445750005770>", "empty":"<:left_empty:862331445720121365>"},
-		"mid": {"full":"<:middle_full:862331445300428821>", "half":"<:middle_half:862331445845688340>", "fulls":"<:middle_fullsingle:862331445703737364>", "empty":"<:middle_empty:862331445813313606>"},
-		"right": {"full":"<:right_full:862331445657468939>", "half":"<:right_half:862331445702819880>", "fulls":"<:right_full:862331445657468939>", "empty":"<:right_empty:862331445313273857>"}
+		"left": {
+			"empty": "<:left_empty:974754778376724600>",
+			"blue": ["<:left_blue_full:974754804859543602>", "<:left_blue_half:974754805094428732>", "<:left_blue_fullstop:974754805006352464>"],
+			"red": ["<:left_red_full:974754858697633833>", "<:left_red_half:974754858735403028>", "<:left_red_fullstop:974754859003817986>"]
+		},
+		"mid": {
+			"empty": "<:mid_empty:974754778460602428>",
+			"blue": ["<:mid_blue_full:974754804939259974>", "<:mid_blue_half:974754804964413460>", "<:mid_blue_fullstop:974754804956004432>"],
+			"red": ["<:mid_red_full:974754858752176229>", "<:mid_red_half:974754858806702080>", "<:mid_red_fullstop:974754858555043914>"]
+		},
+		"right": {
+			"empty": "<:right_empty:974754778217336873>",
+			"blue": ["<:right_blue_full:974754804951822376>", "<:right_blue_half:974754804565958677>", "<:right_blue_full:974754804951822376>"],
+			"red": ["<:right_red_full:974754858894782524>", "<:right_red_half:974754858865422376>", "<:right_red_full:974754858894782524>"]
+		}
 	}
 	
 	bar = ""
@@ -66,14 +79,13 @@ def getBar(value, maxvalue, size, hashalf=False):
 			place = "left"
 		elif i < size:
 			place = "mid"
-
 		if i < segsfilled:
-			bar += barmotes[place]["full"]
+			bar += barmotes[place][color][0]
 		elif i == segsfilled:
 			if ishalf:
-				bar += barmotes[place]["half"]
+				bar += barmotes[place][color][1]
 			else:
-				bar += barmotes[place]["fulls"]
+				bar += barmotes[place][color][2]
 		else:
 			bar += barmotes[place]["empty"]
 	return bar

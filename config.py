@@ -71,11 +71,12 @@ class ConfigManager():
 	# new lol!
 
 	def fix_model(self, obj): # if values or group is missing it'll fill out the list
-		if str(obj.id) not in self.values:
-			self.values[str(obj.id)] = {}
+		id = str(obj.id)
+		if id not in self.values or self.values[id] == None:
+			self.values[id] = {}
 		for name in self.default_values:
-			if name not in self.values[str(obj.id)]:
-				self.values[str(obj.id)][name] = self.default_values[name]
+			if name not in self.values[id]:
+				self.values[id][name] = self.default_values[name]
 
 	def exists(self, name):
 		return (name in self.valid_values)
