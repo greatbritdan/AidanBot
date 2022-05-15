@@ -21,7 +21,7 @@ class AidanBot(commands.Bot):
 
 	def __init__(self, debug_guilds=None):
 		self.settingup = True
-		self.offline = True
+		self.offline = False
 		self.version = "V1 (Slash)"
 		
 		self.GIT = Github(os.getenv("GITHUB_TOKEN"))
