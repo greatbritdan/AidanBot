@@ -7,7 +7,6 @@ from functions import SendDM, getComEmbed, getErrorEmbed
 
 from replybot import replyBot
 from config import ConfigManager
-from github import Github
 
 with open('./data/profiles.json') as file:
 	PROFILES = json.load(file)
@@ -19,12 +18,12 @@ class AidanBot(commands.Bot):
 	def __getitem__(self, key):
 		return getattr(self, key)
 
-	def __init__(self, debug_guilds=None):
+	def __init__(self, github, debug_guilds=None):
 		self.settingup = True
 		self.offline = False
 		self.version = "V1 (Slash)"
 		
-		self.GIT = Github(os.getenv("GITHUB_TOKEN"))
+		self.GIT = github
 		self.botreponame = "Aid0nModder/AidanBot"
 		self.botrepo = self.GIT.get_repo(self.botreponame)
 		self.CON = ConfigManager(self, ctype="guild") # guild config
@@ -69,6 +68,24 @@ class AidanBot(commands.Bot):
 		if self.settingup or message.author.bot or message.webhook_id:
 			return
 		ctx = await self.get_context(message)
+		
+		# automod
+		if ctx.guild.id == 836936601824788520: # Becoming public soon-ish
+			msg = message.content.lower()
+			# saying them feels wrong
+			if "ni##er".replace("#","g") in msg or "fa##ot".replace("#","g") in msg or "#eta#d".replace("#","r") in msg:
+				await ctx.author.timeout_for(datetime.timedelta(days=7), reason="Slur, check for validity and ban if nessasary.")
+				role = get(ctx.guild.roles, id=836937774598848512)
+				await ctx.send(f"{role.mention} Someone was trying to be funny.")
+				await ctx.message.delete()
+			# no ping pong >:(
+			mentions = [user for user in ctx.message.mentions if (not user.bot)]
+			if mentions > 4:
+				await ctx.author.timeout_for(datetime.timedelta(days=2), reason="Mass-Ping, check for validity and ban if nessasary.")
+				role = get(ctx.guild.roles, id=836937774598848512)
+				await ctx.send(f"**SPAM PING!**\n\nAidanBot would like to apologise to {', '.join([user.name for user in mentions])} on behalf of {str(ctx.author)}.\n\n{role.mention} Someone was trying to be funny.")
+				await ctx.message.delete()
+		
 		if (not isinstance(message.channel, discord.channel.DMChannel)):
 			if (not self.isbeta) and await self.handle_invites(message): # remove invites
 				return
