@@ -1,5 +1,6 @@
 import os
 from aidanbot import AidanBot
+from github import Github
 
 def main():
 	github = Github(os.getenv("GITHUB_TOKEN"))
