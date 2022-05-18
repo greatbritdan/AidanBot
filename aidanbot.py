@@ -80,7 +80,7 @@ class AidanBot(commands.Bot):
 				await ctx.message.delete()
 			# no ping pong >:(
 			mentions = [user for user in ctx.message.mentions if (not user.bot)]
-			if mentions > 4:
+			if len(mentions) > 4:
 				await ctx.author.timeout_for(datetime.timedelta(days=2), reason="Mass-Ping, check for validity and ban if nessasary.")
 				role = get(ctx.guild.roles, id=836937774598848512)
 				await ctx.send(f"**SPAM PING!**\n\nAidanBot would like to apologise to {', '.join([user.name for user in mentions])} on behalf of {str(ctx.author)}.\n\n{role.mention} Someone was trying to be funny.")
