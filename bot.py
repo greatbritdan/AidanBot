@@ -2,7 +2,8 @@ import os
 from aidanbot import AidanBot
 
 def main():
-	client = AidanBot()
+	github = Github(os.getenv("GITHUB_TOKEN"))
+	client = AidanBot(github)
 	client.run(os.getenv("DISCORD_TOKEN"))
 
 if __name__ == '__main__':
