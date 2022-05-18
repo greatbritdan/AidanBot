@@ -26,7 +26,7 @@ class replyBot():
             replytype="reply", reply=["I did what i had to do.", "You must never know", "I can't say.", "That wasn't me and you can't prove it.", "Doesn't matter, because you're next {name}...", "I did it for the vine.", "They made NFT's. Anyone would do the same!"], replybefore=["","","","haha... ","HA! ",] )
         self.states["respond"] = replyBotState( findwords=["you sure"],
             reply=["i know so.", "i think so", "i'm very sure man.", "now that i think about it... i don't know..."] )
-        self.states["respond"] = replyBotState( matchwords=["fuck","fucking","fucked","fuk","shit","shitting","shitted","cunt","crap","bitch","dick","cock","penis"], replychance=2,
+        self.states["swear"] = replyBotState( matchwords=["fuck","fucking","fucked","fuk","shit","shitting","shitted","cunt","crap","bitch","dick","cock","penis"], replychance=2,
             reply=["This is a family friendly server ok. No swearing please.", "if you're gonna swear, bleap them like f##k.", "Time to get the soap...", "$ban @{name}! oh...", "you mother flipper!!!"] )
 
         self.states["funny"] = replyBotState( matchwords=["lol","lmao","ha"], reply=["lol","lmao","ha","What's so funny?"], noendpunc=True )
