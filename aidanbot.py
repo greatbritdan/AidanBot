@@ -6,7 +6,6 @@ import json, os, traceback, sys, datetime
 from functions import SendDM, getComEmbed, getErrorEmbed
 
 from replybot import replyBot
-from globalbot import sendGlobalMessage
 from config import ConfigManager
 
 with open('./data/profiles.json') as file:
