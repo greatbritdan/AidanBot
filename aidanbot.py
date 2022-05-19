@@ -1,11 +1,12 @@
 import discord
 from discord.ext import commands
-from discord.utils import find
+from discord.utils import find, get
 
-import json, os, traceback, sys
+import json, os, traceback, sys, datetime
 from functions import SendDM, getComEmbed, getErrorEmbed
 
 from replybot import replyBot
+from globalbot import sendGlobalMessage
 from config import ConfigManager
 
 with open('./data/profiles.json') as file:
@@ -21,7 +22,7 @@ class AidanBot(commands.Bot):
 	def __init__(self, github, debug_guilds=None):
 		self.settingup = True
 		self.offline = False
-		self.version = "V1 (Slash)"
+		self.version = "V1.1 (Slash)"
 		
 		self.GIT = github
 		self.botreponame = "Aid0nModder/AidanBot"
@@ -32,7 +33,7 @@ class AidanBot(commands.Bot):
 
 		intents = discord.Intents.all()
 		mentions = discord.AllowedMentions(everyone=False, roles=False)
-		super().__init__(debug_guilds=debug_guilds, command_prefix="!-/^", intents=intents, allowed_mentions=mentions)
+		super().__init__(debug_guilds=debug_guilds, prefix="kdkldewkldlkw", intents=intents, allowed_mentions=mentions)
 
 		if self.offline:
 			self.load_extension(f'cogs.offline')
@@ -68,9 +69,9 @@ class AidanBot(commands.Bot):
 		if self.settingup or message.author.bot or message.webhook_id:
 			return
 		ctx = await self.get_context(message)
-		
+
 		# automod
-		if ctx.guild.id == 836936601824788520: # Becoming public soon-ish
+		if ctx.guild.id == 836936601824788520: # Becoming public soon
 			msg = message.content.lower()
 			# saying them feels wrong
 			if "ni##er".replace("#","g") in msg or "fa##ot".replace("#","g") in msg or "#eta#d".replace("#","r") in msg:
@@ -85,16 +86,20 @@ class AidanBot(commands.Bot):
 				role = get(ctx.guild.roles, id=836937774598848512)
 				await ctx.send(f"**SPAM PING!**\n\nAidanBot would like to apologise to {', '.join([user.name for user in mentions])} on behalf of {str(ctx.author)}.\n\n{role.mention} Someone was trying to be funny.")
 				await ctx.message.delete()
-		
+
 		if (not isinstance(message.channel, discord.channel.DMChannel)):
 			if (not self.isbeta) and await self.handle_invites(message): # remove invites
 				return
-			channel = self.CON.get_value(ctx.guild, "replybot_channel", guild=ctx.guild) # reply bot uwu
-			if (not self.isbeta) and (not ctx.command) and channel and ctx.channel == channel:
-				return await self.replybot.on_message(message)
-			elif self.isbeta and message.channel.name == "aidanbetabot-talk":
-				return await self.replybot.on_message(message)
-			
+			if not ctx.command:
+				channel = self.CON.get_value(ctx.guild, "replybot_channel", guild=ctx.guild) # reply bot uwu
+				if (not self.isbeta) and channel and ctx.channel == channel:
+					return await self.replybot.on_message(message)
+				elif self.isbeta and message.channel.name == "aidanbetabot-talk":
+					return await self.replybot.on_message(message)	
+				channel = self.CON.get_value(ctx.guild, "global_channel", guild=ctx.guild) # I'VE COME TO MAKE AN ANNOUNCEMENT, AIDAN THE DISCORD BOT IS A BITCH ASS MOTHERFUCKER HE PISSED ON MY BOX.
+				if channel and ctx.channel == channel:
+					await sendGlobalMessage(self, ctx)
+
 	async def on_member_join(self, member):
 		if not self.isbeta:
 			return

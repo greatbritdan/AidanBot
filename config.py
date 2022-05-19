@@ -1,4 +1,4 @@
-import discord
+import discord, copy
 from discord.utils import get
 
 import json
@@ -57,9 +57,10 @@ class ConfigManager():
 			txt = byte.decode("utf-8")
 			self.values = json.loads(txt)
 		elif typ == "save":
+			values = self.savevalues(self.values)
 			await message.delete()
 			with open("temp.json", "w") as f:
-				json.dump(self.values, f, indent=4)
+				json.dump(values, f, indent=4)
 			await channel.send(file=discord.File("temp.json", "values.json"))
 
 	def tonumber(self, val):
@@ -68,15 +69,30 @@ class ConfigManager():
 		except ValueError:
 			return False
 
-	# new lol!
+	def savevalues(self, values):
+		valuescopy = copy.deepcopy(values)
+		for id in valuescopy:
+			valuesidcopy = copy.deepcopy(values[id])
+			for name in valuesidcopy:
+				if values[id][name] == self.default_values[name]:
+					values[id].pop(name)
+			if len(values[id]) == 0:
+				values.pop(id)
+		return values
 
-	def fix_model(self, obj): # if values or group is missing it'll fill out the list
-		id = str(obj.id)
+	def fix_model(self, obj=None, id=None): # if values or group is missing it'll fill out the list
+		if obj: id = str(obj.id)
 		if id not in self.values or self.values[id] == None:
 			self.values[id] = {}
 		for name in self.default_values:
 			if name not in self.values[id]:
 				self.values[id][name] = self.default_values[name]
+
+		# fix yucky order
+		vals = copy.deepcopy(self.values[id])
+		self.values[id] = {}
+		for name in self.default_values:
+			self.values[id][name] = vals[name]
 
 	def exists(self, name):
 		return (name in self.valid_values)
@@ -115,7 +131,7 @@ class ConfigManager():
 		return result
 	def _set_value(self, obj, name, val, guild):
 		self.fix_model(obj)
-		if type(val) == str:
+		if (self.get_type(name) == "channel" or self.get_type(name) == "role") and type(val) == str:
 			val = val.lower()
 
 		if (self.get_type(name) == "channel" or self.get_type(name) == "role") and (val == "false" or val == "none"):
