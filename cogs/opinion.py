@@ -1,12 +1,12 @@
-from discord import Option
-from discord.ext import commands
+import discord
 from discord.commands import SlashCommandGroup
+from discord import Option
 
 import time
 from random import random, randint, seed, choice
 from functions import getComEmbed, getIntFromText, getBar
 
-class OpinionCog(commands.Cog):
+class OpinionCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
 

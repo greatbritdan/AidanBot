@@ -1,22 +1,23 @@
-from discord import Option, InputTextStyle
-from discord.ui import Modal, InputText
-from discord.ext import commands
+import discord
 from discord.commands import SlashCommandGroup
+from discord import Option
 
 import io, contextlib, textwrap
 from traceback import format_exception
+
 from functions import getComEmbed
+from checks import command_checks
 
 def tobool(val):
 	if val.lower() == "true":
 		return True
 	return False
 	
-class OwnerCog(commands.Cog):
+class OwnerCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	class EvalModal(Modal):
+	class EvalModal(discord.ui.Modal):
 		def __init__(self, client, template):
 			self.client = client
 			super().__init__(title="Eval", custom_id="eval")
@@ -26,7 +27,7 @@ class OwnerCog(commands.Cog):
 				txt = 'from discord.utils import get\nguild = get(client.guilds, name="name_here")'
 			if template == "embed":
 				txt = 'from functions import getComEmbed\nemb = getComEmbed(ctx, client, "Amgous", "Sussy")\nawait ctx.send(embed=emb)'
-			self.add_item(InputText(style=InputTextStyle.long, label="Code:", placeholder="print('Hello World!')", value=txt, required=True))
+			self.add_item(discord.ui.InputText(style=discord.InputTextStyle.long, label="Code:", placeholder="print('Hello World!')", value=txt, required=True))
 		async def callback(self, interaction):
 			await interaction.response.send_message("Working...")
 
@@ -38,8 +39,8 @@ class OwnerCog(commands.Cog):
 		respond:Option(str, "If it responds after the code has finished running.", choices=["True","False"], default="True"),
 		ephemeral:Option(str, "If the code can be seen by just you or not.", choices=["True","False"], default="False")
 	):
-		if not await self.client.is_owner(ctx.author):
-			return await ctx.respond("**No.**")
+		if await command_checks(ctx, self.client, is_owner=True): return
+		
 		respond, ephemeral = tobool(respond), tobool(ephemeral)
 		await ctx.send_modal(self.EvalModal(self.client, template))
 		

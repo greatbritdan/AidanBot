@@ -1,12 +1,12 @@
 import discord
+from discord.commands import slash_command, user_command
 from discord import Option
-from discord.ext import commands
 from discord.utils import format_dt
 
 from functions import dateToStr, getComEmbed
 
 # only for message commands
-class UserCog(commands.Cog):
+class UserCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
 		self.specalstatus = {
@@ -14,11 +14,11 @@ class UserCog(commands.Cog):
 			"788492102568902656": "Our Lord And Saviour"
 		}
 
-	@commands.user_command(name="Info")
+	@user_command(name="Info")
 	async def uinfo(self, ctx, user):
 		await self.info(ctx, user)
 
-	@commands.slash_command(name="userinfo")
+	@slash_command(name="userinfo")
 	async def sinfo(self, ctx, user:Option(discord.Member, "User to get info on, you can use an id for users not in server.")):
 		await self.info(ctx, user)
 
@@ -66,7 +66,7 @@ class UserCog(commands.Cog):
 		ruser = await self.client.fetch_user(user.id)
 		if ruser.banner:
 			desc += f" [Banner]({ruser.banner.url})"
-
+			
 		color = discord.Color.from_rgb(20, 29, 37)
 		if user.colour.value:
 			color = user.colour

@@ -1,13 +1,12 @@
 import discord
-from discord import Option, ButtonStyle
-from discord.ext import commands
 from discord.commands import SlashCommandGroup
+from discord import Option
 
 import asyncio, math
 from random import choice, randint
 from functions import getComEmbed, getBar, userPostedRecently
 
-class FightCog(commands.Cog):
+class FightCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
 

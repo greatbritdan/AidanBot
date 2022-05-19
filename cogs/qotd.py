@@ -1,11 +1,13 @@
-from discord import Option, Color
-from discord.ext import commands
-from discord.utils import get, basic_autocomplete
+import discord
 from discord.commands import SlashCommandGroup
+from discord import Option, Color
+from discord.utils import get, basic_autocomplete
 
 import asyncio, datetime
 from random import randint
+
 from functions import getComEmbed
+from checks import command_checks
 
 def tobool(val):
 	if val.lower() == "true":
@@ -16,7 +18,7 @@ async def auto_questions(ctx):
 	questions = ctx.bot.CON.get_value(ctx.interaction.guild, "questions")
 	return [q["question"] for q in questions if ctx.interaction.channel.permissions_for(ctx.interaction.user).manage_messages or q["author"] == ctx.interaction.user.id]
 
-class QOTDCog(commands.Cog):
+class QOTDCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
 
@@ -72,11 +74,8 @@ class QOTDCog(commands.Cog):
 	async def post(self, ctx,
 		testpost:Option(str, "If the question isn't removed from the questions list, useful for tests.", choices=["True", "False"], default="True")
 	):
-		if not await self.client.is_owner(ctx.author):
-			return await ctx.respond("**No.**")
-		channel = self.client.CON.get_value(ctx.guild, "qotd_channel", guild=ctx.guild)
-		if not channel:
-			return await ctx.respond("Question of the day is not set up in this server.")
+		if await command_checks(ctx, self.client, is_owner=True, has_value="qotd_channel"): return
+
 		await self.askQuestion(tobool(testpost), ctx.guild)
 		await ctx.respond("Question has been askified.")
 
@@ -86,9 +85,7 @@ class QOTDCog(commands.Cog):
 		ask:Option(str, "Write a question you want to ask.", required=False),
 		remove:Option(str, "Choose the question you want to remove.", autocomplete=basic_autocomplete(auto_questions), required=False)
 	):
-		channel = self.client.CON.get_value(ctx.guild, "qotd_channel", guild=ctx.guild)
-		if not channel:
-			return await ctx.respond("Question of the day is not set up in this server.")
+		if await command_checks(ctx, self.client, has_value="qotd_channel"): return
 
 		questions = self.client.CON.get_value(ctx.guild, "questions")
 		embed = False

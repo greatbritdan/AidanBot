@@ -1,11 +1,11 @@
-from discord import Option
-from discord.ext import commands
+import discord
 from discord.commands import SlashCommandGroup
+from discord import Option
 
 import asyncio, datetime
 from functions import getComEmbed, dateToStr
 
-class BirthdayCog(commands.Cog):
+class BirthdayCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
 

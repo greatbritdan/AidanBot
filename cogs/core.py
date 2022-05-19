@@ -1,12 +1,13 @@
 import discord
+from discord.commands import slash_command, SlashCommandGroup
 from discord import Option
-from discord.ext import commands
 from discord.utils import get, basic_autocomplete
-from discord.commands import SlashCommandGroup, permissions
 
 import time
 from random import choice
+
 from functions import getComEmbed
+from checks import command_checks
 
 async def auto_CONvaluenames(ctx):
 	return [val for val in ctx.bot.CON.valid_values if not ctx.bot.CON.is_restricted(val)]
@@ -16,28 +17,28 @@ async def auto_githubtags(ctx):
 	return [tag.name for tag in ctx.bot.botrepo.get_labels()]
 
 # man, what a throwback
-class CoreCog(commands.Cog):
+class CoreCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
 
-	@commands.slash_command(name="info", description="Get info about the bot.")
+	@slash_command(name="info", description="Get info about the bot.")
 	async def info(self, ctx):
 		embed = getComEmbed(ctx, self.client, f"Info for {self.client.name}", self.client.info)
 		await ctx.respond(embed=embed, ephemeral=True)
 
-	@commands.slash_command(name="ping", description="Check the Bot and API latency.")
+	@slash_command(name="ping", description="Check the Bot and API latency.")
 	async def ping(self, ctx):
 		start_time = time.time()
 		await ctx.respond("Testing Ping...", ephemeral=True)
 		apitime = time.time() - start_time
 		await ctx.edit(content="Ping Pong motherfliper!```\nBOT: {:.2f} seconds\nAPI: {:.2f} seconds\n```".format(self.client.latency, apitime))
 
-	@commands.slash_command(name="echo", description="Say something as AidanBot.")
+	@slash_command(name="echo", description="Say something as AidanBot.")
 	async def echo(self, ctx, content:Option(str, "What AidanBot will say.", required=True)):
 		await ctx.send(content)
 		await ctx.delete()
 
-	@commands.slash_command(name="issue", description="Create an issue on GitHub.")
+	@slash_command(name="issue", description="Create an issue on GitHub.")
 	async def issue(self, ctx,
 		title:Option(str, "Title of the post.", required=True),
 		body:Option(str, "Body of the post.", required=True),
@@ -53,7 +54,7 @@ class CoreCog(commands.Cog):
 			issue = self.client.botrepo.create_issue(title=title, body=body)
 		await ctx.respond(f"Submitted!\n\nhttps://github.com/{self.client.botreponame}/issues/{issue.number}")
 
-	@commands.slash_command(name="bucket", description="The best command ever?")
+	@slash_command(name="bucket", description="The best command ever?")
 	async def bucket(self, ctx):
 		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp",
 				"https://cdn.discordapp.com/attachments/880033942420484157/882333693094547566/cd805_y_bucket-yellow.webp",
@@ -67,11 +68,12 @@ class CoreCog(commands.Cog):
 	rolegroup = SlashCommandGroup("role", "Role commands.")
 
 	@rolegroup.command(name="add", description="Add a role to you or someone. Can only add [r] roles to yourself without manage_roles.")
-	@permissions.guild_only()
 	async def roleadd(self, ctx, 
 		role:Option(discord.Role, "Role to add to yourself.", required=True),
 		user:Option(discord.Member, "User to add the role to.", required=False)
 	):
+		if await command_checks(ctx, self.client, is_guild=True, bot_has_permission="manage_roles"): return
+		
 		if (user or (not role.name.startswith("[r]"))) and (not ctx.channel.permissions_for(ctx.author).manage_roles):
 			return await ctx.respond("HAHA, Maybe one day kiddo...")
 		clientmember = get(ctx.guild.members, id=self.client.user.id)
@@ -84,11 +86,12 @@ class CoreCog(commands.Cog):
 		await ctx.respond(f"Added {role.mention} to {user.mention}!")
 
 	@rolegroup.command(name="remove", description="Remove a role from you or someone. Can only remove [r] roles from yourself without manage_roles.")
-	@permissions.guild_only()
 	async def roleremove(self, ctx, 
 		role:Option(discord.Role, "Role to remove from yourself.", required=True),
 		user:Option(discord.Member, "User to remove the role from.", required=False)
 	):
+		if await command_checks(ctx, self.client, is_guild=True, bot_has_permission="manage_roles"): return
+
 		if (user or (not role.name.startswith("[r]"))) and (not ctx.channel.permissions_for(ctx.author).manage_roles):
 			return await ctx.respond("HAHA, Maybe one day kiddo...")
 		clientmember = get(ctx.guild.members, id=self.client.user.id)
@@ -105,12 +108,13 @@ class CoreCog(commands.Cog):
 	configgroup = SlashCommandGroup("config", "Config commands.")
 	
 	@configgroup.command(name="guild", description="Guild configerations.")
-	@permissions.guild_only()
 	async def guildconfig(self, ctx,
 		action:Option(str, "Config action.", choices=["List","Set","Reset","Info"], required=True),
 		name:Option(str, "Variable you're performing action on.", autocomplete=basic_autocomplete(auto_CONvaluenames), required=False),
 		value:Option(str, "New value for this Variable.", required=False),
 	):
+		if await command_checks(ctx, self.client, is_guild=True, has_permission="kick_members"): return
+
 		await self.newconfig_command(ctx, self.client.CON, ctx.guild, action, name, value)
 
 	@configgroup.command(name="user", description="User configerations.")
