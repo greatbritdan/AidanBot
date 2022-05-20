@@ -16,14 +16,17 @@ async def command_checks(ctx, client, is_guild=None, is_owner=None, has_value=No
 	if is_owner and (not await client.is_owner(ctx.author)):
 		await ctx.respond(embed=getErrorEmbed(ctx, client, "This command is limited to Aidan only!"))
 		return True
-	if has_value and (not client.CON.get_value(ctx.guild, has_value, ctx.guild)):
-		await ctx.respond(embed=getErrorEmbed(ctx, client, f"The value '{has_value}' is not set up on this server!"))
-		return True
-	if has_permission and (not permission_check(ctx, ctx.author, has_permission)):
-		await ctx.respond(embed=getErrorEmbed(ctx, client, f"You are missing '{has_permission}' permissions!"))
-		return True
-	clientmember = get(ctx.guild.members, id=client.user.id)
-	if bot_has_permission and (not permission_check(ctx, clientmember, bot_has_permission)):
-		await ctx.respond(embed=getErrorEmbed(ctx, client, f"I am missing '{bot_has_permission}' permissions!"))
-		return True
+	if is_guild: # these work only in guilds
+		if has_value and (not client.CON.get_value(ctx.guild, has_value, ctx.guild)):
+			await ctx.respond(embed=getErrorEmbed(ctx, client, f"The value '{has_value}' is not set up on this server!"))
+			return True
+		if has_permission:
+			if not permission_check(ctx, ctx.author, has_permission):
+				await ctx.respond(embed=getErrorEmbed(ctx, client, f"You are missing '{has_permission}' permissions!"))
+				return True
+		if bot_has_permission:
+			clientmember = get(ctx.guild.members, id=client.user.id)
+			if not permission_check(ctx, clientmember, bot_has_permission):
+				await ctx.respond(embed=getErrorEmbed(ctx, client, f"I am missing '{bot_has_permission}' permissions!"))
+				return True
 	return False
