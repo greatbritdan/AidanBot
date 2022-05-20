@@ -74,7 +74,7 @@ class QOTDCog(discord.Cog):
 	async def post(self, ctx,
 		testpost:Option(str, "If the question isn't removed from the questions list, useful for tests.", choices=["True", "False"], default="True")
 	):
-		if await command_checks(ctx, self.client, is_owner=True, has_value="qotd_channel"): return
+		if await command_checks(ctx, self.client, is_owner=True, is_guild=True, has_value="qotd_channel"): return
 
 		await self.askQuestion(tobool(testpost), ctx.guild)
 		await ctx.respond("Question has been askified.")
@@ -85,7 +85,7 @@ class QOTDCog(discord.Cog):
 		ask:Option(str, "Write a question you want to ask.", required=False),
 		remove:Option(str, "Choose the question you want to remove.", autocomplete=basic_autocomplete(auto_questions), required=False)
 	):
-		if await command_checks(ctx, self.client, has_value="qotd_channel"): return
+		if await command_checks(ctx, self.client, is_guild=True, has_value="qotd_channel"): return
 
 		questions = self.client.CON.get_value(ctx.guild, "questions")
 		embed = False
