@@ -10,7 +10,7 @@ def permission_check(ctx, member, permission):
 
 #chenk
 async def command_checks(ctx, client, is_guild=None, is_owner=None, has_value=None, has_permission=None, bot_has_permission=None):
-	if is_guild and isinstance(ctx.channel, discord.channel.DMChannel):
+	if is_guild and isinstance(ctx.channel, discord.PartialMessageable):
 		await ctx.respond(embed=getErrorEmbed(ctx, client, "This command is limited to servers only!"))
 		return True
 	if is_owner and (not await client.is_owner(ctx.author)):
