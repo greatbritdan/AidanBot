@@ -86,7 +86,7 @@ class AidanBot(commands.Bot):
 				await ctx.send(f"**SPAM PING!**\n\nAidanBot would like to apologise to {', '.join([user.name for user in mentions])} on behalf of {str(ctx.author)}.\n\n{role.mention} Someone was trying to be funny.")
 				await ctx.message.delete()
 
-		if (not isinstance(message.channel, discord.channel.DMChannel)):
+		if ctx.guild:
 			if (not self.isbeta) and await self.handle_invites(message): # remove invites
 				return
 			if not ctx.command:
