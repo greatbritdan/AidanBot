@@ -70,7 +70,7 @@ class AidanBot(commands.Bot):
 		ctx = await self.get_context(message)
 
 		# automod
-		if ctx.guild.id == 836936601824788520: # Becoming public soon
+		if ctx.guild and ctx.guild.id == 836936601824788520: # Becoming public soon
 			msg = message.content.lower()
 			# saying them feels wrong
 			if "ni##er".replace("#","g") in msg or "fa##ot".replace("#","g") in msg or "#eta#d".replace("#","r") in msg:
