@@ -95,9 +95,27 @@ class AidanBot(commands.Bot):
 					return await self.replybot.on_message(message)
 				elif self.isbeta and message.channel.name == "aidanbetabot-talk":
 					return await self.replybot.on_message(message)	
+				
 				channel = self.CON.get_value(ctx.guild, "global_channel", guild=ctx.guild) # I'VE COME TO MAKE AN ANNOUNCEMENT, AIDAN THE DISCORD BOT IS A BITCH ASS MOTHERFUCKER HE PISSED ON MY BOX.
 				if channel and ctx.channel == channel:
 					await sendGlobalMessage(self, ctx)
+					
+				nqn = get(ctx.guild.members, id=559426966151757824)
+				if not nqn:
+					emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
+					emogis = [e.replace(":","") for e in emogis]
+					emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
+					if len(emogis) > 0:
+						txt = emogilesstext[0]
+						for idx, emogi in enumerate(emogis):
+							realemogi = get(self.emojis, name=emogi)
+							if realemogi:
+								txt = txt + str(realemogi) + emogilesstext[idx+1]
+							else:
+								txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
+						if txt != ctx.message.content:
+							await ctx.message.delete()
+							await cloneUser(ctx.channel, ctx.author, txt)
 
 	async def on_member_join(self, member):
 		if not self.isbeta:
