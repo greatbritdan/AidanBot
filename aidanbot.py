@@ -114,7 +114,7 @@ class AidanBot(commands.Bot):
 							else:
 								txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
 						if txt != ctx.message.content:
-							await cloneUser(ctx.channel, ctx.author, txt, False)
+							await cloneUser(ctx.channel, ctx.author, txt)
 
 	async def on_member_join(self, member):
 		if not self.isbeta:
@@ -150,7 +150,7 @@ class AidanBot(commands.Bot):
 					return await message.channel.send(f"No posting invites outside of {channel.mention}. >:(")
 				return await message.channel.send("No posting invites in this server. >:(")
 
-async def cloneUser(channel, user, text, makenew=False):
+async def cloneUser(channel, user, text):
 	hook = ""
 	for w in await channel.webhooks():
 		if w.name == "AidanBotNitrontHook":
@@ -162,4 +162,4 @@ async def cloneUser(channel, user, text, makenew=False):
 		await hook.send(text, username=user.display_name, avatar_url=user.display_avatar, wait=True)
 	except:
 		await hook.delete()
-		await cloneUser(channel, user, text, True)
+		await cloneUser(channel, user, text)
