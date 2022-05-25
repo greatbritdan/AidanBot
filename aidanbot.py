@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.utils import find, get
 
-import json, os, traceback, sys, datetime, re
+import json, os, traceback, sys, datetime
 from functions import SendDM, getComEmbed, getErrorEmbed
 
 from replybot import replyBot
@@ -100,22 +100,6 @@ class AidanBot(commands.Bot):
 				if channel and ctx.channel == channel:
 					await sendGlobalMessage(self, ctx)
 
-				nqn = get(ctx.guild.members, id=559426966151757824)
-				if not nqn:
-					emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
-					emogis = [e.replace(":","") for e in emogis]
-					emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
-					if len(emogis) > 0:
-						txt = emogilesstext[0]
-						for idx, emogi in enumerate(emogis):
-							realemogi = get(self.emojis, name=emogi)
-							if realemogi:
-								txt = txt + str(realemogi) + emogilesstext[idx+1]
-							else:
-								txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
-						if txt != ctx.message.content:
-							await cloneUser(ctx.channel, ctx.author, txt)
-
 	async def on_member_join(self, member):
 		if not self.isbeta:
 			return
@@ -149,17 +133,3 @@ class AidanBot(commands.Bot):
 				if channel:
 					return await message.channel.send(f"No posting invites outside of {channel.mention}. >:(")
 				return await message.channel.send("No posting invites in this server. >:(")
-
-async def cloneUser(channel, user, text):
-	hook = ""
-	for w in await channel.webhooks():
-		if w.name == "AidanBotNitrontHook":
-			hook = w
-	if not hook:
-		hook = await channel.create_webhook(name="AidanBotNitrontHook")
-	
-	try:
-		await hook.send(text, username=user.display_name, avatar_url=user.display_avatar, wait=True)
-	except:
-		await hook.delete()
-		await cloneUser(channel, user, text)
