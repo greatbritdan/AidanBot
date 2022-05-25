@@ -115,7 +115,7 @@ class AidanBot(commands.Bot):
 								txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
 						if txt != ctx.message.content:
 							hook = await ctx.channel.create_webhook(name="AidanBotNitrontHook")
-							await hook.send(msg, username=ctx.author.display_name, avatar_url=ctx.author.display_avatar, wait=True)
+							await hook.send(txt, username=ctx.author.display_name, avatar_url=ctx.author.display_avatar, wait=True)
 							await asyncio.sleep(0.2)
 							await hook.delete()
 
