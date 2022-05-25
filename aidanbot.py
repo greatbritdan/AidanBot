@@ -114,7 +114,7 @@ class AidanBot(commands.Bot):
 							else:
 								txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
 						if txt != ctx.message.content:
-							await cloneUser(ctx, txt)
+							await cloneUser(ctx.channel, ctx.author, txt, False)
 
 	async def on_member_join(self, member):
 		if not self.isbeta:
