@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.utils import find, get
 
-import json, os, traceback, sys, datetime
+import json, os, traceback, sys, datetime, re
 from functions import SendDM, getComEmbed, getErrorEmbed
 
 from replybot import replyBot
