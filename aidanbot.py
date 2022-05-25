@@ -6,6 +6,7 @@ import json, os, traceback, sys, datetime, re
 from functions import SendDM, getComEmbed, getErrorEmbed
 
 from replybot import replyBot
+from globalbot import sendGlobalMessage
 from config import ConfigManager
 
 with open('./data/profiles.json') as file:
@@ -70,7 +71,7 @@ class AidanBot(commands.Bot):
 		ctx = await self.get_context(message)
 
 		# automod
-		if ctx.guild and ctx.guild.id == 836936601824788520: # Becoming public soon
+		if ctx.guild.id == 836936601824788520:
 			msg = message.content.lower()
 			# saying them feels wrong
 			if "ni##er".replace("#","g") in msg or "fa##ot".replace("#","g") in msg or "#eta#d".replace("#","r") in msg:
@@ -95,11 +96,11 @@ class AidanBot(commands.Bot):
 					return await self.replybot.on_message(message)
 				elif self.isbeta and message.channel.name == "aidanbetabot-talk":
 					return await self.replybot.on_message(message)	
-				
+
 				channel = self.CON.get_value(ctx.guild, "global_channel", guild=ctx.guild) # I'VE COME TO MAKE AN ANNOUNCEMENT, AIDAN THE DISCORD BOT IS A BITCH ASS MOTHERFUCKER HE PISSED ON MY BOX.
 				if channel and ctx.channel == channel:
 					await sendGlobalMessage(self, ctx)
-					
+
 				nqn = get(ctx.guild.members, id=559426966151757824)
 				if not nqn:
 					emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
