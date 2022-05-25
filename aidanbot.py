@@ -151,12 +151,8 @@ class AidanBot(commands.Bot):
 					return await message.channel.send(f"No posting invites outside of {channel.mention}. >:(")
 				return await message.channel.send("No posting invites in this server. >:(")
 
-async def cloneUser(channel, user, msg):
-    hook = ""
-    for w in await channel.webhooks():
-        if w.name == "AidanBotNitrontHook":
-            hook = w
-    if not hook:
-        hook = await channel.create_webhook(name="AidanBotNitrontHook")
-
-    await hook.send(msg, username=user.display_name, avatar_url=user.display_avatar)
+async def cloneUser(channel, user, msg, makenew):
+	hook = await channel.create_webhook(name="AidanBotNitrontHook")
+	await hook.send(msg, username=user.display_name, avatar_url=user.display_avatar)
+	await hook.delete()
+	
