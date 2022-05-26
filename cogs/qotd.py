@@ -34,7 +34,7 @@ class QOTDCog(discord.Cog):
 				if channel:
 					questions = self.client.CON.get_value(guild, "questions")
 					if len(questions) == 0:
-						emb = getComEmbed(None, self.client, "Question Of The Day", f"Looks like we're out of questions, use /qotd config to add more!", "", Color.from_rgb(145, 29, 37))
+						emb = getComEmbed(None, self.client, "Question Of The Day", f"Looks like we're out of questions, use /qotd config to add more!", Color.from_rgb(145, 29, 37))
 						await channel.send(embed=emb)
 					else:
 						questioni = randint(0, len(questions)-1)
@@ -90,11 +90,14 @@ class QOTDCog(discord.Cog):
 		questions = self.client.CON.get_value(ctx.guild, "questions")
 		embed = False
 		if action == "List":
-			txt = ""
-			for quest in questions:
-				member = get(ctx.guild.members, id=quest["author"])
-				txt += f"\n**'" + quest["question"] + "':** " + str(member)
-			embed = getComEmbed(ctx, self.client, f"All questions for {ctx.guild.name}:", txt)
+			if len(questions) == 0:
+				embed = getComEmbed(ctx, self.client, f"All questions for {ctx.guild.name}:", "Looks like we're out of questions, use /qotd config to add more!")
+			else:
+				txt = ""
+				for quest in questions:
+					member = get(ctx.guild.members, id=quest["author"])
+					txt += f"\n**'" + quest["question"] + "':** " + str(member)
+				embed = getComEmbed(ctx, self.client, f"All questions for {ctx.guild.name}:", txt)
 		elif action == "Ask" and ask:
 			if len(ask) > 100:
 				return await ctx.respond("Too many characters! Questions mustn't be more than 100 characters.")
