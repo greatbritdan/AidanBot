@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord.utils import find, get
 
-import json, os, traceback, sys, datetime
+import json, os, traceback, sys, datetime, re
 from functions import SendDM, getComEmbed, getErrorEmbed
 
 from replybot import replyBot
@@ -18,30 +18,32 @@ class AidanBot(commands.Bot):
 	def __getitem__(self, key):
 		return getattr(self, key)
 
-	def __init__(self, github, debug_guilds=None):
+	def __init__(self, github, debug_guilds=None, offline=False):
 		self.settingup = True
-		self.offline = False
-		self.version = "V1.1 (Slash)"
-		
-		self.GIT = github
-		self.botreponame = "Aid0nModder/AidanBot"
-		self.botrepo = self.GIT.get_repo(self.botreponame)
-		self.CON = ConfigManager(self, ctype="guild") # guild config
-		self.UCON = ConfigManager(self, ctype="user") # user config
-		self.replybot = replyBot(self)
+		self.offline = offline
+		self.version = "V1.2 (Slash)"
 
 		intents = discord.Intents.all()
 		mentions = discord.AllowedMentions(everyone=False, roles=False)
 		super().__init__(debug_guilds=debug_guilds, prefix="kdkldewkldlkw", intents=intents, allowed_mentions=mentions)
 
-		if self.offline:
-			self.load_extension(f'cogs.offline')
-		else:
+		if not self.offline:
+			self.GIT = github
+			self.botreponame = "Aid0nModder/AidanBot"
+			self.botrepo = self.GIT.get_repo(self.botreponame)
+			self.CON = ConfigManager(self, ctype="guild") # guild config
+			self.UCON = ConfigManager(self, ctype="user") # user config
+			self.replybot = replyBot(self)
+
 			for filename in os.listdir('./cogs'):
 				if filename.endswith('.py') and filename != "offline.py":
 					self.load_extension(f'cogs.{filename[:-3]}')
 
 	async def on_ready(self):
+		if self.offline:
+			print(f"< Commands Cleared, logging out >")
+			await self.close()
+
 		profile = "main"
 		if self.user.id == 861571290132643850:
 			profile = "beta"
@@ -54,9 +56,8 @@ class AidanBot(commands.Bot):
 
 		await self.CON.ready()
 		await self.UCON.ready()
-		if not self.offline:
-			await dict(self.cogs)["BirthdayCog"].ready()
-			await dict(self.cogs)["QOTDCog"].ready()
+		await dict(self.cogs)["BirthdayCog"].ready()
+		await dict(self.cogs)["QOTDCog"].ready()
 
 	async def on_application_command_error(self, ctx, error):
 		await ctx.respond(embed=getErrorEmbed(ctx, self, str(error)))
@@ -90,15 +91,27 @@ class AidanBot(commands.Bot):
 			if (not self.isbeta) and await self.handle_invites(message): # remove invites
 				return
 			if not ctx.command:
-				channel = self.CON.get_value(ctx.guild, "replybot_channel", guild=ctx.guild) # reply bot uwu
-				if (not self.isbeta) and channel and ctx.channel == channel:
+				channels = self.CON.get_value(ctx.guild, "replybot_channel", guild=ctx.guild) # reply bot uwu
+				if (not self.isbeta) and channels and ctx.channel in channels:
 					return await self.replybot.on_message(message)
 				elif self.isbeta and message.channel.name == "aidanbetabot-talk":
-					return await self.replybot.on_message(message)	
+					return await self.replybot.on_message(message)
 
-				channel = self.CON.get_value(ctx.guild, "global_channel", guild=ctx.guild) # I'VE COME TO MAKE AN ANNOUNCEMENT, AIDAN THE DISCORD BOT IS A BITCH ASS MOTHERFUCKER HE PISSED ON MY BOX.
-				if channel and ctx.channel == channel:
-					await sendGlobalMessage(self, ctx)
+				'''nqn = get(ctx.guild.members, id=559426966151757824)
+				if not nqn:
+					emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
+					emogis = [e.replace(":","") for e in emogis]
+					emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
+					if len(emogis) > 0:
+						txt = emogilesstext[0]
+						for idx, emogi in enumerate(emogis):
+							realemogi = get(self.emojis, name=emogi)
+							if realemogi:
+								txt = txt + str(realemogi) + emogilesstext[idx+1]
+							else:
+								txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
+						if txt != ctx.message.content:
+							await cloneUser(ctx.channel, ctx.author, txt)'''
 
 	async def on_member_join(self, member):
 		if not self.isbeta:
@@ -127,9 +140,9 @@ class AidanBot(commands.Bot):
 
 	async def handle_invites(self, message):
 		if "discord.gg" in message.content.lower() and self.CON.get_value(message.guild, "remove_invites"):
-			channel = self.CON.get_value(message.guild, "allow_invites_channel", guild=message.guild)
-			if ((not channel) or message.channel != channel) and (not message.channel.permissions_for(message.author).ban_members):
+			channels = self.CON.get_value(message.guild, "allow_invites_channel", guild=message.guild)
+			if ((not channels) or message.channel not in channels) and (not message.channel.permissions_for(message.author).ban_members):
 				await message.delete()
-				if channel:
-					return await message.channel.send(f"No posting invites outside of {channel.mention}. >:(")
+				if channels:
+					return await message.channel.send(f"No posting invites outside of {self.CON.display_value('allow_invites_channel', channels)}. >:(")
 				return await message.channel.send("No posting invites in this server. >:(")

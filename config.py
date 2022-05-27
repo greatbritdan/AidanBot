@@ -25,6 +25,7 @@ class ConfigManager():
 		self.desc_values = {}
 		self.type_values = {}
 		self.restrict_values = {}
+		self.stackable_values = {}
 
 		list = None
 		if self.type == "guild":
@@ -38,7 +39,12 @@ class ConfigManager():
 			self.valid_values.append(val)
 			self.default_values[val] = list[val]["default"]
 			self.desc_values[val] = list[val]["help"]
-			self.type_values[val] = list[val]["type"]
+			if list[val]["type"].startswith("[]"):
+				self.stackable_values[val] = True
+				self.type_values[val] = list[val]["type"][2:]
+			else:
+				self.stackable_values[val] = False
+				self.type_values[val] = list[val]["type"]
 			if "restricted" in list[val]:
 				self.restrict_values[val] = list[val]["restricted"]
 			else:
@@ -100,6 +106,8 @@ class ConfigManager():
 		return self.desc_values[name]
 	def get_type(self, name):
 		return self.type_values[name]
+	def get_stackable(self, name):
+		return self.stackable_values[name]
 	def is_restricted(self, name):
 		if self.restrict_values[name]:
 			return True
@@ -118,6 +126,14 @@ class ConfigManager():
 	def get_value(self, obj, name, guild=None):
 		self.fix_model(obj)
 		val = self.values[str(obj.id)][name]
+		if self.get_stackable(name) and type(val) == list:
+			result = []
+			for nval in val:
+				result.append( self._get_value(name, nval, guild) )
+		else:
+			result = self._get_value(name, val, guild)
+		return result
+	def _get_value(self, name, val, guild=None):
 		if self.get_type(name) == "channel":
 			return get(guild.channels, id=val)
 		elif self.get_type(name) == "role":
@@ -125,67 +141,63 @@ class ConfigManager():
 		else:
 			return val
 	async def set_value(self, obj, name, val, guild=None, noupdate=False):
-		result = self._set_value(obj, name, val, guild)
+		self.fix_model(obj)
+		if self.get_stackable(name):
+			vals = val.replace(" ","").split(",")
+			if len(vals) > 5:
+				return False, True
+			result = []
+			for nval in vals:
+				result.append( self._set_value(obj, name, nval, guild) )
+		else:
+			result = self._set_value(obj, name, val, guild)
+		self.values[str(obj.id)][name] = result
+		print(result)
 		if result and (not noupdate):
 			await self.values_msgupdate("save")
-		return result
+		return result, False
 	def _set_value(self, obj, name, val, guild):
-		self.fix_model(obj)
 		if (self.get_type(name) == "channel" or self.get_type(name) == "role") and type(val) == str:
 			val = val.lower()
-
 		if (self.get_type(name) == "channel" or self.get_type(name) == "role") and (val == "false" or val == "none"):
-			self.values[str(obj.id)][name] = False
-			return True
+			return False
 
 		if self.get_type(name) == "channel":
 			newval = self.tonumber(val)
-			channel = None
-			if newval:
-				channel = get(guild.channels, id=newval)
-			else:
-				channel = get(guild.channels, name=val)
+			channel = get(guild.channels, id=newval) if newval else get(guild.channels, name=val)
 			if channel:
-				self.values[str(obj.id)][name] = channel.id
-				return True
-			return False
-
+				return channel.id
 		elif self.get_type(name) == "role":
 			newval = self.tonumber(val)
-			role = None
-			if newval:
-				role = get(guild.roles, id=newval)
-			else:
-				role = get(guild.roles, name=val)
+			role = get(guild.roles, id=newval) if newval else get(guild.roles, name=val)
 			if role:
-				self.values[str(obj.id)][name] = role.id
-				return True
-			return False
-		
+				return role.id
 		elif self.get_type(name) == "boolean":
 			if val == "true":
-				self.values[str(obj.id)][name] = True
+				return True
 			else:
-				self.values[str(obj.id)][name] = False
-			return True
-			
+				return False
 		elif self.get_type(name) == "number":
 			newval = self.tonumber(val)
 			if newval:
-				self.values[str(obj.id)][name] = newval
-				return True
-			return False
-
+				return newval
 		else:
-			self.values[str(obj.id)][name] = val
-			return True
+			return val
 	async def reset_value(self, obj, name, noupdate=False):
 		self.fix_model(obj)
 		self.values[str(obj.id)][name] = self.default_values[name]
 		if not noupdate:
 			await self.values_msgupdate("save")
 
-	def display_value(self, val):
+	def display_value(self, name, val):
+		if self.get_stackable(name) and type(val) == list:
+			result = []
+			for nval in val:
+				result.append(self._display_value(nval))
+			return ", ".join(result)
+		else:
+			return self._display_value(val)
+	def _display_value(self, val):
 		if isinstance(val, discord.TextChannel) or isinstance(val, discord.VoiceChannel) or isinstance(val, discord.Role):
 			return val.mention
 		else:

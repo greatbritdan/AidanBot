@@ -26,7 +26,7 @@ class replyBot():
             replytype="reply", reply=["I did what i had to do.", "You must never know", "I can't say.", "That wasn't me and you can't prove it.", "Doesn't matter, because you're next {name}...", "I did it for the vine.", "They made NFT's. Anyone would do the same!"], replybefore=["","","","haha... ","HA! ",] )
         self.states["respond"] = replyBotState( findwords=["you sure"],
             reply=["i know so.", "i think so", "i'm very sure man.", "now that i think about it... i don't know..."] )
-        self.states["swear"] = replyBotState( matchwords=["fuck","fucking","fucked","fuk","shit","shitting","shitted","cunt","crap","bitch","dick","cock","penis"], replychance=2,
+        self.states["respond"] = replyBotState( matchwords=["fuck","fucking","fucked","fuk","shit","shitting","shitted","cunt","crap","bitch","dick","cock","penis"], replychance=2,
             reply=["This is a family friendly server ok. No swearing please.", "if you're gonna swear, bleap them like f##k.", "Time to get the soap...", "$ban @{name}! oh...", "you mother flipper!!!"] )
 
         self.states["funny"] = replyBotState( matchwords=["lol","lmao","ha"], reply=["lol","lmao","ha","What's so funny?"], noendpunc=True )
@@ -42,7 +42,7 @@ class replyBot():
         self.states["else"] = replyBotState(
             alwaystrigger=True, replychance=6,
             replybefore=["","","","Hey, ","Oy, ","Uhh... ","Hear me out. ","Hold up!... "],
-            reply=["Wanna say that to my face?","Wanna repeat yourself?","Who asked lmao.","BRUH","I'm sorry what?","That's cringe","I wish i cared.","What if... You shut up?","LMAO","+ ratio","\*yawn*"]
+            reply=["Wanna say that to my face?","Wanna repeat yourself?","Who asked lmao.","BRUH","I'm sorry what?","That's cringe","I wish i cared.","What if... You shut up?","LMAO","+ ratio","\*yawn*","Omg shuf up...","No one asked","look at this dude"]
         )
         self.states["rareelse"] = replyBotState(
             alwaystrigger=True, replychance=15,
@@ -136,12 +136,10 @@ class replyBot():
 def getEmojiFromMsg(client, message):
     # default
     defemojis = emoji.core.distinct_emoji_lis(message.clean_content)
-
     # custom
     emojis = re.findall(r'<a?:\w*:\d*>', message.content) # spoopy regex
     emojis = [int(e.split(':')[2].replace('>', '')) for e in emojis]
     emojis = [client.get_emoji(e) for e in emojis]
-
     return emojis+defemojis
 
 # each state, like greeting, determans what type of message was sent
