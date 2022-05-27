@@ -53,7 +53,7 @@ class CoreCog(discord.Cog):
 		else:
 			issue = self.client.botrepo.create_issue(title=title, body=body)
 		await ctx.respond(f"Submitted!\n\nhttps://github.com/{self.client.botreponame}/issues/{issue.number}")
-
+		
 	@slash_command(name="bucket", description="The best command ever?")
 	async def bucket(self, ctx):
 		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp",
@@ -132,17 +132,20 @@ class CoreCog(discord.Cog):
 			txt = ""
 			for name in values:
 				if not CON.is_restricted(name):
-					txt += f"\n**- {name}:** {CON.display_value(CON.get_value(obj, name, ctx.guild))}"
+					txt += f"\n**- {name}:** {CON.display_value(name, CON.get_value(obj, name, ctx.guild))}"
 			embed = getComEmbed(ctx, self.client, f"All values for {obj.name}:", txt)
 		elif action == "Info" and name:
-			txt = f"**Value:** {CON.display_value(values[name])}\n**Default Value:** `{CON.default_values[name]}`\n**Description:** '{CON.desc_values[name]}'\n**Type:** `{CON.type_values[name]}`"
+			txt = f"**Value:** {CON.display_value(name, values[name])}\n**Default Value:** `{CON.default_values[name]}`\n**Description:** '{CON.desc_values[name]}'\n**Type:** `{CON.type_values[name]}`\n**Stackable:** `{CON.stackable_values[name]}`"
 			embed = getComEmbed(ctx, self.client, f"Info for {name}:", txt)
 		elif action == "Reset" and name:
 			await CON.reset_value(obj, name)
 			embed = getComEmbed(ctx, self.client, content=f"Reset {name} to `{CON.default_values[name]}`!")
 		elif action == "Set" and name and value:
-			await CON.set_value(obj, name, value, ctx.guild)
-			embed = getComEmbed(ctx, self.client, content=f"Set {name} to {CON.display_value(CON.get_value(obj, name, ctx.guild))}!")
+			fulval, error = await CON.set_value(obj, name, value, ctx.guild)
+			if error:
+				embed = getComEmbed(ctx, self.client, content=f"Stackable values like {name} can only have a maximum of **5** channels\n\n**Upgrade to AidanBot+ for up to 25** <:problame:869571321967816704>")
+			else:
+				embed = getComEmbed(ctx, self.client, content=f"Set {name} to {CON.display_value(name, CON.get_value(obj, name, ctx.guild))}!")
 		else:
 			return await ctx.respond("Seems like you're missing some arguments. Try again.")
 		await ctx.respond(embed=embed)

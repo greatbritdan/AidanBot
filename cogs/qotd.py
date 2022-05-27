@@ -41,12 +41,14 @@ class QOTDCog(discord.Cog):
 						question = questions[questioni]
 
 						quest, author = question["question"], get(guild.members, id=question["author"])
-						if not quest.endswith("?"):
-							quest += "?"
+						if not quest.endswith("?"): quest += "?"
 						emb = getComEmbed(None, self.client, "Question Of The Day", quest)
 						emb.set_footer(text=f"Question submitted by {str(author)}")
-						await channel.send(embed=emb)
 
+						txt, role = "", self.client.CON.get_value(guild, "qotd_role", guild=guild)
+						if (not testpost) and role:
+							txt = f"Wake up sussy's, New QOTD dropped. {role.mention}"
+						await channel.send(txt, embed=emb)
 						if not testpost:
 							questions.pop(questioni)
 							await self.client.CON.set_value(guild, "questions", questions)
