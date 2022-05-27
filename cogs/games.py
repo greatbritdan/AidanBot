@@ -390,7 +390,7 @@ class fightUser():
 	def disableMove(self):
 		return self.comboing
 	def clamp(self):
-		self.health, self.energy, self.mp = clamp(self.health,0,100), clamp(self.energy,0,3), clamp(self.mp,0,3)
+		self.health, self.energy, self.mp, self.multiplier = clamp(self.health,0,100), clamp(self.energy,0,3), clamp(self.mp,0,3), clamp(self.multiplier,1,2.5)
 	def getUI(self):
 		return [f"{self.name} Stats:", f'''
 		`Health    :` {getBar(self.health,100,10,True)} **({self.health})**
