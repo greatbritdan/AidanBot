@@ -17,8 +17,8 @@
     },
     "allow_invites_channel": {
         "default":false,
-        "help":"The channel that invites are allowed in.",
-        "type":"channel"
+        "help":"The channel(s) that invites are allowed in.",
+        "type":"[]channel"
     },
 
     "prefix": {
@@ -49,6 +49,11 @@
         "help":"The channel that question of the day questions are posted.",
         "type":"channel"
     },
+    "qotd_role": {
+        "default":false,
+        "help":"The role that gets pinged when a new qotd is posted.",
+        "type":"role"
+    },
     "questions": {
         "default":[],
         "help":"Question of the day questions.",
@@ -58,13 +63,7 @@
 
     "replybot_channel": {
         "default":false,
-        "help":"The channel that allows AidanBot to reply to people [BETA].",
-        "type":"channel"
-    },
-    "global_channel": {
-        "default":false,
-        "help":"The channel that allows people to read and send messages to a global chat.",
-        "type":"channel",
-        "restricted":true
+        "help":"The channel(s) that allows AidanBot to reply to people [BETA].",
+        "type":"[]channel"
     }
 }
