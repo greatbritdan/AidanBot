@@ -21,37 +21,35 @@ Slash Command Hierarchy!
 	/userinfo -  Get info on a user.
 
 	/config
-	-	/config guild -       Edit guild configeration. (GUILD ONLY)
+	-	/config guild -       Edit guild configeration. (GUILD ONLY) (REQUIRES KICK MEMBERS)
 	-	/config user -        Edit user configeration.
-
 	/role
-	-	/role add -           Add a [r] role to yourself or any role to anyone if you have manage roles.
-	-	/role remove -        Remove a role, same restrictions as above.
+	-	/role add -           Add a [r] role to yourself or any role to anyone if you have manage roles. (GUILD ONLY)
+	-	/role remove -        Remove a role, same restrictions as above. (GUILD ONLY)
 
 	/opinion
 	-	/opinion rate -       Rate a thing.
 	-	/opinion percent -    Get percent of thing.
 	-	/opinion ask -        Ask a thing.
 	-	/opinion decide -     Decinde on thing.
-
 	/games
-	-	/games fight -        Fight people or bots.
-	-	/games rps -          Rock, paper, sissors.
-
+	-	/games rps -           Rock, paper, sissors.
+	-	/games fight -         Fight people or bots.
+	-	/games fightclassic -  Fight people or bots, but classic.
+	
 	/birthday
 	-	/birthday set -       Set your birthday.
 	-	/birthday remove -    Remove your birthday.
 	-	/birthday upcoming -  See upcoming birthdays.
-
 	/qotd (MUST HAVE 'qotd_channel' CONFIG SETUP!)
-	-	/qotd list -          Forcefully ask a question. (OWNER ONLY)
+	-	/qotd ask -           Forcefully ask a question. (OWNER ONLY)
 	-	/qotd config -        Add, remove and see all questions.
 
 	/owner
-	-	/owner eval -         [DONE] run sum code (OWNER ONLY)
+	-	/owner eval -         run sum code (OWNER ONLY)
 
-	(message) UwU - Uwuifys a message. :3
-	(message) Raw - Get the raw text of a message.
-	(user) Info - Get info on a user.
+	(message) UwU -  Uwuifys a message. :3
+	(message) Raw -  Get the raw text of a message.
+	(user) Info -    Get info on a user.
 
 '''
