@@ -114,7 +114,7 @@ class AidanBot(commands.Bot):
 							await cloneUser(ctx.channel, ctx.author, txt)'''
 
 	async def on_member_join(self, member):
-		if not self.isbeta:
+		if self.isbeta:
 			return
 		channel = self.CON.get_value(member.guild, "welcome_message_channel", guild=member.guild)
 		msg = self.CON.get_value(member.guild, "welcome_message")
@@ -122,7 +122,7 @@ class AidanBot(commands.Bot):
 			await channel.send(msg.format(name=member.name, mention=member.mention, user=member, member=member, server=member.guild, guild=member.guild))
 
 	async def on_guild_join(self, guild):
-		if not self.isbeta:
+		if self.isbeta:
 			return
 		await SendDM(self, "SOMEONE DID WHAT?!?!", f"Added to {guild.name}!")
 		
@@ -134,7 +134,7 @@ class AidanBot(commands.Bot):
 			await chan.send(embed=emb)
 
 	async def on_guild_remove(self, guild):
-		if not self.isbeta:
+		if self.isbeta:
 			return
 		await self.CON.remove_group(guild)
 
