@@ -48,7 +48,7 @@ class QOTDCog(discord.Cog):
 						txt, role = "", self.client.CON.get_value(guild, "qotd_role", guild=guild)
 						if (not testpost) and role:
 							txt = f"Wake up sussy's, New QOTD dropped. {role.mention}"
-						await channel.send(txt, embed=emb)
+						await channel.send(txt, embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
 						if not testpost:
 							questions.pop(questioni)
 							await self.client.CON.set_value(guild, "questions", questions)
