@@ -26,7 +26,7 @@ def getErrorEmbed(ctx, client, error="Default error"):
 
 async def SendDM(client, title, description):
 	aidan = await client.fetch_user(384439774972215296) # is me :]
-	emb = getComEmbed(None, client, "System Message", title, description, Color.from_rgb(70, 29, 37))
+	emb = getComEmbed(None, client, title, description, Color.from_rgb(70, 29, 37))
 	await aidan.send(embed=emb)
 
 # others
