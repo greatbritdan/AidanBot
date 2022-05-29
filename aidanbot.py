@@ -96,22 +96,9 @@ class AidanBot(commands.Bot):
 					return await self.replybot.on_message(message)
 				elif self.isbeta and message.channel.name == "aidanbetabot-talk":
 					return await self.replybot.on_message(message)
-
-				'''nqn = get(ctx.guild.members, id=559426966151757824)
-				if not nqn:
-					emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
-					emogis = [e.replace(":","") for e in emogis]
-					emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
-					if len(emogis) > 0:
-						txt = emogilesstext[0]
-						for idx, emogi in enumerate(emogis):
-							realemogi = get(self.emojis, name=emogi)
-							if realemogi:
-								txt = txt + str(realemogi) + emogilesstext[idx+1]
-							else:
-								txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
-						if txt != ctx.message.content:
-							await cloneUser(ctx.channel, ctx.author, txt)'''
+				nqn = get(ctx.guild.members, id=559426966151757824)
+				if (not nqn) and await self.handle_emojis(ctx):
+					return
 
 	async def on_member_join(self, member):
 		if self.isbeta:
@@ -156,3 +143,54 @@ class AidanBot(commands.Bot):
 						if channels:
 							return await message.channel.send(f"No posting invites outside of {self.CON.display_value('allow_invites_channel', channels)}. >:(")
 						return await message.channel.send("No posting invites in this server. >:(")
+					
+	async def handle_emojis(self, ctx):
+		emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
+		emogis = [e.replace(":","") for e in emogis]
+		emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
+		print(emogis)
+		print(emogilesstext)
+		if len(emogis) > 0:
+			txt = emogilesstext[0]
+			for idx, emogi in enumerate(emogis):
+				realemogi = get(self.emojis, name=emogi)
+				if realemogi:
+					txt = txt + str(realemogi) + emogilesstext[idx+1]
+				else:
+					txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
+			if txt != ctx.message.content:
+				for f in os.listdir("./nitrontfiles"): # clear old items
+					os.remove(os.path.join("./nitrontfiles", f))
+
+				paths, filenames = [], []
+				if len(ctx.message.attachments) > 0: # save all attackments
+					for idx, file in enumerate(ctx.message.attachments):
+						filenames.append(file.filename)
+						path = f"./nitrontfiles/emogifile{idx}_{file.filename}"
+						paths.append(path)
+						await file.save(path)
+
+				newfiles = None
+				if len(ctx.message.attachments) > 0: # create discord file objects of attachments
+					newfiles = []
+					for idx, _ in enumerate(paths):
+						newfiles.append(discord.File(paths[idx], filenames[idx]))
+
+				await self.sendWebhook(ctx.channel, ctx.author, txt, newfiles)
+				await ctx.message.delete()
+				return True
+		return False
+
+	async def sendWebhook(self, channel, user, txt, files):
+		hook = False
+		for w in await channel.webhooks():
+			if w.name == "AidanBotCloneHook":
+				hook = w
+		if not hook:
+			hook = await channel.create_webhook(name="AidanBotCloneHook")
+
+		try:
+			await hook.send(txt, username=user.display_name, avatar_url=user.display_avatar, files=files)
+		except:
+			await hook.delete()
+			await self.sendWebhook(channel, user, txt, files)
