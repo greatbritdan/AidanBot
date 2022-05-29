@@ -139,10 +139,21 @@ class AidanBot(commands.Bot):
 		await self.CON.remove_group(guild)
 
 	async def handle_invites(self, message):
-		if "discord.gg" in message.content.lower() and self.CON.get_value(message.guild, "remove_invites"):
-			channels = self.CON.get_value(message.guild, "allow_invites_channel", guild=message.guild)
-			if ((not channels) or message.channel not in channels) and (not message.channel.permissions_for(message.author).ban_members):
-				await message.delete()
-				if channels:
-					return await message.channel.send(f"No posting invites outside of {self.CON.display_value('allow_invites_channel', channels)}. >:(")
-				return await message.channel.send("No posting invites in this server. >:(")
+		channels = self.CON.get_value(message.guild, "allow_invites_channel", guild=message.guild)
+		if self.CON.get_value(message.guild, "remove_invites") and ((not channels) or (message.channel not in channels)):
+			invites = re.findall(r'discord\.gg\/\S*|discord\.com\/invite\/\S*', message.clean_content)
+			print(invites)
+			if invites and len(invites) > 0:
+				guildinviteids = []
+				for invite in await message.guild.invites():
+					guildinviteids.append(invite.id)
+					print(f"Guild ID: {invite.id}")
+
+				for invite in invites:
+					inviteid = invite.split("/")[-1]
+					print(f"Send ID: {inviteid}")
+					if inviteid not in guildinviteids:
+						await message.delete()
+						if channels:
+							return await message.channel.send(f"No posting invites outside of {self.CON.display_value('allow_invites_channel', channels)}. >:(")
+						return await message.channel.send("No posting invites in this server. >:(")
