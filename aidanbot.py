@@ -148,8 +148,6 @@ class AidanBot(commands.Bot):
 		emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
 		emogis = [e.replace(":","") for e in emogis]
 		emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
-		print(emogis)
-		print(emogilesstext)
 		if len(emogis) > 0:
 			txt = emogilesstext[0]
 			for idx, emogi in enumerate(emogis):
