@@ -74,7 +74,7 @@ class CoreCog(discord.Cog):
 	):
 		if await command_checks(ctx, self.client, is_guild=True, bot_has_permission="manage_roles"): return
 		
-		if (user or (not role.name.startswith("[r]"))) and (not ctx.channel.permissions_for(ctx.author).manage_roles):
+		if ((user and user != ctx.author) or (not role.name.startswith("[r]"))) and (not ctx.channel.permissions_for(ctx.author).manage_roles):
 			return await ctx.respond("HAHA, Maybe one day kiddo...")
 		clientmember = get(ctx.guild.members, id=self.client.user.id)
 		if role.position >= clientmember.top_role.position:
@@ -92,7 +92,7 @@ class CoreCog(discord.Cog):
 	):
 		if await command_checks(ctx, self.client, is_guild=True, bot_has_permission="manage_roles"): return
 
-		if (user or (not role.name.startswith("[r]"))) and (not ctx.channel.permissions_for(ctx.author).manage_roles):
+		if ((user and user != ctx.author) or (not role.name.startswith("[r]"))) and (not ctx.channel.permissions_for(ctx.author).manage_roles):
 			return await ctx.respond("HAHA, Maybe one day kiddo...")
 		clientmember = get(ctx.guild.members, id=self.client.user.id)
 		if role.position >= clientmember.top_role.position:
