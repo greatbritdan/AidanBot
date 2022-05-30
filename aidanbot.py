@@ -24,7 +24,7 @@ class AidanBot(commands.Bot):
 		self.version = "V1.2 (Slash)"
 
 		intents = discord.Intents.all()
-		mentions = discord.AllowedMentions(everyone=False)
+		mentions = discord.AllowedMentions(everyone=False, roles=False)
 		super().__init__(debug_guilds=debug_guilds, prefix="kdkldewkldlkw", intents=intents, allowed_mentions=mentions)
 
 		if not self.offline:
