@@ -148,7 +148,13 @@ class AidanBot(commands.Bot):
 		emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
 		emogis = [e.replace(":","") for e in emogis]
 		emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
-		if len(emogis) > 0:
+		if len(emogis) == 1 and emogilesstext[0] == "$" and emogilesstext[1] == "":
+			realemogi = get(self.emojis, name=emogis[0])
+			msgs = await ctx.channel.history(limit=2).flatten()
+			await msgs[1].add_reaction(realemogi)
+			await ctx.message.delete()
+			return True
+		elif len(emogis) > 0:
 			txt = emogilesstext[0]
 			for idx, emogi in enumerate(emogis):
 				realemogi = get(self.emojis, name=emogi)
