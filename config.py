@@ -167,10 +167,6 @@ class ConfigManager():
 			channel = get(guild.channels, id=newval) if newval else get(guild.channels, name=val)
 			if channel:
 				return channel.id
-			else:
-				thread = get(guild.threads, id=newval) if newval else get(guild.threads, name=val)
-				if thread:
-					return thread.id
 		elif self.get_type(name) == "role":
 			newval = self.tonumber(val)
 			role = get(guild.roles, id=newval) if newval else get(guild.roles, name=val)
