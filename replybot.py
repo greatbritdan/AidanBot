@@ -24,6 +24,8 @@ class replyBot():
             replytype="reply", reply=["Yes, 100%", "Yep", "I'm sure", "I think so", "uhhh idk", "i donb't think so", "nahhh", "nope", "NEVER!"], replyafter=["","",""," maybe..."," i think."] )
         self.states["questionwhydid"] = replyBotState( findwords=["why did", "why do"],
             replytype="reply", reply=["I did what i had to do.", "You must never know", "I can't say.", "That wasn't me and you can't prove it.", "Doesn't matter, because you're next {name}...", "I did it for the vine.", "They made NFT's. Anyone would do the same!"], replybefore=["","","","haha... ","HA! ",] )
+        self.states["questionareyou"] = replyBotState( findwords=["are you", "were you"],
+            replytype="reply", reply=["Yep!", "Yeah i think so", "Only sometimes", "No, not anymore", "Never", "No, but maybe one day...", "Nope", "NO, 100% NOT."] )
         self.states["respond"] = replyBotState( findwords=["you sure"],
             reply=["i know so.", "i think so", "i'm very sure man.", "now that i think about it... i don't know..."] )
         self.states["respond"] = replyBotState( matchwords=["fuck","fucking","fucked","fuk","shit","shitting","shitted","cunt","crap","bitch","dick","cock","penis"], replychance=2,
@@ -49,7 +51,7 @@ class replyBot():
             reply=["Look, i may be stupid but... what the fuck!?!","This is going in my cringe collection!","Caught yo ass in 4K."]
         )
 
-        self.statemanager = ["^howareyou|questionwhydid|questionwhendid|questionwhen|questiondoyou", "hello|bye|sorry|respond", "*funny|uwu|sus|like|love|hate|unsad|thanks", "rareelse|else"]
+        self.statemanager = ["^howareyou|questionareyou|questionwhydid|questionwhendid|questionwhen|questiondoyou", "hello|bye|sorry|respond", "*funny|uwu|sus|like|love|hate|unsad|thanks", "rareelse|else"]
 
         self.punctuation = [".",",","!","?",":"]
         self.endpunctuation = [".","!"]
@@ -141,7 +143,7 @@ def getEmojiFromMsg(client, message):
     emojis = [int(e.split(':')[2].replace('>', '')) for e in emojis]
     emojis = [client.get_emoji(e) for e in emojis]
     return emojis+defemojis
-
+    
 # each state, like greeting, determans what type of message was sent
 class replyBotState():
     def __init__(self, **kwargs):
