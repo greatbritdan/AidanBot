@@ -1,5 +1,6 @@
 # inspired by NH's reply bot, don't give me any credit for the idea.
 
+import discord
 from discord.utils import get
 
 import re, emoji
@@ -14,6 +15,15 @@ class replyBot():
             reply=["Hey","Hi","Hello"], replybefore=["","","","Oh uhh ","Yo! "], replyafter=["","",""," :wave:"," {name}",", ig..."] )
         self.states["bye"] = replyBotState( matchwords=["bye","goodbye","bubye","cya","gtg"],
             reply=["Bye","Goodbye","Bubye","Bye","Cya l8r"], replybefore=["","","Awww, "], replyafter=["","",""," :wave:"," {name}"] )
+        self.states["sorry"] = replyBotState( matchwords=["sorry","sry"],
+            reply=["it's ok.","All is forgiven :)","screw you.","fine"] )
+        self.states["respond"] = replyBotState( findwords=["you sure"],
+            reply=["i know so.", "i think so", "i'm very sure man.", "now that i think about it... i don't know..."] )
+        self.states["swear"] = replyBotState( matchwords=["fuck","fucking","fucked","fuk","shit","shitting","shitted","cunt","crap","bitch","dick","cock","penis"], replychance=2,
+            reply=["This is a family friendly server ok. No swearing please.", "if you're gonna swear, bleap them like f##k.", "Time to get the soap...", "$ban @{name}! oh...", "you mother flipper!!!"] )
+        self.states["shutup"] = replyBotState( findwords=["shut up", "stfu"],
+            replytype="reply", reply=["I'll shut up when i feel like it.", "No, you stfu.", "Cope harder", "<:Depressed:855810846395203584>", "Shut", "HAHAHHA, no..."] )
+
         self.states["howareyou"] = replyBotState( findwords=["how are you","you ok"],
             reply=["I'm fine.","Just awful", "I've felt better.", "I'll be fine... soon...", "I have no idea", "All i feel is agony."], replyafter=["","","",""," :slight_smile:"] )
         self.states["questionwhen"] = replyBotState( findwords=["how long", "when will"],
@@ -26,15 +36,10 @@ class replyBot():
             replytype="reply", reply=["I did what i had to do.", "You must never know", "I can't say.", "That wasn't me and you can't prove it.", "Doesn't matter, because you're next {name}...", "I did it for the vine.", "They made NFT's. Anyone would do the same!"], replybefore=["","","","haha... ","HA! ",] )
         self.states["questionareyou"] = replyBotState( findwords=["are you", "were you"],
             replytype="reply", reply=["Yep!", "Yeah i think so", "Only sometimes", "No, not anymore", "Never", "No, but maybe one day...", "Nope", "NO, 100% NOT."] )
-        self.states["respond"] = replyBotState( findwords=["you sure"],
-            reply=["i know so.", "i think so", "i'm very sure man.", "now that i think about it... i don't know..."] )
-        self.states["respond"] = replyBotState( matchwords=["fuck","fucking","fucked","fuk","shit","shitting","shitted","cunt","crap","bitch","dick","cock","penis"], replychance=2,
-            reply=["This is a family friendly server ok. No swearing please.", "if you're gonna swear, bleap them like f##k.", "Time to get the soap...", "$ban @{name}! oh...", "you mother flipper!!!"] )
 
         self.states["funny"] = replyBotState( matchwords=["lol","lmao","ha"], reply=["lol","lmao","ha","What's so funny?"], noendpunc=True )
         self.states["uwu"] = replyBotState( findwords=["uwu","owo",":3","nya"], reply=["uwu","owo",":3","~nya"], replychance=2 )
         self.states["sus"] = replyBotState( findwords=["sus","sussy","amogus","amongus","among us","among","vent"], reply=["AMOGUS!","Oh god... sus","SUSSY BAKA?","Tha's sus","{name} vented."], replychance=2 )
-        self.states["sorry"] = replyBotState( matchwords=["sorry","sry"], reply=["it's ok.","All is forgiven :)","screw you.","fine"] )
         self.states["like"] = replyBotState( matchwords=["good","like","great","cool"], reply=["Thanks","You too","You think so?","That's nice of you!"] )
         self.states["love"] = replyBotState( matchwords=["love","cute","luve"], reply=["Thanks","You too",":flushed:","You think so?",":heart:","That's nice of you!"] )
         self.states["hate"] = replyBotState( matchwords=["bad","dislike","hate","suck","sucks","ugly","dumbass","stupid"], reply=["That's not nice",":(","Please don't say things like that","Bruh","+ratio",":("] )
@@ -47,11 +52,11 @@ class replyBot():
             reply=["Wanna say that to my face?","Wanna repeat yourself?","Who asked lmao.","BRUH","I'm sorry what?","That's cringe","I wish i cared.","What if... You shut up?","LMAO","+ ratio","\*yawn*","Omg shuf up...","No one asked","look at this dude"]
         )
         self.states["rareelse"] = replyBotState(
-            alwaystrigger=True, replychance=15,
+            alwaystrigger=True, replychance=25,
             reply=["Look, i may be stupid but... what the fuck!?!","This is going in my cringe collection!","Caught yo ass in 4K."]
         )
 
-        self.statemanager = ["^howareyou|questionareyou|questionwhydid|questionwhendid|questionwhen|questiondoyou", "hello|bye|sorry|respond", "*funny|uwu|sus|like|love|hate|unsad|thanks", "rareelse|else"]
+        self.statemanager = ["^howareyou|questionareyou|questionwhydid|questionwhendid|questionwhen|questiondoyou", "hello|bye|sorry|respond|swear|shutup", "*funny|uwu|sus|like|love|hate|unsad|thanks", "rareelse|else"]
 
         self.punctuation = [".",",","!","?",":"]
         self.endpunctuation = [".","!"]
@@ -124,9 +129,19 @@ class replyBot():
     async def on_message_noreply(self, message):
         emoji = getEmojiFromMsg(self.client, message)
         if len(emoji) > 0:
-            return await message.channel.send(emoji[0])
+            emongi = choice(emoji)
+            if emongi and emongi.available:
+                return await message.channel.send(emongi)
+        if len(message.stickers) > 0:
+            stinker = choice(message.stickers)
+            try:
+                return await message.channel.send(stickers=[stinker])
+            except:
+                h = False
         if randint(1,8) == 8:
-            await message.channel.send(str(choice(message.guild.emojis)))
+            return await message.channel.send(str(choice(message.guild.emojis)))
+        if randint(1,16) == 16:
+            return await message.channel.send(stickers=[choice(message.guild.stickers)])
 
     def ends_in_punct(self, txt):
         for punc in self.punctuation:
