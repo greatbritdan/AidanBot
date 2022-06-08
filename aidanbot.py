@@ -3,7 +3,6 @@ from discord.ext import commands
 from discord.utils import find, get
 
 import json, os, traceback, sys, datetime, re
-from random import choice
 
 from functions import SendDM, getComEmbed, getComErrorEmbed
 
@@ -160,10 +159,12 @@ class AidanBot(commands.Bot):
 		emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
 		if len(emogis) == 1 and emogilesstext[0] == "$" and emogilesstext[1] == "":
 			realemogi = get(self.emojis, name=emogis[0])
-			msgs = await ctx.channel.history(limit=2).flatten()
-			await msgs[1].add_reaction(realemogi)
-			await ctx.message.delete()
-			return True
+			if realemogi:
+				msgs = await ctx.channel.history(limit=2).flatten()
+				await msgs[1].add_reaction(realemogi)
+				await ctx.message.delete()
+				return True
+			return False
 		elif len(emogis) > 0:
 			txt = emogilesstext[0]
 			for idx, emogi in enumerate(emogis):
@@ -208,13 +209,3 @@ class AidanBot(commands.Bot):
 		except:
 			await hook.delete()
 			await self.sendWebhook(channel, user, txt, files)
-
-	def generateToken(self):
-		chars = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-		txt = ""
-		for i in range(27): txt += choice(chars)
-		txt += "."
-		for i in range(5): txt += choice(chars)
-		txt += "."
-		for i in range(27): txt += choice(chars)
-		return txt
