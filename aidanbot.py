@@ -3,7 +3,9 @@ from discord.ext import commands
 from discord.utils import find, get
 
 import json, os, traceback, sys, datetime, re
-from functions import SendDM, getComEmbed, getErrorEmbed
+from random import choice
+
+from functions import SendDM, getComEmbed, getComErrorEmbed
 
 from replybot import replyBot
 from config import ConfigManager
@@ -60,7 +62,7 @@ class AidanBot(commands.Bot):
 		await dict(self.cogs)["QOTDCog"].ready()
 
 	async def on_application_command_error(self, ctx, error):
-		await ctx.respond(embed=getErrorEmbed(ctx, self, str(error)))
+		await ctx.respond(embed=getComErrorEmbed(ctx, self, str(error)))
 		if await self.is_owner(ctx.author):
 			print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
 			traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
@@ -100,17 +102,18 @@ class AidanBot(commands.Bot):
 				if (not nqn) and await self.handle_emojis(ctx):
 					return
 
-	async def on_member_join(self, member):
-		if self.isbeta:
-			return
-		channel = self.CON.get_value(member.guild, "welcome_message_channel", guild=member.guild)
-		msg = self.CON.get_value(member.guild, "welcome_message")
+	async def on_member_join(self, member:discord.Member):
+		if self.isbeta: return
+		channel = self.CON.get_value(member.guild, "join_message_channel", guild=member.guild)
+		msg = self.CON.get_value(member.guild, "join_message")
 		if channel and msg:
 			await channel.send(msg.format(name=member.name, mention=member.mention, user=member, member=member, server=member.guild, guild=member.guild))
+		role = self.CON.get_value(member.guild, "join_role", guild=member.guild)
+		if role:
+			await member.add_roles(role)
 
 	async def on_guild_join(self, guild):
-		if self.isbeta:
-			return
+		if self.isbeta: return
 		await SendDM(self, "SOMEONE DID WHAT?!?!", f"Added to {guild.name}!")
 		
 		chan = find(lambda m: "general" in m.name, guild.text_channels)
@@ -121,13 +124,20 @@ class AidanBot(commands.Bot):
 			await chan.send(embed=emb)
 
 	async def on_guild_remove(self, guild):
-		if self.isbeta:
-			return
+		if self.isbeta: return
 		await self.CON.remove_group(guild)
 
 	async def handle_invites(self, message):
-		channels = self.CON.get_value(message.guild, "allow_invites_channel", guild=message.guild)
-		if self.CON.get_value(message.guild, "remove_invites") and ((not channels) or (message.channel not in channels)):
+		channels = self.CON.get_value(message.guild, "remove_invites_exempt_channels", guild=message.guild)
+		roles = self.CON.get_value(message.guild, "remove_invites_exempt_roles", guild=message.guild)
+		hasrole = False
+		if roles:
+			for role in roles:
+				if role in message.author.roles:
+					hasrole = True
+					break
+
+		if self.CON.get_value(message.guild, "remove_invites") and ((not channels) or (message.channel not in channels)) and ((not roles) or (not hasrole)):
 			invites = re.findall(r'discord\.gg\/\S*|discord\.com\/invite\/\S*', message.clean_content)
 			if invites and len(invites) > 0:
 				guildinviteids = []
@@ -141,21 +151,19 @@ class AidanBot(commands.Bot):
 					if inviteid not in guildinviteids:
 						await message.delete()
 						if channels:
-							return await message.channel.send(f"No posting invites outside of {self.CON.display_value('allow_invites_channel', channels)}. >:(")
+							return await message.channel.send(f"No posting invites outside of {self.CON.display_value('remove_invites_exempt_channels', channels)}. >:(")
 						return await message.channel.send("No posting invites in this server. >:(")
-					
+
 	async def handle_emojis(self, ctx):
 		emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
 		emogis = [e.replace(":","") for e in emogis]
 		emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
 		if len(emogis) == 1 and emogilesstext[0] == "$" and emogilesstext[1] == "":
 			realemogi = get(self.emojis, name=emogis[0])
-			if realemogi:
-				msgs = await ctx.channel.history(limit=2).flatten()
-				await msgs[1].add_reaction(realemogi)
-				await ctx.message.delete()
-				return True
-			return False
+			msgs = await ctx.channel.history(limit=2).flatten()
+			await msgs[1].add_reaction(realemogi)
+			await ctx.message.delete()
+			return True
 		elif len(emogis) > 0:
 			txt = emogilesstext[0]
 			for idx, emogi in enumerate(emogis):
@@ -200,3 +208,13 @@ class AidanBot(commands.Bot):
 		except:
 			await hook.delete()
 			await self.sendWebhook(channel, user, txt, files)
+
+	def generateToken(self):
+		chars = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+		txt = ""
+		for i in range(27): txt += choice(chars)
+		txt += "."
+		for i in range(5): txt += choice(chars)
+		txt += "."
+		for i in range(27): txt += choice(chars)
+		return txt
