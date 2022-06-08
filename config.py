@@ -140,19 +140,27 @@ class ConfigManager():
 			return get(guild.roles, id=val)
 		else:
 			return val
+	def can_set_value(self, obj, name, val):
+		stackable_limit = 5
+		string_limit = 100
+		if self.get_stackable(name) and len(val.replace(" ","").split(",")) > stackable_limit:
+			return "Stackable values like `{name}` can't have more than {limit} {type}s.".format(limit=stackable_limit, name=name, type=self.get_type(name))
+		if self.get_type(name) == "string" and len(val) > string_limit:
+			return "String values like `{name}` can't have more than {limit} letters.".format(limit=string_limit, name=name)
+		return False
 	async def set_value(self, obj, name, val, guild=None, noupdate=False):
 		self.fix_model(obj)
+		err = self.can_set_value(obj, name, val)
+		if err:
+			return False, err
 		if self.get_stackable(name):
 			vals = val.replace(" ","").split(",")
-			if len(vals) > 5:
-				return False, True
 			result = []
 			for nval in vals:
 				result.append( self._set_value(obj, name, nval, guild) )
 		else:
 			result = self._set_value(obj, name, val, guild)
 		self.values[str(obj.id)][name] = result
-		print(result)
 		if result and (not noupdate):
 			await self.values_msgupdate("save")
 		return result, False
