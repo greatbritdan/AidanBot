@@ -1,13 +1,18 @@
 {
-    "welcome_message": {
+    "join_message": {
         "default":"Please welcome {name}!",
         "help":"The message that sends when a user joins your server, only works if 'welcome_message_channel' is set.",
         "type":"string"
     },
-    "welcome_message_channel": {
+    "join_message_channel": {
         "default":false,
         "help":"The channel that receives a message when a user joins your server.",
         "type":"channel"
+    },
+    "join_role": {
+        "default":false,
+        "help":"The role that a user receives when they join your server.",
+        "type":"role"
     },
 
     "remove_invites": {
@@ -15,17 +20,15 @@
         "help":"If invites are removed.",
         "type":"boolean"
     },
-    "allow_invites_channel": {
+    "remove_invites_exempt_channels": {
         "default":false,
-        "help":"The channel(s) that invites are allowed in.",
+        "help":"The channel(s) that are exempt from invite removal.",
         "type":"[]channel"
     },
-
-    "prefix": {
+    "remove_invites_exempt_roles": {
         "default":false,
-        "help":"The prefix the bot will use in this server,\nFalse means use default ($), and string means custom prefix (duh).",
-        "type":"string",
-        "restricted":true
+        "help":"The role(s) that are exempt from invite removal.",
+        "type":"[]role"
     },
 
     "birthday_announcement_channel": {
