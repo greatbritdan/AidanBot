@@ -20,8 +20,19 @@ def getComEmbed(ctx=None, client=None, title=Embed.Empty, content=Embed.Empty, c
 		emb.set_footer(text=f"Requested by a user")
 	return emb
 
-def getErrorEmbed(ctx, client, error="Default error"):
-	emb = getComEmbed(ctx, client, "AidanBot ran into and uh-oh error:", f"```{error}```", Color.from_rgb(220, 29, 37))
+def getErrorEmbed(client, error="ha"):
+	emb = getComEmbed(None, client, "Oh noes! AidanBot ran into an error:", f"```{error}```", Color.from_rgb(220, 29, 37))
+	emb.remove_footer()
+	return emb
+
+def getComErrorEmbed(ctx, client, error="ha"):
+	emb = getComEmbed(None, client, f"Oh noes! AidanBot ran into an error while prossesing {ctx.command}:", f"```{error}```", Color.from_rgb(220, 29, 37))
+	emb.remove_footer()
+	return emb
+	
+def getCheckErrorEmbed(ctx, client, error="ha"):
+	emb = getComEmbed(None, client, f"Oh noes! One or more checks failed while prossesing {ctx.command}:", f"```{error}```", Color.from_rgb(120, 29, 37))
+	emb.remove_footer()
 	return emb
 
 async def SendDM(client, title, description):
