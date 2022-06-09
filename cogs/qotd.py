@@ -46,7 +46,7 @@ class QOTDCog(discord.Cog):
 						emb.set_footer(text=f"Question submitted by {str(author)}")
 
 						txt, role = "", self.client.CON.get_value(guild, "qotd_role", guild=guild)
-						if (not testpost) and role:
+						if role and (not testpost):
 							txt = f"Wake up sussy's, New QOTD dropped. {role.mention}"
 						await channel.send(txt, embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
 						if not testpost:
@@ -65,7 +65,7 @@ class QOTDCog(discord.Cog):
 			target_time = datetime.datetime.combine(now.date(), when)
 			seconds_until_target = (target_time - now).total_seconds()
 			await asyncio.sleep(seconds_until_target)
-			await self.askQuestion()
+			await self.askQuestion(False, False)
 			tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
 			seconds = (tomorrow - now).total_seconds()
 			await asyncio.sleep(seconds)
