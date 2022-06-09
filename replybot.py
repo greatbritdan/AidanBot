@@ -130,7 +130,7 @@ class replyBot():
         emoji = getEmojiFromMsg(self.client, message)
         if len(emoji) > 0:
             emongi = choice(emoji)
-            if emongi and emongi.available:
+            if emongi and (type(emongi) == str or emongi.available):
                 return await message.channel.send(emongi)
         if len(message.stickers) > 0:
             stinker = choice(message.stickers)
