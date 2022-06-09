@@ -65,7 +65,7 @@ class QOTDCog(discord.Cog):
 			target_time = datetime.datetime.combine(now.date(), when)
 			seconds_until_target = (target_time - now).total_seconds()
 			await asyncio.sleep(seconds_until_target)
-			await self.askQuestion(False, False)
+			await self.askQuestion()
 			tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
 			seconds = (tomorrow - now).total_seconds()
 			await asyncio.sleep(seconds)
