@@ -161,31 +161,32 @@ class ConfigManager():
 		else:
 			result = self._set_value(obj, name, val, guild)
 		self.values[str(obj.id)][name] = result
-		if result and (not noupdate):
+		if not noupdate:
 			await self.values_msgupdate("save")
 		return result, False
 	def _set_value(self, obj, name, val, guild):
-		if (self.get_type(name) == "channel" or self.get_type(name) == "role") and type(val) == str:
+		typ = self.get_type(name)
+		if (typ == "channel" or typ == "role" or typ == "boolean") and type(val) == str:
 			val = val.lower()
-		if (self.get_type(name) == "channel" or self.get_type(name) == "role") and (val == "false" or val == "none"):
+		if (typ == "channel" or typ == "role") and (val == "false" or val == "none"):
 			return False
 
-		if self.get_type(name) == "channel":
+		if typ == "channel":
 			newval = self.tonumber(val)
 			channel = get(guild.channels, id=newval) if newval else get(guild.channels, name=val)
 			if channel:
 				return channel.id
-		elif self.get_type(name) == "role":
+		elif typ == "role":
 			newval = self.tonumber(val)
 			role = get(guild.roles, id=newval) if newval else get(guild.roles, name=val)
 			if role:
 				return role.id
-		elif self.get_type(name) == "boolean":
+		elif typ == "boolean":
 			if val == "true":
 				return True
 			else:
 				return False
-		elif self.get_type(name) == "number":
+		elif typ == "number":
 			newval = self.tonumber(val)
 			if newval:
 				return newval
