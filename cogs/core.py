@@ -143,7 +143,7 @@ class CoreCog(discord.Cog):
 		elif action == "Set" and name and value:
 			fulval, error = await CON.set_value(obj, name, value, ctx.guild)
 			if error:
-				embed = getComEmbed(ctx, self.client, content=f"Stackable values like {name} can only have a maximum of **5** channels\n\n**Upgrade to AidanBot+ for up to 25** <:problame:869571321967816704>")
+				embed = getComEmbed(ctx, self.client, content=error)
 			else:
 				embed = getComEmbed(ctx, self.client, content=f"Set {name} to {CON.display_value(name, CON.get_value(obj, name, ctx.guild))}!")
 		else:
