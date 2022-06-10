@@ -9,7 +9,6 @@ def getEmbed(title, content, color, fields):
 			inline = True if len(f) > 2 else False
 			emb.add_field(name=f[0], value=f[1], inline=inline)
 	return emb
-
 def getComEmbed(ctx=None, client=None, title=Embed.Empty, content=Embed.Empty, color=Color.from_rgb(20, 29, 37), fields=None):
 	emb = getEmbed(title, content, color, fields)
 	emb.timestamp = datetime.datetime.utcnow()
@@ -19,17 +18,14 @@ def getComEmbed(ctx=None, client=None, title=Embed.Empty, content=Embed.Empty, c
 	else:
 		emb.set_footer(text=f"Requested by a user")
 	return emb
-
 def getErrorEmbed(client, error="ha"):
 	emb = getComEmbed(None, client, "Oh noes! AidanBot ran into an error:", f"```{error}```", Color.from_rgb(220, 29, 37))
 	emb.remove_footer()
 	return emb
-
 def getComErrorEmbed(ctx, client, error="ha"):
 	emb = getComEmbed(None, client, f"Oh noes! AidanBot ran into an error while prossesing {ctx.command}:", f"```{error}```", Color.from_rgb(220, 29, 37))
 	emb.remove_footer()
 	return emb
-	
 def getCheckErrorEmbed(ctx, client, error="ha"):
 	emb = getComEmbed(None, client, f"Oh noes! One or more checks failed while prossesing {ctx.command}:", f"```{error}```", Color.from_rgb(120, 29, 37))
 	emb.remove_footer()

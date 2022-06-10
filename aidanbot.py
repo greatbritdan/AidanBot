@@ -3,8 +3,10 @@ from discord.ext import commands
 from discord.utils import find, get
 
 import json, os, traceback, sys, datetime, re
+from random import choice
 
 from functions import SendDM, getComEmbed, getComErrorEmbed
+from checks import command_checks_silent
 
 from replybot import replyBot
 from config import ConfigManager
@@ -89,7 +91,7 @@ class AidanBot(commands.Bot):
 				await ctx.message.delete()
 
 		if ctx.guild:
-			if (not self.isbeta) and await self.handle_invites(message): # remove invites
+			if (not self.isbeta) and await self.handle_invites(ctx): # remove invites
 				return
 			if not ctx.command:
 				channels = self.CON.get_value(ctx.guild, "replybot_channel", guild=ctx.guild) # reply bot uwu
@@ -103,13 +105,16 @@ class AidanBot(commands.Bot):
 
 	async def on_member_join(self, member:discord.Member):
 		if self.isbeta: return
+
 		channel = self.CON.get_value(member.guild, "join_message_channel", guild=member.guild)
 		msg = self.CON.get_value(member.guild, "join_message")
 		if channel and msg:
 			await channel.send(msg.format(name=member.name, mention=member.mention, user=member, member=member, server=member.guild, guild=member.guild))
-		role = self.CON.get_value(member.guild, "join_role", guild=member.guild)
-		if role:
-			await member.add_roles(role)
+
+		if not await command_checks_silent(None, self, guild=member.guild, user=member, is_guild=True, bot_has_permission="manage_roles"):
+			role = self.CON.get_value(member.guild, "join_role", guild=member.guild)
+			if role:
+				await member.add_roles(role)
 
 	async def on_guild_join(self, guild):
 		if self.isbeta: return
@@ -119,39 +124,53 @@ class AidanBot(commands.Bot):
 		if not chan:
 			chan = find(lambda m: "talk" in m.name, guild.text_channels)
 		if chan:
-			emb = getComEmbed(None, self, f"Hello world!.. oh uhh i meant {guild.name}!", f"I'm {self.name}, a dumb bot made by Aidan#8883 (that mari0 guy).\nI'm a general bot that has many features and prides myself on not having premium or selling NFT's.\n\nFrom fun and useless commands like /opinion and /games, to more useful features like /role, And many configeration optuions using /config. I'll make a great addition to the server.\n\nBefore we get started, you might want to read my [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service) and [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy). As well as chck out my User guide (Coming soon).")
+			info = '''
+			I'm {name}, a dumb bot made by Aidan#8883 (that mari0 guy). I'm a general bot that has many features and prides myself on not having premium or selling NFT's.
+			
+			From fun and useless commands like /opinion and /games, to more useful features like /role, And many configeration optuions using /config. I'll make a great addition to the server.
+
+			Before we get started, you might want to read my [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service) and and my [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy).
+			'''
+			perms = '''
+			The Permissions I come with are only the ones I need, But I understand if you don't like the sound of some. Don't worry tho, Some can be disabled safely, just remeber some functionality will be lost.
+			
+			- Manage Roles: You won't be able to use /role and `join_role`/`birthday_role` will not work.
+			- Manage Server: Your own server invites will be removed from your server.
+			- Ping Everyone/Here/Role: `qotd_role` will not ping unless it is set to "everyone can ping this role"
+			'''
+			emb = getComEmbed(None, self, f"Hello world!.. oh uhh i meant {guild.name}!", info.format(name=self.name), fields=[["Permissions", perms]])
 			await chan.send(embed=emb)
 
 	async def on_guild_remove(self, guild):
 		if self.isbeta: return
 		await self.CON.remove_group(guild)
 
-	async def handle_invites(self, message):
-		channels = self.CON.get_value(message.guild, "remove_invites_exempt_channels", guild=message.guild)
-		roles = self.CON.get_value(message.guild, "remove_invites_exempt_roles", guild=message.guild)
+	async def handle_invites(self, ctx):
+		channels = self.CON.get_value(ctx.guild, "remove_invites_exempt_channels", guild=ctx.guild)
+		roles = self.CON.get_value(ctx.guild, "remove_invites_exempt_roles", guild=ctx.guild)
 		hasrole = False
 		if roles:
 			for role in roles:
-				if role in message.author.roles:
+				if role in ctx.author.roles:
 					hasrole = True
 					break
 
-		if self.CON.get_value(message.guild, "remove_invites") and ((not channels) or (message.channel not in channels)) and ((not roles) or (not hasrole)):
-			invites = re.findall(r'discord\.gg\/\S*|discord\.com\/invite\/\S*', message.clean_content)
+		if self.CON.get_value(ctx.guild, "remove_invites") and ((not channels) or (ctx.channel not in channels)) and ((not roles) or (not hasrole)):
+			invites = re.findall(r'discord\.gg\/\S*|discord\.com\/invite\/\S*', ctx.message.clean_content)
 			if invites and len(invites) > 0:
 				guildinviteids = []
-				for invite in await message.guild.invites():
-					guildinviteids.append(invite.id)
-					#print(f"Guild ID: {invite.id}")
-
+				if not await command_checks_silent(ctx, self, is_guild=True, bot_has_permission="manage_guild"):
+					for invite in await ctx.guild.invites():
+						guildinviteids.append(invite.id)
+						#print(f"Guild ID: {invite.id}")
 				for invite in invites:
 					inviteid = invite.split("/")[-1]
 					#print(f"Send ID: {inviteid}")
 					if inviteid not in guildinviteids:
-						await message.delete()
+						await ctx.message.delete()
 						if channels:
-							return await message.channel.send(f"No posting invites outside of {self.CON.display_value('remove_invites_exempt_channels', channels)}. >:(")
-						return await message.channel.send("No posting invites in this server. >:(")
+							return await ctx.send(f"No posting invites outside of {self.CON.display_value('remove_invites_exempt_channels', channels)}. >:(")
+						return await ctx.send("No posting invites in this server. >:(")
 
 	async def handle_emojis(self, ctx):
 		emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
@@ -159,12 +178,10 @@ class AidanBot(commands.Bot):
 		emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
 		if len(emogis) == 1 and emogilesstext[0] == "$" and emogilesstext[1] == "":
 			realemogi = get(self.emojis, name=emogis[0])
-			if realemogi:
-				msgs = await ctx.channel.history(limit=2).flatten()
-				await msgs[1].add_reaction(realemogi)
-				await ctx.message.delete()
-				return True
-			return False
+			msgs = await ctx.channel.history(limit=2).flatten()
+			await msgs[1].add_reaction(realemogi)
+			await ctx.message.delete()
+			return True
 		elif len(emogis) > 0:
 			txt = emogilesstext[0]
 			for idx, emogi in enumerate(emogis):

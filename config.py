@@ -29,7 +29,7 @@ class ConfigManager():
 
 		list = None
 		if self.type == "guild":
-			self.logname = "logs"
+			self.logname = "test-logs" #"logs"
 			list = VALUES
 		if self.type == "user":
 			self.logname = "user-logs"
