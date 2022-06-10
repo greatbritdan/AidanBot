@@ -24,7 +24,7 @@ class QOTDCog(discord.Cog):
 
 	async def ready(self):
 		self.client.loop.create_task(self.background_task())
-
+		
 	async def askQuestion(self, testpost=False, postguild=False):
 		if self.client.isbeta:
 			return
@@ -46,13 +46,13 @@ class QOTDCog(discord.Cog):
 						emb.set_footer(text=f"Question submitted by {str(author)}")
 
 						txt, role = "", self.client.CON.get_value(guild, "qotd_role", guild=guild)
-						if role and (not testpost):
+						if (not testpost) and role:
 							txt = f"Wake up sussy's, New QOTD dropped. {role.mention}"
 						await channel.send(txt, embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
 						if not testpost:
 							questions.pop(questioni)
 							await self.client.CON.set_value(guild, "questions", questions)
-
+							
 	async def background_task(self):
 		when = datetime.time(15,0,0)
 		now = datetime.datetime.utcnow()

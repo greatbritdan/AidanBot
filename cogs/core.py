@@ -23,8 +23,26 @@ class CoreCog(discord.Cog):
 
 	@slash_command(name="info", description="Get info about the bot.")
 	async def info(self, ctx):
-		embed = getComEmbed(ctx, self.client, f"Info for {self.client.name}", self.client.info)
-		await ctx.respond(embed=embed, ephemeral=True)
+		info = '''
+		
+		[Aidan's Youtube](https://www.youtube.com/c/AidanMapper)
+		[Aidan's Discord Server](https://discord.gg/KXrDUZfBpq)
+		[AidanBot's Privacy Policy](https://github.com/Aid0nModder/AidanBot#privacy-policy)
+		[AidanBot's Terms of Service](https://github.com/Aid0nModder/AidanBot#terms-of-service)
+		
+		If you find a bug or he has made a typo <:AidanSmug:837001740947161168>,
+		you can report it to Aidan on his server in one of the bot chats.
+		You can also suggest features in the suggestion channel on his server!
+		'''
+		perms = '''
+		The Permissions I come with are only the ones I need, But I understand if you don't like the sound of some. Don't worry tho, Some can be disabled safely, just remeber some functionality will be lost.
+		
+			- Manage Roles: You won't be able to use /role and `join_role`/`birthday_role` will not work.
+			- Manage Server: Your own server invites will be removed from your server.
+			- Ping Everyone/Here/Role: `qotd_role` will not ping unless it is set to "everyone can ping this role"
+		'''
+		embed = getComEmbed(ctx, self.client, f"Info for {self.client.name}", self.client.info + info, fields=[["Permissions", perms]])
+		await ctx.respond(embed=embed)
 
 	@slash_command(name="ping", description="Check the Bot and API latency.")
 	async def ping(self, ctx):
@@ -37,7 +55,7 @@ class CoreCog(discord.Cog):
 	async def echo(self, ctx, content:Option(str, "What AidanBot will say.", required=True)):
 		await ctx.send(content)
 		await ctx.delete()
-
+	
 	@slash_command(name="issue", description="Create an issue on GitHub.")
 	async def issue(self, ctx,
 		title:Option(str, "Title of the post.", required=True),
@@ -47,21 +65,11 @@ class CoreCog(discord.Cog):
 	):
 		body += f"\n\n[ Submitted by {str(ctx.author)} via /issue ]"
 		labels = [i for i in [label1, label2] if i]
-
 		if len(labels) > 0:
 			issue = self.client.botrepo.create_issue(title=title, body=body, labels=labels)
 		else:
 			issue = self.client.botrepo.create_issue(title=title, body=body)
 		await ctx.respond(f"Submitted!\n\nhttps://github.com/{self.client.botreponame}/issues/{issue.number}")
-		
-	@slash_command(name="bucket", description="The best command ever?")
-	async def bucket(self, ctx):
-		urls = ["https://cdn.discordapp.com/attachments/880033942420484157/882333690410197062/cd804_y_bucket-blue.webp",
-				"https://cdn.discordapp.com/attachments/880033942420484157/882333693094547566/cd805_y_bucket-yellow.webp",
-				"https://cdn.discordapp.com/attachments/880033942420484157/882333695162343424/cd807_y_bucket-red.webp"]
-		embed = getComEmbed(ctx, self.client, "Buket", "")
-		embed.set_image(url=choice(urls))
-		await ctx.respond(embed=embed)
 
 	# ROLES #
 
@@ -114,7 +122,6 @@ class CoreCog(discord.Cog):
 		value:Option(str, "New value for this Variable.", required=False),
 	):
 		if await command_checks(ctx, self.client, is_guild=True, has_permission="kick_members"): return
-
 		await self.newconfig_command(ctx, self.client.CON, ctx.guild, action, name, value)
 
 	@configgroup.command(name="user", description="User configerations.")

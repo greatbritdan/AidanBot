@@ -1,10 +1,25 @@
+from http.client import responses
 import discord
 from discord.commands import SlashCommandGroup
 from discord import Option
 
-import time
+import time, hashlib, re
+import emoji as em
+from datetime import date
 from random import random, randint, seed, choice
 from functions import getComEmbed, getIntFromText, getBar
+
+def getLikeness(string):
+	days = date.today() - date(2022,6,28)
+	num = int(hashlib.sha512(string.encode()).hexdigest(), 16)+days.days
+	seed(num)
+	return randint(0,100)
+
+def limitLikeness(score, newhigh):
+	return round(score/(100/newhigh))
+
+def replaceWord(text, find, replace):
+	return re.sub(r"\b" + find + r"\b", replace, text)
 
 class OpinionCog(discord.Cog):
 	def __init__(self, client):
@@ -12,59 +27,41 @@ class OpinionCog(discord.Cog):
 
 	opiniongroup = SlashCommandGroup("opinion", "Opinion based commands.")
 
+	'''@opiniongroup.command(name="likeness", description="Get your likeness score.")
+	async def likeness(self, ctx, 
+		thing:Option(str, "Thing to get likeness score of. Defaults to you", required=False)
+	):
+		thing = thing or str(ctx.author)
+		await ctx.respond(f"Likeness score for '{thing}': {getLikeness(thing)}")'''
+
 	@opiniongroup.command(name="rate", description="AidanBot will rate a thing.")
 	async def rate(self, ctx, 
 		thing:Option(str, "Thing AidanBot will rate.", required=True)
 	):
-		words = thing.split(" ")
-		newords = []
-		convertwords = {"your":"my", "you":"me", "yourself":"myself", "my":"your", "me":"you", "i":"you", "myself":"yourself","this":"that","these":"those","that":"this","those":"these"}
-		removelist = [".",",","/","!","?","'",'"']
-		for word in words:
-			w = word.lower()
-			for l in removelist:
-				w = w.replace(l, "")
-			if w in convertwords:
-				word = word.lower().replace(w, convertwords[w])
-			newords.append(word)
+		thing = thing.lower()
+		repwords = {"your":"my","you":"me","yourself":"myself","my":"your","me":"you","i":"you","myself":"yourself","this":"that","these":"those","that":"this","those":"these"}
+		for name in repwords:
+			thing = replaceWord(thing,name,repwords[name])
 
-		thing = " ".join(newords)
-		seed(getIntFromText(thing.lower()))
-		responces = [
-			["{0} is worse than anything i have ever rated.", [-10, -10]],
-			["{0} is just awful, holy crap!", [-1, 0]],
-			["{0} goes right into F tier.", [0, 2]],
-			["{0} is really bad.", [0, 2]],
-			["{0}? i can't say that with a straight mouth!", [0, 2]],
-			["I have no opinion on {0}.", [2, 2]],
-			["{0} is alright, but could be better.", [3, 5]],
-			["{0} is pretty good!", [4, 6]],
-			["{0} is neat!", [4, 6]],
-			["{0} is great. Not the best tho.", [5, 8]],
-			["Never seen it, but I like the sound of {0}!", [5, 8]],
-			["{0} is amazing!", [7, 9]],
-			["{0} is the best thing, by far.", [10, 10]],
-			["I AM GOD", [11, 11]],
-			["HE SUCKS SO GOD DAMN MUCH!!!!!", [-3888292929929922, -3888292929929922]]
-		]
+		responses = {
+			"0": ["{0} is the worst thing I have ever rated.", "{0}? I feel sick...", "{0} is not even so bad it's funny...", "{0} is... awful... in every way."],
+			"1": ["{0} is not the worst, that's the only good thing i can say.", "I prefer {0} over 2020. IG", "{0} is not awful, but still utterly disgusting!"],
+			"2": "1",
+			"3": ["{0} isn't great, but i can handle it.", "{0} is ok on a rainy day.", "There are things much better than {0} but also much worse things."],
+			"4": "3",
+			"5": ["{0} is ok. Just ok.", "I like {0} from time to time.", "I'm mutural on {0}.", "{0} is, pretty good."],
+			"6": "5",
+			"7": ["I really like {0}!", "{0} is quite good.", "There are better things than {0} but overall it's good.", "{0} is very good!"],
+			"8": "7",
+			"9": ["{0} is great, really great!", "{0} is a top pick for sure!", "{0} is almost perfect.", "{0} is amazing!!"],
+			"10": ["I love {0}, it's incredible!", "{0} is a top pick for sure!!", "{0}? 10/10, enough said.", "{0} is just, the best thing."]
+		}
 
-		# if it's aidanbot/aidanbetabot or aidan, respond differently
-		index = randint(0, 12)
-		thung = thing.lower()
-		if self.client.isbeta:
-			if thung == "aidanbetabot" or thung == "me":
-				index = 13
-			elif thung == "aidanbot":
-				index = 14
-		else:
-			if thung == "aidanbot" or thung == "me":
-				index = 13
-			elif thung == "aidanbetabot":
-				index = 14
+		score = limitLikeness(getLikeness(thing),10)
+		r = responses[str(score)]
+		response = choice(responses[r]) if type(r) == str else choice(r)
 
-		txt = responces[index][0]
-		rating = randint(responces[index][1][0], responces[index][1][1])
-		embed = getComEmbed(ctx, self.client, txt.format(thing), f"**Score:** `{rating}/10`")
+		embed = getComEmbed(ctx, self.client, response.format(thing), f"**Score:** `{score}/10`")
 		await ctx.respond(embed=embed)
 
 	@opiniongroup.command(name="percent", description="AidanBot will say what part of something is something.")
@@ -73,17 +70,15 @@ class OpinionCog(discord.Cog):
 		someone:Option(str, "The someone.", default="False")
 	):
 		if someone == "False":
-			seed(getIntFromText(something.lower() + ctx.author.name.lower()))
+			score = getLikeness(something.lower() + ":" + ctx.author.name.lower())
 		else:
-			seed(getIntFromText(something.lower() + someone.lower()))
-		value = randint(0,100)
-		end = getBar(value, 100, 10, True)
-		
+			score = getLikeness(something.lower() + ":" + someone.lower())
+		end = getBar(score, 100, 10, True)
 		embed = False
 		if someone == "False":
-			embed = getComEmbed(ctx, self.client, f"You are **{str(value)}%** {something}.", end)
+			embed = getComEmbed(ctx, self.client, f"You are **{str(score)}%** {something}.", end)
 		else:
-			embed = getComEmbed(ctx, self.client, f"{someone} is **{str(value)}%** {something}.", end)
+			embed = getComEmbed(ctx, self.client, f"{someone} is **{str(score)}%** {something}.", end)
 		await ctx.respond(embed=embed)
 
 	@opiniongroup.command(name="ask", description="AidanBot will answer your burning questions.")
@@ -118,7 +113,7 @@ class OpinionCog(discord.Cog):
 			answers = ["ye.", "no.", "absolutely not!", "HAH, NO WAY AT ALL.", "maybe, probably...", "uhhh, it's unlikely", "i can't tell, sorry."]
 
 		if getseed:
-			seed(getIntFromText(question.lower()))
+			getLikeness(question.lower())
 		if len(answers) > 0:
 			answer = answers[randint(0, len(answers)-1)]
 		if len(starts) > 0:
@@ -132,19 +127,47 @@ class OpinionCog(discord.Cog):
 
 	@opiniongroup.command(name="decide", description="AidanBot will decide on something for you.")
 	async def decide(self, ctx, 
-		option1:Option(str, "Option 1.", required=True),
-		option2:Option(str, "Option 2.", required=True),
-		option3:Option(str, "Option 3.", required=False),
-		option4:Option(str, "Option 4.", required=False),
-		option5:Option(str, "Option 5.", required=False),
-		option6:Option(str, "Option 6.", required=False),
-		option7:Option(str, "Option 7.", required=False),
-		option8:Option(str, "Option 8.", required=False)
+		options:Option(str, "All the options sepperated by commas", required=True),
 	):
-		opts = [option1, option2, option3, option4, option5, option6, option7, option8]
-		options = [i for i in opts if i]
+		options = [i.strip() for i in options.split(",") if i]
 		embed = getComEmbed(ctx, self.client, f"I choose... {choice(options)}")
 		await ctx.respond(embed=embed)
+
+	@opiniongroup.command(name="tierlist", description="AidanBot will make a tier list to piss you off.")
+	async def tierlist(self, ctx,
+		options:Option(str, "All the options sepperated by commas", required=True),
+	):
+		opts = [i.strip() for i in options.split(",") if i]
+		options = []
+		for opt in opts:
+			emoji = em.core.distinct_emoji_lis(opt)
+			if len(emoji) > 0:
+				options.append(emoji[0])
+			else:
+				options.append(opt)
+			
+		def sort(e):
+			if ":" in em.core.demojize(e):
+				return 1
+			return 2
+		options.sort(key=sort)
+
+		tieremojisidx = ["s","a","b","c","d","e","f"]
+		tieremojis = { "s":"<:tierS:980025543816781904>", "a":"<:tierA:980025543732891648>", "b":"<:tierB:980025543858733126>", "c":"<:tierC:980025543959408671>", "d":"<:tierD:980025543514800160>", "e":"<:tierE:980025543837757500>", "f":"<:tierF:980025543560953867>" }
+		tiers = {"s":[], "a":[], "b":[], "c":[], "d":[], "e":[], "f":[]}
+		def makeTierList():
+			tierlist = ""
+			for tier in tiers:
+				tierlist += f"{tieremojis[tier]}`:` {', '.join(tiers[tier])}\n"
+			return tierlist
+
+		flippyflop = [6,5,4,3,2,1,0]
+		for option in options:
+			tier = limitLikeness(getLikeness(em.core.demojize(option).lower()),6)
+			tiers[tieremojisidx[flippyflop[tier]]].append(option)
+		
+		emb = getComEmbed(ctx, self.client, "Tier List", makeTierList())
+		await ctx.respond(embed=emb)
 
 def str_time_prop(start, end, time_format):
     stime = time.mktime(time.strptime(start, time_format))

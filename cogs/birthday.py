@@ -3,7 +3,9 @@ from discord.commands import SlashCommandGroup
 from discord import Option
 
 import asyncio, datetime
+
 from functions import getComEmbed, dateToStr
+from checks import  command_checks_silent
 
 class BirthdayCog(discord.Cog):
 	def __init__(self, client):
@@ -29,11 +31,12 @@ class BirthdayCog(discord.Cog):
 		for user in self.borths: # no longer birthday :(
 			for guild in self.client.guilds:
 				if user in guild.members:
-					member = guild.get_member(user.id)
+					if not await command_checks_silent(None, self.client, guild=guild, user=user, is_guild=True, bot_has_permission="manage_roles"):
+						member = guild.get_member(user.id)
 
-					role = self.client.CON.get_value(guild, "birthday_role", guild=guild)
-					if role and role in member.roles:
-						await member.remove_roles(role)
+						role = self.client.CON.get_value(guild, "birthday_role", guild=guild)
+						if role and role in member.roles:
+							await member.remove_roles(role)
 		self.borths = await self.getBirthdays()
 		for user in self.borths: # is birthday :)
 			for guild in self.client.guilds:
@@ -45,9 +48,10 @@ class BirthdayCog(discord.Cog):
 					if channel and msg:
 						await channel.send(msg.format(name=user.name, mention=user.mention, user=user, member=user))
 					
-					role = self.client.CON.get_value(guild, "birthday_role", guild=guild)
-					if role:
-						await member.add_roles(role)
+					if not await command_checks_silent(None, self.client, guild=guild, user=user, is_guild=True, bot_has_permission="manage_roles"):
+						role = self.client.CON.get_value(guild, "birthday_role", guild=guild)
+						if role:
+							await member.add_roles(role)
 
 	async def background_task(self):
 		when = datetime.time(1,0,0)

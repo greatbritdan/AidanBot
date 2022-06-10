@@ -195,7 +195,7 @@ class GamesCog(discord.Cog):
 		action = [f"{turn.name} used {id}!"]
 		if id == "comboend":
 			action = [f"{turn.name} finished combo!"]
-		elif id == "heal" and (turn.heals != False) and turn.heals == 0:
+		elif id == "heal" and type(turn.heals) == int and turn.heals == 0:
 			action = [f"{turn.name} used {id}, That was their last..."]
 
 		if len(changes) > 0:
@@ -380,7 +380,6 @@ class fightUser():
 		self.level = level
 		
 		self.health, self.energy, self.mp = 100, 2, 1
-		self.heals = False
 		self.defaultmultiplier = 1.5 if self.bot and self.level == "rigged" else 1
 		self.multiplier = self.defaultmultiplier
 		self.comboing, self.defending, self.enemy = False, False, False
@@ -390,7 +389,7 @@ class fightUser():
 	def disableMove(self):
 		return self.comboing
 	def clamp(self):
-		self.health, self.energy, self.mp, self.multiplier = clamp(self.health,0,100), clamp(self.energy,0,3), clamp(self.mp,0,3), clamp(self.multiplier,1,2.5)
+		self.health, self.energy, self.mp = clamp(self.health,0,100), clamp(self.energy,0,3), clamp(self.mp,0,3)
 	def getUI(self):
 		return [f"{self.name} Stats:", f'''
 		`Health    :` {getBar(self.health,100,10,True)} **({self.health})**

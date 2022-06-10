@@ -11,30 +11,52 @@ class OwnerCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
 
+	class EvalView(discord.ui.View):
+		def __init__(self, client, cog, ctx, code):
+			self.client = client
+			self.cog = cog
+			self.ctx = ctx
+			self.code = code
+			super().__init__()
+
+		@discord.ui.button(label="Re-run", emoji="🔁", style=discord.ButtonStyle.green)
+		async def rerun(self, button:discord.ui.Button, interaction:discord.Interaction):
+			embed = await self.cog.true_eval(self.ctx, self.code)
+			await interaction.response.edit_message(embed=embed)
+
+		@discord.ui.button(label="Disable", emoji="✖️", style=discord.ButtonStyle.red)
+		async def disable(self, button:discord.ui.Button, interaction:discord.Interaction):
+			if await command_checks(self.ctx, self.client, user=interaction.user, is_owner=True, ephemeral=True): return
+			await interaction.response.edit_message(view=None)
+
+	@message_command(name="Eval-Rerun")
+	async def _evalr(self, ctx, message):
+		if await command_checks(ctx, self.client, is_owner=True): return
+		embed = await self.true_eval(ctx, clean_code(message.clean_content))
+		view = self.EvalView(self.client, self, ctx, clean_code(message.clean_content))
+		await ctx.respond(embed=embed, view=view)
+
 	@message_command(name="Eval")
 	async def _eval(self, ctx, message):
 		if await command_checks(ctx, self.client, is_owner=True): return
-
-		code = clean_code(message.clean_content)
-		if code == "print(client.token)" or code == "print(self.token)":
-			result = self.client.generateToken()
-		else:
-			local_variables = { "self": self.client, "client": self.client, "ctx": ctx, "author": ctx.author, "channel": ctx.channel, "guild": ctx.guild }
-			stdout = io.StringIO()
-			try:
-				with contextlib.redirect_stdout(stdout):
-					exec(f"import discord\n\nasync def func():\n{textwrap.indent(code, '    ')}", local_variables)
-					await local_variables["func"]()
-					result = f"{stdout.getvalue()}"
-			except Exception as e:
-				result = "".join(format_exception(e, e, e.__traceback__))
-
-		embed = False
-		if result == "":
-			embed = getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```")
-		else:
-			embed = getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```\nResults: ```\n{str(result)}\n```")
+		embed = await self.true_eval(ctx, clean_code(message.clean_content))
 		await ctx.respond(embed=embed)
+
+	async def true_eval(self, ctx, code):
+		local_variables = { "self": self.client, "client": self.client, "ctx": ctx, "author": ctx.author, "channel": ctx.channel, "guild": ctx.guild }
+		stdout = io.StringIO()
+		try:
+			with contextlib.redirect_stdout(stdout):
+				exec(f"import discord\n\nasync def func():\n{textwrap.indent(code, '    ')}", local_variables)
+				await local_variables["func"]()
+				result = f"{stdout.getvalue()}"
+		except Exception as e:
+			result = "".join(format_exception(e, e, e.__traceback__))
+
+		if result == "":
+			return getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```")
+		else:
+			return getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```\nResults: ```\n{str(result)}\n```")
 
 def clean_code(content):
 	if content.startswith("```") and content.endswith("```"):
