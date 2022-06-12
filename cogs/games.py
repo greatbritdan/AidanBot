@@ -380,6 +380,7 @@ class fightUser():
 		self.level = level
 		
 		self.health, self.energy, self.mp = 100, 2, 1
+		self.heals = False
 		self.defaultmultiplier = 1.5 if self.bot and self.level == "rigged" else 1
 		self.multiplier = self.defaultmultiplier
 		self.comboing, self.defending, self.enemy = False, False, False
