@@ -73,15 +73,9 @@ class AidanBot(commands.Bot):
 			return
 		ctx = await self.get_context(message)
 
-		# automod
+		# spam pings
 		if ctx.guild and ctx.guild.id == 836936601824788520:
 			msg = message.content.lower()
-			# saying them feels wrong
-			if "ni##er".replace("#","g") in msg or "fa##ot".replace("#","g") in msg or "#eta#d".replace("#","r") in msg:
-				await ctx.author.timeout_for(datetime.timedelta(days=7), reason="Slur, check for validity and ban if nessasary.")
-				role = get(ctx.guild.roles, id=836937774598848512)
-				await ctx.send(f"{role.mention} Someone was trying to be funny.")
-				await ctx.message.delete()
 			# no ping pong >:(
 			mentions = [user for user in ctx.message.mentions if (not user.bot)]
 			if len(mentions) > 4:
