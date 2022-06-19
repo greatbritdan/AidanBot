@@ -101,8 +101,8 @@ class QOTDCog(discord.Cog):
 					txt += f"\n**'" + quest["question"] + "':** " + str(member)
 				embed = getComEmbed(ctx, self.client, f"All questions for {ctx.guild.name}:", txt)
 		elif action == "Ask" and ask:
-			if len(ask) > 100:
-				return await ctx.respond("Too many characters! Questions mustn't be more than 100 characters.")
+			if len(ask) > 250:
+				return await ctx.respond("Too many characters! Questions mustn't be more than 250 characters.")
 			if len([q for q in questions if q["question"] == ask]) > 0:
 				return await ctx.respond("You can't send the same question as someone else.")
 			questions.append({ "question": ask, "author": ctx.author.id })
