@@ -23,7 +23,10 @@ class CoreCog(discord.Cog):
 
 	@slash_command(name="info", description="Get info about the bot.")
 	async def info(self, ctx):
-		info = '''
+		info = f'''
+
+		**VERSION:** {self.client.version}
+		**GUILD STATUS:** {self.client.CON.get_value(ctx.guild, "guild_status")}
 		
 		[Aidan's Youtube](https://www.youtube.com/c/AidanMapper)
 		[Aidan's Discord Server](https://discord.gg/KXrDUZfBpq)
