@@ -1,6 +1,6 @@
 {
     "guild_status": {
-        "default":false,
+        "default":"Basic",
         "help":"The status of the server, determents if the server has access to additional benefits.",
         "type":"string",
         "restricted":true
