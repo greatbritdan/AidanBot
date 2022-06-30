@@ -1,11 +1,14 @@
 import discord
-from discord.commands import message_command
+from discord.commands import message_command, SlashCommandGroup
+from discord import Option
+from discord.utils import get
 
 import io, contextlib, textwrap
 from traceback import format_exception
 
 from functions import getComEmbed
 from checks import command_checks
+	
 	
 class OwnerCog(discord.Cog):
 	def __init__(self, client):
