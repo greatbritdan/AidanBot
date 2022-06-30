@@ -1,4 +1,11 @@
 {
+    "guild_status": {
+        "default":false,
+        "help":"The status of the server, determents if the server has access to additional benefits.",
+        "type":"string",
+        "restricted":true
+    },
+    
     "join_message": {
         "default":"Please welcome {name}!",
         "help":"The message that sends when a user joins your server, only works if 'welcome_message_channel' is set.",
