@@ -15,9 +15,9 @@ The data collected is as follows:
 **All this data is protected and private, I will NEVER give out or sell any of it, nor will i ever use my bot to spy on users or servers!**
 
 # Terms of service < Last updated: August 30th 2022 >
-By using AidanBot you are agreeing to my **Terms of Service for users**:
+## By using AidanBot you are agreeing to my **Terms of Service for users**:
 
-## By agreeing to these terms as a user you are agreeing to...
+By agreeing to these terms as a user you are agreeing to...
 
 - **Never abuse AidanBot** > By overloading, crashing, spamming or any other kind of malicious act that could damage or slow down the bot. Exceptions to this are for bug-testing or by accident. The owner (Aidan#8883) will be fully responsible for determining if your act was just or not.
 - **Never automate Aidanbot** > By using a self-bot, running commands on a timer, "botting" or using macros on AidanBot. There are no exceptions to this.
@@ -25,6 +25,8 @@ By using AidanBot you are agreeing to my **Terms of Service for users**:
 Breaking any one of these rules could result in your access to his commands being limited or removed. If you have been affected by this and believe the punishment is unjust or that you have learned your lesson, reach out to the owner (Aidan#8883).
 
 ## By adding AidanBot to your server you are **agreeing to my Terms of Service for admins**:
+
+By agreeing to these terms as an admin you are agreeing to...
 
 - **Making sure people don't abuse AidanBot** > While not fully responsible, you still have a duty to make sure people use AidanBot properly.
 
