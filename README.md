@@ -1,13 +1,18 @@
 # AidanBot
-AidanBot is a dumb bot i made that i run on my server.
+AidanBot is a dumb bot i made that i run on my server. Originaly designed to do nothing bur rate things, now transformed into a half utility, half entertainment bot.
 
 # Privacy policy
-Aidanbot does collect some data, global values are stored on a server which i can accses, and if AidanBot gets an error i will recive the same error for further analysis.
-Any private information you share in these fields may be accesible to me but i'll never used them maliciously.
+Aidanbot does collect serveral types of data, all the data I collect is strictly confidential and no one but me has access.
+The data collected is as follows:
+- **Your basic user data** > As long as you are in one server with AidanBot, I have access stuff like username, profile, badges, mutral servers, etc, nothing major but something to be aware of.
+- **Your servers featuresv > Deppending on the features you give AidanBot, I could have to dangerouse functions like banning, delting channels/roles/emojis and may other things, I recommend you only use the default permissions.
+- **Error messages** > If AidanBot has an error i'll be alerted of what it is and who caused it. This is strictly for bug fixing.
+- **User config data** > I have full accses to all of your user config data. This is never viewed unless saving/loading stops working.
+- **Guild config data** > I have full accses to all of your guild config data for each of your servers AidanBot is in. This is never viewed unless saving/loading stops working or a value is replaced/renamed.
 
-I also:
-- Pledge to never use my bot to spy on users or servers.
-- Pledge to never share any of these details to anyone ever, not even for money.
+**Also keep in mind, any data you enter into the bot (including personal information) is your responsibility!!!**
+
+**All this data is protected and private, I will NEVER give out or sell any of it, nor will i ever use my bot to spy on users or servers!**
 
 # Terms of service
 By using my bot you are agreeing to my Terms of Service.
