@@ -143,7 +143,7 @@ class ConfigManager():
 	def can_set_value(self, obj, name, val):
 		stackable_limit = 5
 		string_limit = 250
-		if self.get_value(obj, "guild_status"):
+		if self.type == "guild" and self.get_value(obj, "guild_status"):
 			stackable_limit = 15
 			string_limit = 500
 		if self.get_stackable(name) and len(val.replace(" ","").split(",")) > stackable_limit:
