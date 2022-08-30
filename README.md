@@ -17,7 +17,7 @@ The data collected is as follows:
 # Terms of service < Last updated: August 30th 2022 >
 By using AidanBot you are agreeing to my **Terms of Service for users**:
 
-##By agreeing to these terms as a user you are agreeing to...
+## By agreeing to these terms as a user you are agreeing to...
 
 - **Never abuse AidanBot** > By overloading, crashing, spamming or any other kind of malicious act that could damage or slow down the bot. Exceptions to this are for bug-testing or by accident. The owner (Aidan#8883) will be fully responsible for determining if your act was just or not.
 - **Never automate Aidanbot** > By using a self-bot, running commands on a timer, "botting" or using macros on AidanBot. There are no exceptions to this.
