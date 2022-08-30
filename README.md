@@ -5,7 +5,7 @@ AidanBot is a dumb bot i made that i run on my server. Originaly designed to do 
 Aidanbot does collect serveral types of data, all the data I collect is strictly confidential and no one but me has access.
 The data collected is as follows:
 - **Your basic user data** > As long as you are in one server with AidanBot, I have access stuff like username, profile, badges, mutral servers, etc, nothing major but something to be aware of.
-- **Your servers features** > Deppending on the features you give AidanBot, I could have to dangerous functions like banning, delting channels/roles/emojis and may other things, I recommend you only use the default permissions.
+- **Your servers features** > Deppending on the features you give AidanBot, I could have to dangerous functions like banning, deleting channels/roles/emojis and many other things, I recommend you only use the default permissions.
 - **Error messages** > If AidanBot has an error i'll be alerted of what it is and who caused it. This is strictly for bug fixing.
 - **User config data** > I have full accses to all of your user config data. This is never viewed unless saving/loading stops working.
 - **Guild config data** > I have full accses to all of your guild config data for each of your servers AidanBot is in. This is never viewed unless saving/loading stops working or a value is replaced/renamed.
