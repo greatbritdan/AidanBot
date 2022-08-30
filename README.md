@@ -1,7 +1,10 @@
 # AidanBot
-AidanBot is a dumb bot i made that i run on my server. Originaly designed to do nothing bur rate things, now transformed into a half utility, half entertainment bot.
+## Latest Version: V2
+### AidanBot is a dumb bot i made that i run on my server. Originaly designed to do nothing bur rate things, now transformed into a half utility, half entertainment bot.
 
-# Privacy policy < Last updated: August 30th 2022 >
+---
+
+## Privacy policy < Last updated: August 30th 2022 >
 Aidanbot does collect serveral types of data, all the data I collect is strictly confidential and no one but me has access.
 The data collected is as follows:
 - **Your basic user data** > As long as you are in one server with AidanBot, I have access stuff like username, profile, badges, mutral servers, etc, nothing major but something to be aware of.
@@ -14,8 +17,10 @@ The data collected is as follows:
 
 **All this data is protected and private, I will NEVER give out or sell any of it, nor will i ever use my bot to spy on users or servers!**
 
-# Terms of service < Last updated: August 30th 2022 >
-## By using AidanBot you are agreeing to my **Terms of Service for users**:
+---
+
+## Terms of service < Last updated: August 30th 2022 >
+### By using AidanBot you are agreeing to my **Terms of Service for users**:
 
 By agreeing to these terms as a user you are agreeing to...
 
@@ -24,7 +29,7 @@ By agreeing to these terms as a user you are agreeing to...
 
 Breaking any one of these rules could result in your access to his commands being limited or removed. If you have been affected by this and believe the punishment is unjust or that you have learned your lesson, reach out to the owner (Aidan#8883).
 
-## By adding AidanBot to your server you are **agreeing to my Terms of Service for admins**:
+### By adding AidanBot to your server you are **agreeing to my Terms of Service for admins**:
 
 By agreeing to these terms as an admin you are agreeing to...
 
@@ -32,5 +37,7 @@ By agreeing to these terms as an admin you are agreeing to...
 
 Breaking any one of these rules could result in him being removed and your access to his commands being limited or removed. If you have been affected by this and believe the punishment is unjust or that you have learned your lesson, reach out to the owner (Aidan#8883).
 
-# Unstable commands
+---
+
+## Unstable commands
 This command is currently unstable, issues, bugs and errors are likely to occour and you shouldn't rely on them just yet, if you'd like to help test this command I'd be very happy, make an issue with all the issues you find and that'll help speed up its development and get it removed from here.
