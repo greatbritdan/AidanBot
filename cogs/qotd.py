@@ -51,7 +51,10 @@ class QOTDCog(discord.Cog):
 						await channel.send(txt, embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
 						if not testpost:
 							questions.pop(questioni)
-							await self.client.CON.set_value(guild, "questions", questions)
+							try:
+								await self.client.CON.set_value(guild, "questions", questions)
+							except:
+								print("QOTD Failed. Propper error will exist in V2")
 							
 	async def background_task(self):
 		when = datetime.time(15,0,0)
