@@ -185,29 +185,33 @@ class AidanBot(commands.Bot):
 				else:
 					txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
 			if txt != ctx.message.content:
-				for f in os.listdir("./nitrontfiles"): # clear old items
-					os.remove(os.path.join("./nitrontfiles", f))
-
-				paths, filenames = [], []
-				if len(ctx.message.attachments) > 0: # save all attackments
-					for idx, file in enumerate(ctx.message.attachments):
-						filenames.append(file.filename)
-						path = f"./nitrontfiles/emogifile{idx}_{file.filename}"
-						paths.append(path)
-						await file.save(path)
-
-				newfiles = None
-				if len(ctx.message.attachments) > 0: # create discord file objects of attachments
-					newfiles = []
-					for idx, _ in enumerate(paths):
-						newfiles.append(discord.File(paths[idx], filenames[idx]))
-
-				await self.sendWebhook(ctx.channel, ctx.author, txt, newfiles)
+				files = await self.attachmentsToFiles(ctx.message.attachments)
+				await self.sendWebhook(ctx.channel, ctx.author, txt, files)
 				await ctx.message.delete()
 				return True
 		return False
 
-	async def sendWebhook(self, channel, user, txt, files):
+	async def attachmentsToFiles(self, attachments):
+		for f in os.listdir("./nitrontfiles"): # clear old items
+			os.remove(os.path.join("./nitrontfiles", f))
+
+		paths, filenames = [], []
+		if len(attachments) > 0: # save all attackments
+			for idx, file in enumerate(attachments):
+				filenames.append(file.filename)
+				path = f"./nitrontfiles/emogifile{idx}_{file.filename}"
+				paths.append(path)
+				await file.save(path)
+
+		files = None
+		if len(attachments) > 0: # create discord file objects of attachments
+			files = []
+			for idx, _ in enumerate(paths):
+				files.append(discord.File(paths[idx], filenames[idx]))
+			
+		return files
+
+	async def sendWebhook(self, channel, user, txt, files, nameadd=None):
 		hook = False
 		for w in await channel.webhooks():
 			if w.name == "AidanBotCloneHook":
@@ -216,7 +220,10 @@ class AidanBot(commands.Bot):
 			hook = await channel.create_webhook(name="AidanBotCloneHook")
 
 		try:
-			await hook.send(txt, username=user.display_name, avatar_url=user.display_avatar, files=files)
+			if nameadd:
+				await hook.send(txt, username=user.display_name+nameadd, avatar_url=user.display_avatar, files=files)
+			else:
+				await hook.send(txt, username=user.display_name, avatar_url=user.display_avatar, files=files)
 		except:
 			await hook.delete()
-			await self.sendWebhook(channel, user, txt, files)
+			await self.sendWebhook(channel, user, txt, files, nameadd)
