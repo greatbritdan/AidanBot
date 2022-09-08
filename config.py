@@ -35,6 +35,7 @@ class ConfigManager():
 			self.logname = "user-logs"
 			list = UAVALUES
 
+		self.autocomplete = []
 		for val in list:
 			self.valid_values.append(val)
 			self.default_values[val] = list[val]["default"]
@@ -49,6 +50,7 @@ class ConfigManager():
 				self.restrict_values[val] = list[val]["restricted"]
 			else:
 				self.restrict_values[val] = False
+				self.autocomplete.append(val)
 
 	async def ready(self):
 		await self.values_msgupdate("load")
