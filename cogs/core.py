@@ -10,9 +10,9 @@ from functions import getComEmbed
 from checks import command_checks
 
 async def auto_CONvaluenames(ctx):
-	return [val for val in ctx.bot.CON.valid_values if not ctx.bot.CON.is_restricted(val)]
+	return ctx.bot.CON.autocomplete
 async def auto_UCONvaluenames(ctx):
-	return [val for val in ctx.bot.UCON.valid_values if not ctx.bot.UCON.is_restricted(val)]
+	return ctx.bot.UCON.autocomplete
 async def auto_githubtags(ctx):
 	return [tag.name for tag in ctx.bot.botrepo.get_labels()]
 
