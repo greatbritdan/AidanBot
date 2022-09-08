@@ -43,7 +43,10 @@ class QOTDCog(discord.Cog):
 						quest, author = question["question"], get(guild.members, id=question["author"])
 						if not quest.endswith("?"): quest += "?"
 						emb = getComEmbed(None, self.client, "Question Of The Day", quest)
-						emb.set_footer(text=f"Question submitted by {str(author)}")
+						if len(questions) == 2:
+							emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! Consier adding some now!")
+						else:
+							emb.set_footer(text=f"Question submitted by {str(author)} | {len(questions)-1} questions left.")
 
 						txt, role = "", self.client.CON.get_value(guild, "qotd_role", guild=guild)
 						if (not testpost) and role:
