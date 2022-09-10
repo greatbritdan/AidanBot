@@ -4,8 +4,8 @@ from discord.commands import SlashCommandGroup
 from discord import Option, Color
 from discord.utils import get
 
-import asyncio, datetime, choice
-from random import randint
+import asyncio, datetime
+from random import randint, choice
 
 from functions import getComEmbed
 from checks import command_checks
