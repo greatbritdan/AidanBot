@@ -9,6 +9,9 @@ from traceback import format_exception
 from functions import getComEmbed
 from checks import command_checks
 	
+choicetest = ["test1","test2"]
+async def auto_test(ctx):
+	return choicetest
 	
 class OwnerCog(discord.Cog):
 	def __init__(self, client):
@@ -80,6 +83,12 @@ class OwnerCog(discord.Cog):
 		else:
 			await ctx.respond(f"Couldn't find guild with id `{guildid}` :/")
 
+	@ownergroup.command(name="test", description="Testing")
+	async def test(self, ctx,
+		test:Option(str, "test", autocomplete=basic_autocomplete(auto_test))
+	):
+		await ctx.respond(f"test: {test}")
+			
 def clean_code(content):
 	if content.startswith("```") and content.endswith("```"):
 		return "\n".join(content.split("\n")[1:])[:-3]
