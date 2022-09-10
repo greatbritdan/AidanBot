@@ -24,7 +24,7 @@ class AidanBot(commands.Bot):
 	def __init__(self, repo, debug_guilds=None, offline=False):
 		self.settingup = True
 		self.offline = offline
-		self.version = "V1.3 (Slash)"
+		self.version = "V1.4 (Slash)"
 
 		intents = discord.Intents.all()
 		mentions = discord.AllowedMentions(everyone=False, roles=False)
