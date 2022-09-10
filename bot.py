@@ -1,14 +1,38 @@
-import os
 from aidanbot import AidanBot
 from github import Github
+import json
+
+github = Github(os.getenv("GITHUB_TOKEN"))
+githubrepo = github.get_repo("Aid0nModder/AidanBot")
+token = os.getenv("DISCORD_TOKEN")
+
+def getCONnames():
+	names = []
+	with open('./data/values.json') as file:
+		list = json.load(file)
+		for val in list:
+			if "restricted" not in list[val]:
+				names.append(val)
+	return names
+	
+def getUCONnames():
+	names = []
+	with open('./data/uservalues.json') as file:
+		list = json.load(file)
+		for val in list:
+			if "restricted" not in list[val]:
+				names.append(val)
+	return names
+
+def getGithubtags():
+	return [tag.name for tag in githubrepo.get_labels()]
 
 def main():
-	github = Github(os.getenv("GITHUB_TOKEN"))
-	client = AidanBot(github)
-	client.run(os.getenv("DISCORD_TOKEN"))
-
+	client = AidanBot(githubrepo, [836936601824788520, 760987756985843733, 939885594786533396, 879063875469860874])
+	client.run(token)
+	
 if __name__ == '__main__':
-    main()
+	main()
 
 '''
 Slash Command Hierarchy!
