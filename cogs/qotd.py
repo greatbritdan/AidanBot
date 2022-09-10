@@ -94,7 +94,7 @@ class QOTDCog(discord.Cog):
 		await ctx.respond("Question has been askified.")
 		
 	@qotdgroup.command(name="list", description="List all questions.")
-	async def list(self, ctx:AC):	
+	async def list(self, ctx):	
 		if await command_checks(ctx, self.client, is_guild=True, has_value="qotd_channel"): return
 		questions = self.client.CON.get_value(ctx.guild, "questions")
 
@@ -123,7 +123,7 @@ class QOTDCog(discord.Cog):
 		await paginator.respond(ctx.interaction)
 
 	@qotdgroup.command(name="ask", description="Add a question to the daily questions.")
-	async def ask(self, ctx:AC,
+	async def ask(self, ctx,
 		question:Option(str, "The question you want to ask.", required=True)
 	):	
 		if await command_checks(ctx, self.client, is_guild=True, has_value="qotd_channel"): return
@@ -137,7 +137,7 @@ class QOTDCog(discord.Cog):
 		await ctx.respond(embed=getComEmbed(ctx, self.client, f"Added question!"))
 
 	@qotdgroup.command(name="remove", description="Remove one of your questions from the daily questions, Mods can remove anyones question.")
-	async def remove(self, ctx:AC,
+	async def remove(self, ctx,
 		questionid:Option(str, "The ID of question you want to remove.", required=True)
 	):	
 		if await command_checks(ctx, self.client, is_guild=True, has_value="qotd_channel"): return
