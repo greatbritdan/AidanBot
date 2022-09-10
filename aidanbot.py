@@ -21,7 +21,7 @@ class AidanBot(commands.Bot):
 	def __getitem__(self, key):
 		return getattr(self, key)
 
-	def __init__(self, github, debug_guilds=None, offline=False):
+	def __init__(self, repo, debug_guilds=None, offline=False):
 		self.settingup = True
 		self.offline = offline
 		self.version = "V1.3 (Slash)"
@@ -31,9 +31,7 @@ class AidanBot(commands.Bot):
 		super().__init__(debug_guilds=debug_guilds, prefix="kdkldewkldlkw", intents=intents, allowed_mentions=mentions)
 
 		if not self.offline:
-			self.GIT = github
-			self.botreponame = "Aid0nModder/AidanBot"
-			self.botrepo = self.GIT.get_repo(self.botreponame)
+			self.botrepo = repo
 			self.CON = ConfigManager(self, ctype="guild") # guild config
 			self.UCON = ConfigManager(self, ctype="user") # user config
 			self.replybot = replyBot(self)
