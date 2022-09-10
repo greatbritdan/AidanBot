@@ -1,6 +1,6 @@
 from aidanbot import AidanBot
 from github import Github
-import json
+import os, json
 
 github = Github(os.getenv("GITHUB_TOKEN"))
 githubrepo = github.get_repo("Aid0nModder/AidanBot")
