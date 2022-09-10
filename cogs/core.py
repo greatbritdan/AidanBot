@@ -6,6 +6,7 @@ from discord.utils import get
 import time
 from random import choice
 
+from bot import getCONnames, getUCONnames, getGithubtags
 from functions import getComEmbed
 from checks import command_checks
 
