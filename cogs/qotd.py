@@ -1,7 +1,8 @@
 import discord
+from discord.ext import pages
 from discord.commands import SlashCommandGroup
 from discord import Option, Color
-from discord.utils import get, basic_autocomplete
+from discord.utils import get
 
 import asyncio, datetime
 from random import randint
@@ -13,10 +14,6 @@ def tobool(val):
 	if val.lower() == "true":
 		return True
 	return False
-
-async def auto_questions(ctx):
-	questions = ctx.bot.CON.get_value(ctx.interaction.guild, "questions")
-	return [q["question"] for q in questions if ctx.interaction.channel.permissions_for(ctx.interaction.user).manage_messages or q["author"] == ctx.interaction.user.id]
 
 class QOTDCog(discord.Cog):
 	def __init__(self, client):
@@ -76,6 +73,15 @@ class QOTDCog(discord.Cog):
 			seconds = (tomorrow - now).total_seconds()
 			await asyncio.sleep(seconds)
 
+	def generateID(self, questions):
+		questionids = [q["id"] for q in questions]
+		txt = ""
+		while txt == "" or txt in questionids:
+			txt = ""
+			for i in range(6):
+				txt += choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+		return txt
+			
 	qotdgroup = SlashCommandGroup("qotd", "Question Of The Day commands.")
 
 	@qotdgroup.command(name="post", description="Forcefully post a question.")
@@ -86,41 +92,59 @@ class QOTDCog(discord.Cog):
 
 		await self.askQuestion(tobool(testpost), ctx.guild)
 		await ctx.respond("Question has been askified.")
-
-	@qotdgroup.command(name="config", description="Ask, List and remove questions.")
-	async def config(self, ctx,
-		action:Option(str, "Config action.", choices=["List","Ask","Remove"], required=True),
-		ask:Option(str, "Write a question you want to ask.", required=False),
-		remove:Option(str, "Choose the question you want to remove.", autocomplete=basic_autocomplete(auto_questions), required=False)
-	):
+		
+	@qotdgroup.command(name="list", description="List all questions.")
+	async def list(self, ctx:AC):	
 		if await command_checks(ctx, self.client, is_guild=True, has_value="qotd_channel"): return
-
 		questions = self.client.CON.get_value(ctx.guild, "questions")
-		embed = False
-		if action == "List":
-			if len(questions) == 0:
-				embed = getComEmbed(ctx, self.client, f"All questions for {ctx.guild.name}:", "Looks like we're out of questions, use /qotd config to add more!")
-			else:
-				txt = ""
-				for quest in questions:
-					member = get(ctx.guild.members, id=quest["author"])
-					txt += f"\n**'" + quest["question"] + "':** " + str(member)
-				embed = getComEmbed(ctx, self.client, f"All questions for {ctx.guild.name}:", txt)
-		elif action == "Ask" and ask:
-			if len(ask) > 250:
-				return await ctx.respond("Too many characters! Questions mustn't be more than 250 characters.")
-			if len([q for q in questions if q["question"] == ask]) > 0:
-				return await ctx.respond("You can't send the same question as someone else.")
-			questions.append({ "question": ask, "author": ctx.author.id })
-			await self.client.CON.set_value(ctx.guild, "questions", questions)
-			embed = getComEmbed(ctx, self.client, f"Added question!")
-		elif action == "Remove" and remove:
-			questions = [q for q in questions if q["question"] != remove]
-			await self.client.CON.set_value(ctx.guild, "questions", questions)
-			embed = getComEmbed(ctx, self.client, f"Removed question!")
-		else:
-			return await ctx.respond("Seems like you're missing some arguments. Try again.")
-		await ctx.respond(embed=embed)
+
+		def getqotdlistembed(questions):
+			fields = []
+			for question in questions:
+				member = get(ctx.guild.members, id=question["author"])
+				fields.append([f"'{question['question']}'", f"Submitted by **{str(member)}** | ID: **{question['id']}**"])
+			return getComEmbed(ctx, self.client, f"All Questions for {ctx.guild.name}", "Submit your own wil /qotd ask!", fields=fields)
+
+		def divide_chunks(l, n):
+			for i in range(0, len(l), n):
+				yield l[i:i + n]
+
+		infopages = []
+		questionchunks = divide_chunks(questions, 5)
+		for qc in questionchunks:
+			infopages.append(getqotdlistembed(qc))
+
+		infopagesbuttons = [
+			pages.PaginatorButton("prev", label="<-", style=discord.ButtonStyle.blurple),
+			pages.PaginatorButton("page_indicator", style=discord.ButtonStyle.gray, disabled=True),
+			pages.PaginatorButton("next", label="->", style=discord.ButtonStyle.blurple),
+		]
+		paginator = pages.Paginator(pages=infopages, loop_pages=True, disable_on_timeout=True, timeout=60, use_default_buttons=False, custom_buttons=infopagesbuttons)
+		await paginator.respond(ctx.interaction)
+
+	@qotdgroup.command(name="ask", description="Add a question to the daily questions.")
+	async def ask(self, ctx:AC,
+		question:Option(str, "The question you want to ask.", required=True)
+	):	
+		if await command_checks(ctx, self.client, is_guild=True, has_value="qotd_channel"): return
+		questions = self.client.CON.get_value(ctx.guild, "questions")
+		if len(question) > 250:
+			return await ctx.respond("Too many characters! Questions mustn't be more than 250 characters.")
+		if len([q for q in questions if q["question"] == question]) > 0:
+			return await ctx.respond("You can't send the same question as someone else.")
+		questions.append({ "question": question, "author": ctx.author.id, "id": self.generateID(questions) })
+		await self.client.CON.set_value(ctx.guild, "questions", questions)
+		await ctx.respond(embed=getComEmbed(ctx, self.client, f"Added question!"))
+
+	@qotdgroup.command(name="remove", description="Remove one of your questions from the daily questions, Mods can remove anyones question.")
+	async def remove(self, ctx:AC,
+		questionid:Option(str, "The ID of question you want to remove.", required=True)
+	):	
+		if await command_checks(ctx, self.client, is_guild=True, has_value="qotd_channel"): return
+		questions = self.client.CON.get_value(ctx.guild, "questions")
+		questions = [q for q in questions if q["id"] != questionid]
+		await self.client.CON.set_value(ctx.guild, "questions", questions)
+		await ctx.respond(embed=getComEmbed(ctx, self.client, f"Removed question!"))
 
 def setup(client):
 	client.add_cog(QOTDCog(client))
