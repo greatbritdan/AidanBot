@@ -179,7 +179,7 @@ class GamesCog(discord.Cog):
 		else:
 			deathmessages = {
 				"punch": "{win} punched {wint} into oblivion.",
-				"slap": "{win} was destryed by {wint}'s mega slap.",
+				"slap": "{wint} was destryed by {win}'s mega slap.",
 				"combo": "{wint} couldn't even handle half of {win}'s combo.",
 				"comboend": "{wint} got combo'd right in the gut by {win}.",
 				"pierce": "{win} pierced {wint} in the heart.",
