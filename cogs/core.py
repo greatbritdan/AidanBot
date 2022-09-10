@@ -1,7 +1,7 @@
 import discord
 from discord.commands import slash_command, SlashCommandGroup
 from discord import Option
-from discord.utils import get, basic_autocomplete
+from discord.utils import get
 
 import time
 from random import choice
@@ -9,12 +9,9 @@ from random import choice
 from functions import getComEmbed
 from checks import command_checks
 
-async def auto_CONvaluenames(ctx):
-	return ctx.bot.CON.autocomplete
-async def auto_UCONvaluenames(ctx):
-	return ctx.bot.UCON.autocomplete
-async def auto_githubtags(ctx):
-	return [tag.name for tag in ctx.bot.botrepo.get_labels()]
+CONvaluenames = getCONnames()
+UCONvaluenames = getUCONnames()
+GithubTags = getGithubtags()
 
 # man, what a throwback
 class CoreCog(discord.Cog):
@@ -63,11 +60,12 @@ class CoreCog(discord.Cog):
 	async def issue(self, ctx,
 		title:Option(str, "Title of the post.", required=True),
 		body:Option(str, "Body of the post.", required=True),
-		label1:Option(str, "Tag for the post.", autocomplete=basic_autocomplete(auto_githubtags), required=False),
-		label2:Option(str, "Another Tag for the post.", autocomplete=basic_autocomplete(auto_githubtags), required=False)
+		label1:Option(str, "1st Tag for the post.", choices=GithubTags, required=False),
+		label2:Option(str, "2nd Tag for the post.", choices=GithubTags, required=False),
+		label3:Option(str, "3rd Tag for the post.", choices=GithubTags, required=False)
 	):
 		body += f"\n\n[ Submitted by {str(ctx.author)} via /issue ]"
-		labels = [i for i in [label1, label2] if i]
+		labels = [i for i in [label1, label2, label3] if i]
 		if len(labels) > 0:
 			issue = self.client.botrepo.create_issue(title=title, body=body, labels=labels)
 		else:
@@ -121,8 +119,8 @@ class CoreCog(discord.Cog):
 	@configgroup.command(name="guild", description="Guild configerations.")
 	async def guildconfig(self, ctx,
 		action:Option(str, "Config action.", choices=["List","Set","Reset","Info"], required=True),
-		name:Option(str, "Variable you're performing action on.", autocomplete=basic_autocomplete(auto_CONvaluenames), required=False),
-		value:Option(str, "New value for this Variable.", required=False),
+		name:Option(str, "Variable you're performing action on. Required for all but 'List'.", choices=CONvaluenames, required=False),
+		value:Option(str, "New value for this Variable. Required for 'Set'.", required=False),
 	):
 		if await command_checks(ctx, self.client, is_guild=True, has_permission="kick_members"): return
 		await self.newconfig_command(ctx, self.client.CON, ctx.guild, action, name, value)
@@ -130,7 +128,7 @@ class CoreCog(discord.Cog):
 	@configgroup.command(name="user", description="User configerations.")
 	async def userconfig(self, ctx,
 		action:Option(str, "Config action.", choices=["List","Set","Reset","Info"], required=True),
-		name:Option(str, "Variable you're performing action on. Required for all but 'List'.", autocomplete=basic_autocomplete(auto_UCONvaluenames), required=False),
+		name:Option(str, "Variable you're performing action on. Required for all but 'List'.", choices=UCONvaluenames, required=False),
 		value:Option(str, "New value for this Variable. Required for 'Set'.", required=False)
 	):
 		await self.newconfig_command(ctx, self.client.UCON, ctx.author, action, name, value)
