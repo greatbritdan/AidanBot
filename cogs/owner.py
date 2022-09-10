@@ -1,7 +1,7 @@
 import discord
 from discord.commands import message_command, SlashCommandGroup
 from discord import Option
-from discord.utils import get
+from discord.utils import get, basic_autocomplete
 
 import io, contextlib, textwrap
 from traceback import format_exception
