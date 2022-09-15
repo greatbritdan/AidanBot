@@ -1,5 +1,9 @@
+import discord
+from discord.ext import commands
+from discord.utils import get
 from discord import Embed, Color
-import datetime, math
+
+import traceback, datetime, math
 
 # embeds
 def getEmbed(title, content, color, fields):
@@ -9,7 +13,8 @@ def getEmbed(title, content, color, fields):
 			inline = True if len(f) > 2 else False
 			emb.add_field(name=f[0], value=f[1], inline=inline)
 	return emb
-def getComEmbed(ctx=None, client=None, title=Embed.Empty, content=Embed.Empty, color=Color.from_rgb(20, 29, 37), fields=None):
+
+def getComEmbed(ctx:commands.Context=None, client:commands.Bot=None, title=Embed.Empty, content=Embed.Empty, color=Color.from_rgb(20, 29, 37), fields=None):
 	emb = getEmbed(title, content, color, fields)
 	emb.timestamp = datetime.datetime.utcnow()
 	emb.set_author(name=f"{client.name} > Version: {client.version}", icon_url=client.pfp)
@@ -18,37 +23,46 @@ def getComEmbed(ctx=None, client=None, title=Embed.Empty, content=Embed.Empty, c
 	else:
 		emb.set_footer(text=f"Requested by a user")
 	return emb
-def getErrorEmbed(client, error="ha"):
-	emb = getComEmbed(None, client, "Oh noes! AidanBot ran into an error:", f"```{error}```", Color.from_rgb(220, 29, 37))
+
+def getErrorEmbed(client:commands.Bot, error="ha"):
+	emb = getComEmbed(None, client, f"Oh noes! {client.name} ran into an error:", f"```{error}```", Color.from_rgb(220, 29, 37))
 	emb.remove_footer()
 	return emb
-def getComErrorEmbed(ctx, client, error="ha"):
-	emb = getComEmbed(None, client, f"Oh noes! AidanBot ran into an error while prossesing {ctx.command}:", f"```{error}```", Color.from_rgb(220, 29, 37))
+
+def getComErrorEmbed(ctx:commands.Context, client:commands.Bot, error="ha"):
+	emb = getComEmbed(None, client, f"Oh noes! {client.name} ran into an error while prossesing {ctx.command}:", f"```{error}```", Color.from_rgb(220, 29, 37))
 	emb.remove_footer()
 	return emb
-def getCheckErrorEmbed(ctx, client, error="ha"):
+
+def getCheckErrorEmbed(ctx:commands.Context, client:commands.Bot, error="ha"):
 	emb = getComEmbed(None, client, f"Oh noes! One or more checks failed while prossesing {ctx.command}:", f"```{error}```", Color.from_rgb(120, 29, 37))
 	emb.remove_footer()
 	return emb
 
-async def SendDM(client, title, description):
+async def SendDM(client:commands.Bot, title, description):
 	aidan = await client.fetch_user(384439774972215296) # is me :]
-	emb = getComEmbed(None, client, title, description, Color.from_rgb(70, 29, 37))
-	await aidan.send(embed=emb)
+	await aidan.send(embed=getComEmbed(None, client, title, description, Color.from_rgb(70, 29, 37)))
 
-# others
-def getIntFromText(txt):
-	theNEWlist = "1234567890abcdefghijklmnopqrstuvwxyz .,:;/-+`%$"
-	sed = ""
-	for letter in txt:
-		ind = theNEWlist.find(letter)
-		if ind:
-			sed += str(ind+1)
-		else:
-			sed += "46"
-	return int(sed)
+async def sendComError(client:commands.Bot, ctx:commands.Context, error):
+	guild = get(client.guilds, id=879063875469860874)
+	channel = get(guild.channels, name="error-logs")
+	err = traceback.format_exception_only(error)[0]
+	trac = '\n'.join(traceback.format_exception(error))
+	await channel.send(embed=getComEmbed(None, client, f"Command Error received [/{ctx.command.qualified_name}]:", f"**Error:** `{err}`\n**Traceback:** ```\n{trac}\n```", Color.from_rgb(220, 29, 37)))
 
-async def userPostedRecently(channel, user, limit):
+async def sendError(client:commands.Bot, event, error):
+	guild = get(client.guilds, id=879063875469860874)
+	channel = get(guild.channels, name="error-logs")
+	err = traceback.format_exception_only(error[1])[0]
+	trac = '\n'.join(traceback.format_exception(error[1]))
+	await channel.send(embed=getComEmbed(None, client, f"Event Error received [{event}]:", f"**Error:** `{err}`\n**Traceback:** ```\n{trac}\n```", Color.from_rgb(220, 29, 37)))
+
+async def sendCustomError(client:commands.Bot, event, error):
+	guild = get(client.guilds, id=879063875469860874)
+	channel = get(guild.channels, name="error-logs")
+	await channel.send(embed=getComEmbed(None, client, f"Custom Error received [{event}]:", f"**Error:**\n```{error}```", Color.from_rgb(220, 29, 37)))
+
+async def userPostedRecently(channel:discord.TextChannel, user:discord.Member, limit):
 	async for msg in channel.history(limit=limit):
 		if msg.author == user:
 			return True

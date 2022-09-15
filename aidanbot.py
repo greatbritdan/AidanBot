@@ -1,18 +1,14 @@
 import discord
 from discord.ext import commands
 from discord.utils import find, get
+from github import Repository
 
-import json, os, traceback, sys, datetime, re
-from random import choice
-
-from functions import SendDM, getComEmbed, getComErrorEmbed
-from checks import command_checks_silent
+import json, os, traceback, sys, re
 
 from replybot import replyBot
 from config import ConfigManager
-
-with open('./data/profiles.json') as file:
-	PROFILES = json.load(file)
+from functions import sendError, sendComError, SendDM, getComEmbed, getComErrorEmbed
+from checks import command_checks_silent
 
 # My Son.
 class AidanBot(commands.Bot):
@@ -21,10 +17,13 @@ class AidanBot(commands.Bot):
 	def __getitem__(self, key):
 		return getattr(self, key)
 
-	def __init__(self, repo, debug_guilds=None, offline=False):
+	def mentioncommand(self, name):
+		return self.get_application_command(name).mention
+
+	def __init__(self, repo:Repository, debug_guilds=None, offline=False):
 		self.settingup = True
 		self.offline = offline
-		self.version = "V1.4 (Slash)"
+		self.version = "V2 (Slash)"
 
 		intents = discord.Intents.all()
 		mentions = discord.AllowedMentions(everyone=False, roles=False)
@@ -48,8 +47,11 @@ class AidanBot(commands.Bot):
 		profile = "main"
 		if self.user.id == 861571290132643850:
 			profile = "beta"
-		for name in PROFILES[profile]:
-			self[name] = PROFILES[profile][name]
+
+		with open('./data/profiles.json') as file:
+			profiles = json.load(file)
+		for name in profiles[profile]:
+			self[name] = profiles[profile][name]
 
 		self.settingup = False
 		await self.change_presence(activity=discord.Activity(name=f"/info for info",type=discord.ActivityType.playing))
@@ -59,37 +61,34 @@ class AidanBot(commands.Bot):
 		await self.UCON.ready()
 		await dict(self.cogs)["BirthdayCog"].ready()
 		await dict(self.cogs)["QOTDCog"].ready()
+		await dict(self.cogs)["UserCog"].ready()
 
-	async def on_application_command_error(self, ctx, error):
+	async def on_error(self, event, *args, **kwargs):
+		if self.isbeta:
+			await sendError(self, event, sys.exc_info())
+
+	async def on_application_command_error(self, ctx:discord.ApplicationContext, error):
 		await ctx.respond(embed=getComErrorEmbed(ctx, self, str(error)))
-		if await self.is_owner(ctx.author):
-			print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-			traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+		if self.isbeta:
+			await sendComError(self, ctx, error)
+		print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+		traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
-	async def on_message(self, message):
+	async def on_message(self, message:discord.Message):
 		if self.settingup or message.author.bot or message.webhook_id:
 			return
-		ctx = await self.get_context(message)
+		if self.isbeta:
+			if message.channel.id == 971157179446984794:
+				return await self.replybot.on_message(message)
+			return
 
-		# spam pings
-		if ctx.guild and ctx.guild.id == 836936601824788520:
-			msg = message.content.lower()
-			# no ping pong >:(
-			mentions = [user for user in ctx.message.mentions if (not user.bot)]
-			if len(mentions) > 4:
-				await ctx.author.timeout_for(datetime.timedelta(days=2), reason="Mass-Ping, check for validity and ban if nessasary.")
-				role = get(ctx.guild.roles, id=836937774598848512)
-				await ctx.send(f"**SPAM PING!**\n\nAidanBot would like to apologise to {', '.join([user.name for user in mentions])} on behalf of {str(ctx.author)}.\n\n{role.mention} Someone was trying to be funny.")
-				await ctx.message.delete()
-
+		ctx:commands.Context = await self.get_context(message)
 		if ctx.guild:
-			if (not self.isbeta) and await self.handle_invites(ctx): # remove invites
+			if await self.handle_invites(ctx): # remove invites
 				return
 			if not ctx.command:
 				channels = self.CON.get_value(ctx.guild, "replybot_channel", guild=ctx.guild) # reply bot uwu
-				if (not self.isbeta) and channels and ctx.channel in channels:
-					return await self.replybot.on_message(message)
-				elif self.isbeta and message.channel.name == "aidanbetabot-talk":
+				if channels and ctx.channel in channels:
 					return await self.replybot.on_message(message)
 				nqn = get(ctx.guild.members, id=559426966151757824)
 				if (not nqn) and await self.handle_emojis(ctx):
@@ -108,36 +107,35 @@ class AidanBot(commands.Bot):
 			if role:
 				await member.add_roles(role)
 
-	async def on_guild_join(self, guild):
+	async def on_guild_join(self, guild:discord.Guild):
 		if self.isbeta: return
 		await SendDM(self, "SOMEONE DID WHAT?!?!", f"Added to {guild.name}!")
 		
 		chan = find(lambda m: "general" in m.name, guild.text_channels)
 		if not chan:
 			chan = find(lambda m: "talk" in m.name, guild.text_channels)
+		if not chan:
+			for channel in guild.text_channels:
+				if channel.can_send():
+					chan = channel
 		if chan:
-			info = '''
-			I'm {name}, a dumb bot made by Aidan#8883 (that mari0 guy). I'm a general bot that has many features and prides myself on not having premium or selling NFT's.
-			
-			From fun and useless commands like /opinion and /games, to more useful features like /role, And many configeration optuions using /config. I'll make a great addition to the server.
+			info = f'''
+			I'm {self.name}, a dumb bot made by **Aidan#8883**. I'm a general bot that has many features and prides myself on not having premium or selling NFT's! From fun and useless commands like /opinion and /games, to more useful features using /config. I'll make a great addition to the server!!!
 
-			Before we get started, you might want to read my [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service) and and my [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy).
+			Before we get started, you might want to read my:
+			- [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service)
+			- [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy)
+
+			> **For aditional info on commands or permissions run {self.mentioncommand("info")}!**
 			'''
-			perms = '''
-			The Permissions I come with are only the ones I need, But I understand if you don't like the sound of some. Don't worry tho, Some can be disabled safely, just remeber some functionality will be lost.
-			
-			- Manage Roles: You won't be able to use /role and `join_role`/`birthday_role` will not work.
-			- Manage Server: Your own server invites will be removed from your server.
-			- Ping Everyone/Here/Role: `qotd_role` will not ping unless it is set to "everyone can ping this role"
-			'''
-			emb = getComEmbed(None, self, f"Hello world!.. oh uhh i meant {guild.name}!", info.format(name=self.name), fields=[["Permissions", perms]])
+			emb = getComEmbed(None, self, f"Hello world!.. oh uhh i meant {guild.name}!", info)
 			await chan.send(embed=emb)
 
-	async def on_guild_remove(self, guild):
+	async def on_guild_remove(self, guild:discord.Guild):
 		if self.isbeta: return
 		await self.CON.remove_group(guild)
 
-	async def handle_invites(self, ctx):
+	async def handle_invites(self, ctx:commands.Context):
 		channels = self.CON.get_value(ctx.guild, "remove_invites_exempt_channels", guild=ctx.guild)
 		roles = self.CON.get_value(ctx.guild, "remove_invites_exempt_roles", guild=ctx.guild)
 		hasrole = False
@@ -164,7 +162,7 @@ class AidanBot(commands.Bot):
 							return await ctx.send(f"No posting invites outside of {self.CON.display_value('remove_invites_exempt_channels', channels)}. >:(")
 						return await ctx.send("No posting invites in this server. >:(")
 
-	async def handle_emojis(self, ctx):
+	async def handle_emojis(self, ctx:commands.Context):
 		emogis = re.findall(r':\w*:(?!\d*>)', ctx.message.content)
 		emogis = [e.replace(":","") for e in emogis]
 		emogilesstext = re.split(r':\w*:(?!\d*>)', ctx.message.content)
@@ -183,7 +181,10 @@ class AidanBot(commands.Bot):
 				else:
 					txt = txt + ":" + emogi + ":" + emogilesstext[idx+1]
 			if txt != ctx.message.content:
-				files = await self.attachmentsToFiles(ctx.message.attachments)
+				if not await command_checks_silent(ctx, self, is_guild=True, bot_has_permission="attach_files"):
+					files = await self.attachmentsToFiles(ctx.message.attachments)
+				else:
+					files = []
 				await self.sendWebhook(ctx.channel, ctx.author, txt, files)
 				await ctx.message.delete()
 				return True
@@ -209,7 +210,7 @@ class AidanBot(commands.Bot):
 			
 		return files
 
-	async def sendWebhook(self, channel, user, txt, files, nameadd=None):
+	async def sendWebhook(self, channel:discord.TextChannel, user:discord.Member, txt, files, nameadd=None):
 		hook = False
 		for w in await channel.webhooks():
 			if w.name == "AidanBotCloneHook":

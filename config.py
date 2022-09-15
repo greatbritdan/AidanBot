@@ -1,4 +1,5 @@
 import discord, copy
+from discord.ext import commands
 from discord.utils import get
 
 import json
@@ -15,7 +16,7 @@ class ConfigManager():
 	def __getitem__(self, key):
 		return getattr(self, key)
 
-	def __init__(self, client, ctype):
+	def __init__(self, client:commands.Bot, ctype):
 		self.client = client
 		self.type = ctype
 
@@ -29,13 +30,12 @@ class ConfigManager():
 
 		list = None
 		if self.type == "guild":
-			self.logname = "guild-logs"
+			self.logname = "guild-logs" #"beta-logs"
 			list = VALUES
 		if self.type == "user":
 			self.logname = "user-logs"
 			list = UAVALUES
 
-		self.autocomplete = []
 		for val in list:
 			self.valid_values.append(val)
 			self.default_values[val] = list[val]["default"]
@@ -50,7 +50,6 @@ class ConfigManager():
 				self.restrict_values[val] = list[val]["restricted"]
 			else:
 				self.restrict_values[val] = False
-				self.autocomplete.append(val)
 
 	async def ready(self):
 		await self.values_msgupdate("load")
@@ -88,7 +87,7 @@ class ConfigManager():
 				values.pop(id)
 		return values
 
-	def fix_model(self, obj=None, id=None): # if values or group is missing it'll fill out the list
+	def fix_model(self, obj:discord.Object=None, id=None): # if values or group is missing it'll fill out the list
 		if obj: id = str(obj.id)
 		if id not in self.values or self.values[id] == None:
 			self.values[id] = {}
@@ -111,21 +110,19 @@ class ConfigManager():
 	def get_stackable(self, name):
 		return self.stackable_values[name]
 	def is_restricted(self, name):
-		if self.restrict_values[name]:
-			return True
-		return False
+		return self.restrict_values[name]
 		
-	async def remove_group(self, obj):
+	async def remove_group(self, obj:discord.Object):
 		if str(obj.id) in self.values:
 			self.values.pop(str(obj.id))
 			await self.values_msgupdate("save")
 			return True
 		return False
-	def get_group(self, obj):
+	def get_group(self, obj:discord.Object):
 		self.fix_model(obj)
 		return self.values[str(obj.id)]
 
-	def get_value(self, obj, name, guild=None):
+	def get_value(self, obj:discord.Object, name, guild:discord.Guild=None):
 		self.fix_model(obj)
 		val = self.values[str(obj.id)][name]
 		if self.get_stackable(name) and type(val) == list:
@@ -135,14 +132,25 @@ class ConfigManager():
 		else:
 			result = self._get_value(name, val, guild)
 		return result
-	def _get_value(self, name, val, guild=None):
-		if self.get_type(name) == "channel":
+	def _get_value(self, name, val, guild:discord.Guild=None):
+		typ = self.get_type(name)
+		if typ == "channel/thread":
+			channel = get(guild.channels, id=val)
+			if channel:
+				return channel
+			else:
+				thread = get(guild.threads, id=val)
+				if thread:
+					return thread
+		elif typ == "channel":
 			return get(guild.channels, id=val)
-		elif self.get_type(name) == "role":
+		elif typ == "thread":
+			return get(guild.threads, id=val)
+		elif typ == "role":
 			return get(guild.roles, id=val)
 		else:
 			return val
-	def can_set_value(self, obj, name, val):
+	def can_set_value(self, obj:discord.Object, name, val):
 		stackable_limit = 5
 		string_limit = 250
 		if self.type == "guild" and self.get_value(obj, "guild_status"):
@@ -153,7 +161,7 @@ class ConfigManager():
 		if self.get_type(name) == "string" and len(val) > string_limit:
 			return "String values like `{name}` can't have more than {limit} letters.".format(limit=string_limit, name=name)
 		return False
-	async def set_value(self, obj, name, val, guild=None, noupdate=False):
+	async def set_value(self, obj:discord.Object, name, val, guild:discord.Guild=None, noupdate=False):
 		self.fix_model(obj)
 		err = self.can_set_value(obj, name, val)
 		if err:
@@ -169,18 +177,32 @@ class ConfigManager():
 		if not noupdate:
 			await self.values_msgupdate("save")
 		return result, False
-	def _set_value(self, obj, name, val, guild):
+	def _set_value(self, obj:discord.Object, name, val, guild:discord.Guild):
 		typ = self.get_type(name)
-		if (typ == "channel" or typ == "role" or typ == "boolean") and type(val) == str:
+		if (typ != "string") and type(val) == str:
 			val = val.lower()
-		if (typ == "channel" or typ == "role") and (val == "false" or val == "none"):
-			return False
+			if (val == "false" or val == "none"):
+				return False
 
+		if typ == "channel/thread":
+			newval = self.tonumber(val)
+			channel = get(guild.channels, id=newval) if newval else get(guild.channels, name=val)
+			if channel:
+				return channel.id
+			else:
+				thread = get(guild.threads, id=newval) if newval else get(guild.threads, name=val)
+				if thread:
+					return thread.id	
 		if typ == "channel":
 			newval = self.tonumber(val)
 			channel = get(guild.channels, id=newval) if newval else get(guild.channels, name=val)
 			if channel:
 				return channel.id
+		elif typ == "thread":
+			newval = self.tonumber(val)
+			thread = get(guild.threads, id=newval) if newval else get(guild.threads, name=val)
+			if thread:
+				return thread.id
 		elif typ == "role":
 			newval = self.tonumber(val)
 			role = get(guild.roles, id=newval) if newval else get(guild.roles, name=val)
@@ -197,12 +219,24 @@ class ConfigManager():
 				return newval
 		else:
 			return val
-	async def reset_value(self, obj, name, noupdate=False):
+	async def reset_value(self, obj:discord.Object, name, noupdate=False):
 		self.fix_model(obj)
 		self.values[str(obj.id)][name] = self.default_values[name]
 		if not noupdate:
 			await self.values_msgupdate("save")
 
+	def raw_value(self, name, val):
+		if self.get_stackable(name) and type(val) == list:
+			result = []
+			for nval in val:
+				result.append(self._raw_value(nval))
+			return ",".join(result)
+		else:
+			return self._raw_value(val)
+	def _raw_value(self, val):
+		if isinstance(val, discord.TextChannel) or isinstance(val, discord.Thread) or isinstance(val, discord.Role):
+			return str(val.id)
+		return str(val)
 	def display_value(self, name, val):
 		if self.get_stackable(name) and type(val) == list:
 			result = []
@@ -212,13 +246,12 @@ class ConfigManager():
 		else:
 			return self._display_value(val)
 	def _display_value(self, val):
-		if isinstance(val, discord.TextChannel) or isinstance(val, discord.VoiceChannel) or isinstance(val, discord.Role):
+		if isinstance(val, discord.TextChannel) or isinstance(val, discord.Thread) or isinstance(val, discord.Role):
 			return val.mention
-		else:
-			return f"`{val}`"
+		return f"`{val}`"
 
 	# loop through each user/guild and return their object, using the guild parameter limits it to a spesific guild.
-	async def loopdata(self, guild=None):
+	async def loopdata(self, guild:discord.Guild=None):
 		chomk = []
 		for id in self.values:
 			obj = None
