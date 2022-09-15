@@ -6,6 +6,12 @@
         "restricted":true
     },
     
+    "mod_role": {
+        "default":false,
+        "help":"The role(s) that will determent if a member can run restricted commands.",
+        "type":"[]role"
+    },
+
     "join_message": {
         "default":"Please welcome {name}!",
         "help":"The message that sends when a user joins your server, only works if 'welcome_message_channel' is set.",
@@ -38,20 +44,26 @@
         "type":"[]role"
     },
 
-    "birthday_announcement_channel": {
-        "default":false,
-        "help":"The channel that receives a message when it's a users birthday.",
-        "type":"channel"
-    },
     "birthday_announcement_message": {
         "default":"Happy Birthday {name}!",
         "help":"The message that sends when it's a users birthday, only works if 'birthday_announcement_channel' is set.",
         "type":"string"
     },
+    "birthday_announcement_channel": {
+        "default":false,
+        "help":"The channel that receives a message when it's a users birthday.",
+        "type":"channel"
+    },
     "birthday_role": {
         "default":false,
         "help":"The role that members get if it's their birthday.",
         "type":"role"
+    },
+    "birthday_posttime": {
+        "default":0,
+        "help":"The time of day that birthday messages will be sent/roles updated.",
+        "type":"number",
+        "restricted":true
     },
 
     "qotd_channel": {
@@ -64,6 +76,12 @@
         "help":"The role that gets pinged when a new qotd is posted.",
         "type":"role"
     },
+    "qotd_posttime": {
+        "default":15,
+        "help":"The time of day that questions will be asked",
+        "type":"number",
+        "restricted":true
+    },
     "questions": {
         "default":[],
         "help":"Question of the day questions.",
@@ -73,7 +91,7 @@
 
     "replybot_channel": {
         "default":false,
-        "help":"The channel(s) that allows AidanBot to reply to people [BETA].",
-        "type":"[]channel"
+        "help":"The channel/theads(s) that allows the bot to reply to people [BETA].",
+        "type":"[]channel/thread"
     }
 }
