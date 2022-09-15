@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 from discord.commands import SlashCommandGroup
 from discord import Option
 
@@ -7,8 +8,9 @@ import asyncio, datetime
 from functions import getComEmbed, dateToStr
 from checks import  command_checks_silent
 
+AC = discord.ApplicationContext
 class BirthdayCog(discord.Cog):
-	def __init__(self, client):
+	def __init__(self, client:commands.Bot):
 		self.client = client
 
 	async def ready(self):
@@ -73,7 +75,7 @@ class BirthdayCog(discord.Cog):
 	borthgroup = SlashCommandGroup("birthday", "Birthday commands.")
 
 	@borthgroup.command(name="set", description="Set your birthday.")
-	async def set(self, ctx,
+	async def set(self, ctx:AC,
 		day:Option(int, "Day of your birthday", min_value=1, max_value=31, required=True),
 		month:Option(int, "Month of your birthday", min_value=1, max_value=12, required=True)
 	):
@@ -84,12 +86,12 @@ class BirthdayCog(discord.Cog):
 			await ctx.respond(f"Nice try but the {dateToStr(day, month)} isn't real, Enter a valid date please.")
 
 	@borthgroup.command(name="remove", description="Remove your birthday.")
-	async def remove(self, ctx):
+	async def remove(self, ctx:AC):
 		await self.client.UCON.set_value(ctx.author, "birthday", False)
 		await ctx.respond("Remeoved your birthday from the database.")
 
 	@borthgroup.command(name="upcoming", description="Upcoming birthdays.")
-	async def upcoming(self, ctx):
+	async def upcoming(self, ctx:AC):
 		birthlist = []
 		for user in await self.client.UCON.loopdata():
 			if user in ctx.guild.members:

@@ -1,7 +1,8 @@
 import discord
+from discord.ext import commands
 from discord.commands import SlashCommandGroup
-from discord import Option, ButtonStyle
 from discord.ui import View, Button
+from discord import Option, ButtonStyle
 
 import asyncio, math
 from random import randint, choice
@@ -12,8 +13,9 @@ combo_damage_1 = [0,8,18]
 combo_damage_2 = [0,18,30]
 heal_gain = [5,10,25]
 
+AC = discord.ApplicationContext
 class GamesCog(discord.Cog):
-	def __init__(self, client):
+	def __init__(self, client:commands.Bot):
 		self.client = client
 
 	async def canPlay(self, ctx, user):
@@ -26,7 +28,7 @@ class GamesCog(discord.Cog):
 	gamesgroup = SlashCommandGroup("games", "All Games.")
 
 	@gamesgroup.command(name="rps", description="Rock, paper, scissors!")
-	async def rps(self, ctx, 
+	async def rps(self, ctx:AC, 
 		player1:Option(discord.Member, "First player.", required=True),
 		player2:Option(discord.Member, "Second player.", required=True),
 	):
@@ -218,7 +220,7 @@ class GamesCog(discord.Cog):
 	# ACCTUAL COMMANDS #
 
 	@gamesgroup.command(name="fight", description="Fight against another user or one of the main AI levels.")
-	async def fight(self, ctx, 
+	async def fight(self, ctx:AC, 
 		player1:Option(discord.Member, "First fighter.", required=True),
 		player2:Option(discord.Member, "Second fighter.", required=True),
 		level:Option(str, "Bot AI level.", choices=["dead","random","easy","medium","hard","rigged"], default="medium"),
@@ -312,7 +314,7 @@ class GamesCog(discord.Cog):
 		await self.fightBase(ctx, player1c, player2c, Button_func, Move_func)
 
 	@gamesgroup.command(name="fightclassic", description="Fight against another user or one of the main AI levels. Full recreation of the original fight.")
-	async def classicfight(self, ctx, 
+	async def classicfight(self, ctx:AC, 
 		player1:Option(discord.Member, "First fighter.", required=True),
 		player2:Option(discord.Member, "Second fighter.", required=True),
 		level:Option(str, "Bot AI level.", choices=["dead","random","normal"], default="normal"),

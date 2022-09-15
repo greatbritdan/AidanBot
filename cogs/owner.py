@@ -1,24 +1,22 @@
 import discord
+from discord.ext import commands
 from discord.commands import message_command, SlashCommandGroup
+from discord.utils import get
 from discord import Option
-from discord.utils import get, basic_autocomplete
 
 import io, contextlib, textwrap
 from traceback import format_exception
 
 from functions import getComEmbed
 from checks import command_checks
-	
-choicetest = ["test1","test2"]
-async def auto_test(ctx):
-	return choicetest
-	
+
+AC = discord.ApplicationContext
 class OwnerCog(discord.Cog):
-	def __init__(self, client):
+	def __init__(self, client:commands.Bot):
 		self.client = client
 
 	class EvalView(discord.ui.View):
-		def __init__(self, client, cog, ctx, code):
+		def __init__(self, client:commands.Bot, cog:discord.Cog, ctx:AC, code):
 			self.client = client
 			self.cog = cog
 			self.ctx = ctx
@@ -36,19 +34,19 @@ class OwnerCog(discord.Cog):
 			await interaction.response.edit_message(view=None)
 
 	@message_command(name="Eval-Rerun")
-	async def _evalr(self, ctx, message):
+	async def _evalr(self, ctx:AC, message:discord.Message):
 		if await command_checks(ctx, self.client, is_owner=True): return
 		embed = await self.true_eval(ctx, clean_code(message.clean_content))
 		view = self.EvalView(self.client, self, ctx, clean_code(message.clean_content))
 		await ctx.respond(embed=embed, view=view)
 
 	@message_command(name="Eval")
-	async def _eval(self, ctx, message):
+	async def _eval(self, ctx:AC, message:discord.Message):
 		if await command_checks(ctx, self.client, is_owner=True): return
 		embed = await self.true_eval(ctx, clean_code(message.clean_content))
 		await ctx.respond(embed=embed)
 
-	async def true_eval(self, ctx, code):
+	async def true_eval(self, ctx:AC, code):
 		local_variables = { "self": self.client, "client": self.client, "ctx": ctx, "author": ctx.author, "channel": ctx.channel, "guild": ctx.guild }
 		stdout = io.StringIO()
 		try:
@@ -63,11 +61,11 @@ class OwnerCog(discord.Cog):
 			return getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```")
 		else:
 			return getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```\nResults: ```\n{str(result)}\n```")
-		
+
 	ownergroup = SlashCommandGroup("owner", "Owner commands.")
 
 	@ownergroup.command(name="guild_status", description="Change a guilds status.")
-	async def guildstatus(self, ctx, 
+	async def guildstatus(self, ctx:AC, 
 		guildid:Option(str, "ID of the guild", required=True),
 		status:Option(str, "The status to set it to.", choices=["Basic","Plus"], default="Basic")
 	):
@@ -84,11 +82,11 @@ class OwnerCog(discord.Cog):
 			await ctx.respond(f"Couldn't find guild with id `{guildid}` :/")
 
 	@ownergroup.command(name="test", description="Testing")
-	async def test(self, ctx,
-		test:Option(str, "test", autocomplete=basic_autocomplete(auto_test))
+	async def test(self, ctx:AC,
+		test:Option(str, "test")
 	):
 		await ctx.respond(f"test: {test}")
-			
+
 def clean_code(content):
 	if content.startswith("```") and content.endswith("```"):
 		return "\n".join(content.split("\n")[1:])[:-3]

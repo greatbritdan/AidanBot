@@ -1,28 +1,35 @@
 import discord
+from discord.ext import commands
 from discord.commands import slash_command, user_command
-from discord import Option
 from discord.utils import format_dt
+from discord import Option
 
 from functions import dateToStr, getComEmbed
 
-# only for message commands
+AC = discord.ApplicationContext
 class UserCog(discord.Cog):
-	def __init__(self, client):
+	def __init__(self, client:commands.Bot):
 		self.client = client
 		self.specalstatus = {
 			"384439774972215296": "Bot Owner 💻",
 			"788492102568902656": "Our Lord And Saviour"
 		}
 
+	async def ready(self):
+		if self.client.isbeta:
+			self.specalstatus["804319602292949013"] = "The inferior bot 💩"
+		else:
+			self.specalstatus["861571290132643850"] = "The inferior bot 💩"
+
 	@user_command(name="Info")
-	async def uinfo(self, ctx, user):
+	async def uinfo(self, ctx:AC, user:discord.Member|discord.User):
 		await self.info(ctx, user)
 
 	@slash_command(name="userinfo")
-	async def sinfo(self, ctx, user:Option(discord.Member, "User to get info on, you can use an id for users not in server.")):
+	async def sinfo(self, ctx:AC, user:Option(discord.Member, "User to get info on, you can use an id for users not in server.")):
 		await self.info(ctx, user)
 
-	async def info(self, ctx, user):	
+	async def info(self, ctx:AC, user:discord.Member|discord.User):	
 		user = user or ctx.author
 		inguild = True
 		if isinstance(user, discord.User):
@@ -42,8 +49,12 @@ class UserCog(discord.Cog):
 			desc += f"**[ Server Booster 💎 ]**\n"
 		if user.bot:
 			desc += f"**[ Bot Gang 🤖 ]**\n"
-		desc += f"**[ Being watched by {len(user.mutual_guilds)} AidanBot's ]**\n\n"
-
+		if len(user.mutual_guilds) == 1:
+			watch = f"**[ Being watched by 1 {self.client.name} ]**\n\n"
+		else:
+			watch = f"**[ Being watched by {len(user.mutual_guilds)} {self.client.name}'s ]**\n\n"
+		desc += watch
+		
 		desc += f"**Id:** {user.id}\n"
 		if inguild:
 			borth = self.client.UCON.get_value(user, 'birthday')
