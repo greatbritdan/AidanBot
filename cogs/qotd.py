@@ -78,7 +78,7 @@ class QOTDCog(discord.Cog):
 						emb.set_footer(text=f"Question submitted by AidanBot | 0 questions left!!!")
 					else:
 						if len(questions) == 2:
-							emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! Consier adding some now!")
+							emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! consider adding some now!")
 						else:
 							emb.set_footer(text=f"Question submitted by {str(author)} | {len(questions)-1} questions left.")
 
