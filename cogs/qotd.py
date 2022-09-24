@@ -78,7 +78,7 @@ class QOTDCog(discord.Cog):
 						emb.set_footer(text=f"Question submitted by AidanBot | 0 questions left!!!")
 					else:
 						if len(questions) == 2:
-							emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! consider adding some now!")
+							emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! Consier adding some now!")
 						else:
 							emb.set_footer(text=f"Question submitted by {str(author)} | {len(questions)-1} questions left.")
 
@@ -97,6 +97,7 @@ class QOTDCog(discord.Cog):
 							await sendCustomError(self.client, "QOTD Error", "Questions was unable to save, please manualy remove question!")
 							
 	async def background_task(self):
+		# This needs to be remade, it's caused so much pain...
 		when = datetime.time(15,0,0)
 		now = datetime.datetime.utcnow()
 		if now.time() > when:
@@ -109,6 +110,7 @@ class QOTDCog(discord.Cog):
 			seconds_until_target = (target_time - now).total_seconds()
 			await asyncio.sleep(seconds_until_target)
 			await self.askQuestion()
+			await asyncio.sleep(15)
 			tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
 			seconds = (tomorrow - now).total_seconds()
 			await asyncio.sleep(seconds)

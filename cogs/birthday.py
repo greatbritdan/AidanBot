@@ -68,6 +68,7 @@ class BirthdayCog(discord.Cog):
 			seconds_until_target = (target_time - now).total_seconds()
 			await asyncio.sleep(seconds_until_target)
 			await self.nextDay()
+			await asyncio.sleep(15)
 			tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
 			seconds = (tomorrow - now).total_seconds()
 			await asyncio.sleep(seconds)
