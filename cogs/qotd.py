@@ -1,10 +1,10 @@
 import discord
-from discord.ext import commands, pages
+from discord.ext import commands, pages, tasks
 from discord.commands import SlashCommandGroup
 from discord.utils import get
 from discord import Option
 
-import asyncio, datetime
+import datetime
 from random import randint, choice
 
 from functions import getComEmbed, sendCustomError
@@ -35,24 +35,13 @@ def tobool(val):
 		return True
 	return False
 
-async def auto_questions(ctx):
-	questions = ctx.bot.CON.get_value(ctx.interaction.guild, "questions")
-	qlist = []
-	for q in questions:
-		if ctx.interaction.channel.permissions_for(ctx.interaction.user).manage_messages or q["author"] == ctx.interaction.user.id:
-			jq = q["question"]
-			if len(jq) > 95:
-				jq = jq[:95]
-			qlist.append(jq)
-	return qlist
-
 AC = discord.ApplicationContext
 class QOTDCog(discord.Cog):
 	def __init__(self, client:commands.Bot):
 		self.client = client
 
 	async def ready(self):
-		self.client.loop.create_task(self.background_task())
+		self.change_stats.start()
 		
 	async def askQuestion(self, testpost=False, postguild:discord.Guild=False):
 		if self.client.isbeta:
@@ -96,24 +85,9 @@ class QOTDCog(discord.Cog):
 						except:
 							await sendCustomError(self.client, "QOTD Error", "Questions was unable to save, please manualy remove question!")
 							
-	async def background_task(self):
-		# This needs to be remade, it's caused so much pain...
-		when = datetime.time(15,0,0)
-		now = datetime.datetime.utcnow()
-		if now.time() > when:
-			tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
-			seconds = (tomorrow - now).total_seconds()
-			await asyncio.sleep(seconds)
-		while True:
-			now = datetime.datetime.utcnow()
-			target_time = datetime.datetime.combine(now.date(), when)
-			seconds_until_target = (target_time - now).total_seconds()
-			await asyncio.sleep(seconds_until_target)
-			await self.askQuestion()
-			await asyncio.sleep(15)
-			tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
-			seconds = (tomorrow - now).total_seconds()
-			await asyncio.sleep(seconds)
+	@tasks.loop(time=datetime.time(16, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def change_stats(self):
+		await self.askQuestion()
 
 	def generateID(self, questions):
 		questionids = [q["id"] for q in questions]
