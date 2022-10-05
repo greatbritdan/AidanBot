@@ -73,7 +73,6 @@ Slash Command Hierarchy!
 	-	/owner change_status -  Change a guilds status
 
 	(message) UwU -  Uwuifys a message. :3
-	(message) Raw -  Get the raw text of a message.
 	(message) Eval -        Eval dat text. (OWNER ONLY)
 	(message) Eval-rerun -  Eval dat text but you can rerun it. (OWNER ONLY)
 	(user) Info -    Get info on a user.
