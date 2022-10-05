@@ -1,7 +1,11 @@
 import discord
 from discord.commands import message_command
 
-from random import choice
+import re
+from random import choice, randint
+
+def replaceWord(text, find, replace):
+	return re.sub(r"\b" + find + r"\b", replace, text)
 
 # only for message commands
 class MessageCog(discord.Cog):
