@@ -8,6 +8,7 @@ def replaceWord(text, find, replace):
 	return re.sub(r"\b" + find + r"\b", replace, text)
 
 # only for message commands
+AC = discord.ApplicationContext
 class MessageCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
