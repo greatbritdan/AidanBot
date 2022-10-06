@@ -85,7 +85,7 @@ class QOTDCog(discord.Cog):
 						except:
 							await sendCustomError(self.client, "QOTD Error", "Questions was unable to save, please manualy remove question!")
 							
-	@tasks.loop(time=datetime.time(16, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	@tasks.loop(time=datetime.time(15, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
 	async def change_stats(self):
 		await self.askQuestion()
 
