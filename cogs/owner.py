@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord.commands import message_command, SlashCommandGroup
+from discord.commands import message_command
 from discord.utils import get
 from discord import Option
 
@@ -61,31 +61,6 @@ class OwnerCog(discord.Cog):
 			return getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```")
 		else:
 			return getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```\nResults: ```\n{str(result)}\n```")
-
-	ownergroup = SlashCommandGroup("owner", "Owner commands.")
-
-	@ownergroup.command(name="guild_status", description="Change a guilds status.")
-	async def guildstatus(self, ctx:AC, 
-		guildid:Option(str, "ID of the guild", required=True),
-		status:Option(str, "The status to set it to.", choices=["Basic","Plus"], default="Basic")
-	):
-		if await command_checks(ctx, self.client, is_guild=True, is_owner=True): return
-		try:
-			guildid = int(guildid)
-		except:
-			return await ctx.respond(f"`{guildid}` Is not a valid guild id")
-		guild = get(self.client.guilds, id=guildid)
-		if guild:
-			await self.client.CON.set_value(guild, "guild_status", status, guild)
-			await ctx.respond(f"Granted '{status}' status to {guild.name}!!!")
-		else:
-			await ctx.respond(f"Couldn't find guild with id `{guildid}` :/")
-
-	@ownergroup.command(name="test", description="Testing")
-	async def test(self, ctx:AC,
-		test:Option(str, "test")
-	):
-		await ctx.respond(f"test: {test}")
 
 def clean_code(content):
 	if content.startswith("```") and content.endswith("```"):
