@@ -107,15 +107,15 @@ class CoreCog(discord.Cog):
 		
 	@slash_command(name="echo", description="Say something as me.")
 	async def echo(self, ctx:AC,
-		content:Option(str, "What I will say.", required=True),
-		attachment:Option(discord.Attachment, "What attachment will he attach.", required=False),
+		message:Option(str, "What I will say.", required=True),
+		attachment:Option(discord.Attachment, "What attachment will he attach.", required=False)
 	):
 		if attachment and (not await command_checks_silent(ctx, self.client, is_guild=True, bot_has_permission="attach_files")):
 			files = await self.client.attachmentsToFiles([attachment])
 		else:
 			files = []
-		await ctx.send(content, files=files)
-		await ctx.delete()
+		await ctx.send(message, files=files)
+		await ctx.respond("Sent!", ephemeral=True)
 	
 	@slash_command(name="issue", description="Create an issue on GitHub.")
 	async def issue(self, ctx:AC,
