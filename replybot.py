@@ -40,7 +40,7 @@ class replyBot():
         self.states["funny"] = replyBotState( matchwords=["lol","lmao","ha"], reply=["lol","lmao","ha","What's so funny?"], noendpunc=True )
         self.states["uwu"] = replyBotState( findwords=["uwu","owo",":3","nya"], reply=["uwu","owo",":3","~nya"], replychance=2 )
         self.states["sus"] = replyBotState( findwords=["sus","sussy","amogus","amongus","among us","among","vent"], reply=["AMOGUS!","Oh god... sus","SUSSY BAKA?","Tha's sus","{name} vented."], replychance=2 )
-        self.states["like"] = replyBotState( matchwords=["good","like","great","cool"], reply=["Thanks","You too","You think so?","That's nice of you!"] )
+        self.states["like"] = replyBotState( matchwords=["good","great","cool"], reply=["Thanks","You too","You think so?","That's nice of you!"] )
         self.states["love"] = replyBotState( matchwords=["love","cute","luve"], reply=["Thanks","You too",":flushed:","You think so?",":heart:","That's nice of you!"] )
         self.states["hate"] = replyBotState( matchwords=["bad","dislike","hate","suck","sucks","ugly","dumbass","stupid"], reply=["That's not nice",":(","Please don't say things like that","Bruh","+ratio",":("] )
         self.states["unsad"] = replyBotState( matchwords=["sad","cry","depressed","depression",":("], reply=["Aww, everything will be ok","I'm here for you",":heart:","chear up :p"] )
