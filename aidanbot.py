@@ -69,7 +69,7 @@ class AidanBot(commands.Bot):
 
 	async def on_application_command_error(self, ctx:discord.ApplicationContext, error):
 		if isinstance(error, commands.CommandOnCooldown):
-			await ctx.respond(f"This command is currently on cooldown. Try again in {error.retry_after:.2f} seconds.", ephemeral=True))
+			await ctx.respond(f"This command is currently on cooldown. Try again in {error.retry_after:.2f} seconds.", ephemeral=True)
 		else:
 			await ctx.respond(embed=getComErrorEmbed(ctx, self, str(error)))
 			if self.isbeta:
