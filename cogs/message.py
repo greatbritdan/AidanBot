@@ -1,5 +1,6 @@
 import discord
 from discord.commands import message_command
+import discord.ext.commands as cmds
 
 import re
 from random import choice, randint
@@ -12,8 +13,9 @@ AC = discord.ApplicationContext
 class MessageCog(discord.Cog):
 	def __init__(self, client):
 		self.client = client
-
+	
 	@message_command(name="UwU")
+	@cmds.cooldown(1,300,cmds.BucketType.channel)
 	async def uwuify(self, ctx:AC, message:discord.Message):
 		endings = [";;w;;", ";w;", "UwU", "OwO", ":3", "X3", "^_^", "\\* *sweats* *", "\\* *screams* *", "\\* *huggles tightly* *"]
 
@@ -46,7 +48,7 @@ class MessageCog(discord.Cog):
 		# print(msg) # dowone
 		await ctx.defer(ephemeral=True)
 		try:
-			await self.client.sendWebhook(ctx.channel, message.author, msg, [], " (fake)")
+			await self.client.sendWebhook(ctx.channel, message.author, msg, [], f" (uwuified by {str(ctx.author)})")
 			await ctx.respond("UwUified!", ephemeral=True)
 		except:
 			await ctx.respond("Error! Try again later!", ephemeral=True)
