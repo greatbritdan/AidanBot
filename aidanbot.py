@@ -68,11 +68,14 @@ class AidanBot(commands.Bot):
 			await sendError(self, event, sys.exc_info())
 
 	async def on_application_command_error(self, ctx:discord.ApplicationContext, error):
-		await ctx.respond(embed=getComErrorEmbed(ctx, self, str(error)))
-		if self.isbeta:
-			await sendComError(self, ctx, error)
-		print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-		traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+		if isinstance(error, commands.CommandOnCooldown):
+			await ctx.respond(f"This command is currently on cooldown. Try again in {error.retry_after:.2f} seconds.")
+		else:
+			await ctx.respond(embed=getComErrorEmbed(ctx, self, str(error)))
+			if self.isbeta:
+				await sendComError(self, ctx, error)
+			print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+			traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
 	async def on_message(self, message:discord.Message):
 		if self.settingup or message.author.bot or message.webhook_id:
