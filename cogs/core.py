@@ -2,9 +2,9 @@ import discord
 from discord.ext import commands, pages
 from discord.commands import slash_command, SlashCommandGroup
 from discord.utils import get
-from discord import Option
+from discord import Option, Color, Embed
 
-from github import Issue
+from github.Issue import Issue
 
 import time
 from bot import getCONnames, getUCONnames, getGithubtags
@@ -117,6 +117,51 @@ class CoreCog(discord.Cog):
 		await ctx.send(message, files=files)
 		await ctx.respond("Sent!", ephemeral=True)
 	
+	@slash_command(name="embed", description="Send a custom embed.")
+	async def embed(self, ctx:AC,
+		title:Option(str, "Title of the embed.", required=True),
+		description:Option(str, "Description of the embed.", required=True),
+		color:Option(str, "Color of the embed", choices=["default","red","green"], required=True),
+		timestamp:Option(bool, "if timestamp is enabled.", required=False, default=False),
+		header:Option(str, "Header of the embed.", required=False, default=False),
+		footer:Option(str, "Footer of the embed.", required=False, default=False),
+		field1:Option(str, "A field of the emebd, split title and value with '|'", required=False, default=False),
+		field2:Option(str, "A field of the emebd, split title and value with '|'", required=False, default=False),
+		field3:Option(str, "A field of the emebd, split title and value with '|'", required=False, default=False)
+	):
+		if color == "default": color = Color.from_rgb(20, 29, 37)
+		if color == "red": color = Color.from_rgb(220, 29, 37)
+		if color == "green": color = Color.from_rgb(20, 229, 37)
+		if timestamp: timestamp = datetime.now()
+
+		emb = Embed(title=title, description=description, color=color, timestamp=timestamp)
+		if footer:
+			emb.set_footer(text=footer)
+		if header:
+			emb.set_author(name=header)
+
+		if field1:
+			field1 = field1.split("|")
+			if len(field1) > 2 and field1[2] == "true":
+				emb.add_field(name=field1[0], value=field1[1], inline=True)
+			else:
+				emb.add_field(name=field1[0], value=field1[1], inline=False)
+		if field2:
+			field2 = field2.split("|")
+			if len(field2) > 2 and field2[2] == "true":
+				emb.add_field(name=field2[0], value=field2[1], inline=True)
+			else:
+				emb.add_field(name=field2[0], value=field2[1], inline=False)
+		if field3:
+			field3 = field3.split("|")
+			if len(field3) > 2 and field3[2] == "true":
+				emb.add_field(name=field3[0], value=field3[1], inline=True)
+			else:
+				emb.add_field(name=field3[0], value=field3[1], inline=False)
+
+		await ctx.send(embed=emb)
+		await ctx.respond("Sent!", ephemeral=True)
+		
 	@slash_command(name="issue", description="Create an issue on GitHub.")
 	async def issue(self, ctx:AC,
 		title:Option(str, "Title of the post.", required=True),
@@ -128,9 +173,9 @@ class CoreCog(discord.Cog):
 		body += f"\n\n[ Submitted by {str(ctx.author)} via /issue ]"
 		labels = [i for i in [label1, label2, label3] if i]
 		if len(labels) > 0:
-			issue = self.client.botrepo.create_issue(title=title, body=body, labels=labels)
+			issue:Issue = self.client.botrepo.create_issue(title=title, body=body, labels=labels)
 		else:
-			issue = self.client.botrepo.create_issue(title=title, body=body)
+			issue:Issue = self.client.botrepo.create_issue(title=title, body=body)
 		await ctx.respond(f"Submitted!\n\n{issue.html_url}")
 
 	@slash_command(name="clone", description="Say something as another user.")
