@@ -7,6 +7,7 @@ from discord import Option, Color, Embed
 from github.Issue import Issue
 
 import time
+from datetime import datetime
 from bot import getCONnames, getUCONnames, getGithubtags
 from functions import getComEmbed
 from checks import command_checks, command_checks_silent, permission_check
