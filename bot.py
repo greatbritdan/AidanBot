@@ -41,6 +41,7 @@ Slash Command Hierarchy!
 	/info -      Bot info.
 	/ping -      Get bots latency.
 	/echo -      Make the bot say something.
+	/embed -     Create a custom embed.
 	/issue -     Create an issue on github.
 	/userinfo -  Get info on a user.
 
