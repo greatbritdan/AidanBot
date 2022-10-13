@@ -115,7 +115,7 @@ class QOTDCog(discord.Cog):
 			for question in questions:
 				member = get(ctx.guild.members, id=question["author"])
 				fields.append([f"'{question['question']}'", f"Submitted by **{str(member)}** | ID: **{question['id']}**"])
-			return getComEmbed(ctx, self.client, f"All Questions for {ctx.guild.name}", "Submit your own wil /qotd ask!", fields=fields)
+			return getComEmbed(ctx, self.client, f"All Questions for {ctx.guild.name}", "Submit your own questions with /qotd ask!", fields=fields)
 
 		def divide_chunks(l, n):
 			for i in range(0, len(l), n):
