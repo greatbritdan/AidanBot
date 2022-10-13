@@ -41,11 +41,23 @@ class QOTDCog(discord.Cog):
 		self.client = client
 
 	async def ready(self):
-		self.change_stats.start()
+		self.daily_task.start()
+		
+	def cog_unload(self):
+		self.daily_task.cancel()
+
+	def generateID(self, questions):
+		questionids = [q["id"] for q in questions]
+		txt = ""
+		while txt == "" or txt in questionids:
+			txt = ""
+			for i in range(6):
+				txt += choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+		return txt
 		
 	async def askQuestion(self, testpost=False, postguild:discord.Guild=False):
-		if self.client.isbeta:
-			return
+		if self.client.isbeta: return
+
 		for guild in await self.client.CON.loopdata():
 			if (not postguild) or postguild == guild:
 				channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
@@ -84,48 +96,14 @@ class QOTDCog(discord.Cog):
 							await self.client.CON.set_value(guild, "questions", questions)
 						except:
 							await sendCustomError(self.client, "QOTD Error", "Questions was unable to save, please manualy remove question!")
-							
+
 	@tasks.loop(time=datetime.time(15, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def change_stats(self):
+	async def daily_task(self):
 		await self.askQuestion()
 
-	def generateID(self, questions):
-		questionids = [q["id"] for q in questions]
-		txt = ""
-		while txt == "" or txt in questionids:
-			txt = ""
-			for i in range(6):
-				txt += choice("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
-		return txt
+	###
 
 	qotdgroup = SlashCommandGroup("qotd", "Question Of The Day commands.")
-
-	'''@qotdgroup.command(name="setposttime", description="Sets the post time for QOTD.")
-	async def setposttime(self, ctx:AC,
-		posttime:Option(str, "The time where it will be posted.", choices=["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23"], required=True)
-	):
-		if await command_checks(ctx, self.client, is_guild=True, has_mod_role=True, has_value="qotd_channel"): return
-		posttime = int(posttime)
-
-		when = datetime.time(posttime,0,0)
-		now = datetime.datetime.utcnow()
-		if now.time() > when:
-			post = datetime.datetime.combine(now.date()+datetime.timedelta(days=1), datetime.time(0))
-		post = datetime.datetime.combine(now.date(), when)
-		time = post-now
-
-		await self.client.CON.set_value(ctx.guild, "qotd_posttime", posttime)
-		await ctx.respond(embed=getComEmbed(ctx, self.client, f"Set posttime, next question in {math.floor(time.seconds/60/60)} hour(s) and {math.ceil((time.seconds/60)%60)} minute(s).", "(Calculated in UTC, change if incorrect)"))
-		#await ctx.respond(embed=getComEmbed(ctx, self.client, f"Set posttime to {format_dt(post,'t')}! Next question will be asked {format_dt(post,'R')}."))'''
-
-	@qotdgroup.command(name="post", description="Forcefully post a question.")
-	async def post(self, ctx:AC,
-		testpost:Option(str, "If the question isn't removed from the questions list, useful for tests.", choices=["True", "False"], default="True")
-	):
-		if await command_checks(ctx, self.client, is_owner=True, is_guild=True, has_value="qotd_channel"): return
-
-		await self.askQuestion(tobool(testpost), ctx.guild)
-		await ctx.respond("Question has been askified.")
 
 	@qotdgroup.command(name="list", description="List all questions.")
 	async def list(self, ctx:AC):	
@@ -137,7 +115,7 @@ class QOTDCog(discord.Cog):
 			for question in questions:
 				member = get(ctx.guild.members, id=question["author"])
 				fields.append([f"'{question['question']}'", f"Submitted by **{str(member)}** | ID: **{question['id']}**"])
-			return getComEmbed(ctx, self.client, f"All Questions for {ctx.guild.name}", "Submit your own questions with /qotd ask!", fields=fields)
+			return getComEmbed(ctx, self.client, f"All Questions for {ctx.guild.name}", "Submit your own wil /qotd ask!", fields=fields)
 
 		def divide_chunks(l, n):
 			for i in range(0, len(l), n):
@@ -192,6 +170,15 @@ class QOTDCog(discord.Cog):
 				newquestions.append({ "question": question["question"], "author": question["author"], "id": self.generateID(newquestions) })
 		await self.client.CON.set_value(ctx.guild, "questions", newquestions)
 		await ctx.respond(embed=getComEmbed(ctx, self.client, f"Converted question!"))
+
+	@qotdgroup.command(name="post", description="Forcefully post a question.")
+	async def post(self, ctx:AC,
+		testpost:Option(str, "If the question isn't removed from the questions list, useful for tests.", choices=["True", "False"], default="True")
+	):
+		if await command_checks(ctx, self.client, is_owner=True, is_guild=True, has_value="qotd_channel"): return
+
+		await self.askQuestion(tobool(testpost), ctx.guild)
+		await ctx.respond("Question has been askified.")
 
 def setup(client):
 	client.add_cog(QOTDCog(client))

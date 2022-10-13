@@ -1,9 +1,9 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord.commands import SlashCommandGroup
 from discord import Option
 
-import asyncio, datetime
+import datetime
 
 from functions import getComEmbed, dateToStr
 from checks import  command_checks_silent
@@ -15,7 +15,10 @@ class BirthdayCog(discord.Cog):
 
 	async def ready(self):
 		self.borths = await self.getBirthdays()
-		self.client.loop.create_task(self.background_task())
+		self.daily_task.start()
+
+	def cog_unload(self):
+		self.daily_task.cancel()
 	
 	async def getBirthdays(self):
 		borths = []
@@ -27,8 +30,7 @@ class BirthdayCog(discord.Cog):
 		return borths
 
 	async def nextDay(self):
-		if self.client.isbeta:
-			return
+		if self.client.isbeta: return
 
 		for user in self.borths: # no longer birthday :(
 			for guild in self.client.guilds:
@@ -39,6 +41,7 @@ class BirthdayCog(discord.Cog):
 						role = self.client.CON.get_value(guild, "birthday_role", guild=guild)
 						if role and role in member.roles:
 							await member.remove_roles(role)
+
 		self.borths = await self.getBirthdays()
 		for user in self.borths: # is birthday :)
 			for guild in self.client.guilds:
@@ -55,23 +58,11 @@ class BirthdayCog(discord.Cog):
 						if role:
 							await member.add_roles(role)
 
-	async def background_task(self):
-		when = datetime.time(1,0,0)
-		now = datetime.datetime.utcnow()
-		if now.time() > when:
-			tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
-			seconds = (tomorrow - now).total_seconds()
-			await asyncio.sleep(seconds)
-		while True:
-			now = datetime.datetime.utcnow()
-			target_time = datetime.datetime.combine(now.date(), when)
-			seconds_until_target = (target_time - now).total_seconds()
-			await asyncio.sleep(seconds_until_target)
-			await self.nextDay()
-			await asyncio.sleep(15)
-			tomorrow = datetime.datetime.combine(now.date() + datetime.timedelta(days=1), datetime.time(0))
-			seconds = (tomorrow - now).total_seconds()
-			await asyncio.sleep(seconds)
+	@tasks.loop(time=datetime.time(0, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def daily_task(self):
+		await self.nextDay()
+
+	###
 
 	borthgroup = SlashCommandGroup("birthday", "Birthday commands.")
 
