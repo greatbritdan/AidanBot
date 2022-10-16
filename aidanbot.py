@@ -18,7 +18,12 @@ class AidanBot(commands.Bot):
 		return getattr(self, key)
 
 	def mentioncommand(self, name):
-		return self.get_application_command(name).mention
+		if " " in name:
+			gname, nname = name.split(" ")
+			group = self.get_application_command(gname, type=discord.SlashCommandGroup)
+			return f"</{gname} {nname}:{group.id}>"
+		else:
+			return self.get_application_command(name).mention
 
 	def __init__(self, repo:Repository, debug_guilds=None, offline=False):
 		self.settingup = True
@@ -61,7 +66,6 @@ class AidanBot(commands.Bot):
 		await self.UCON.ready()
 		await dict(self.cogs)["BirthdayCog"].ready()
 		await dict(self.cogs)["QOTDCog"].ready()
-		await dict(self.cogs)["UserCog"].ready()
 
 	async def on_error(self, event, *args, **kwargs):
 		if self.isbeta:
