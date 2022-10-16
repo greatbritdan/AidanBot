@@ -12,14 +12,11 @@ class UserCog(discord.Cog):
 		self.client = client
 		self.specalstatus = {
 			"384439774972215296": "Bot Owner 💻",
-			"788492102568902656": "Our Lord And Saviour"
+			"788492102568902656": "Our Lord And Saviour",
+			"804319602292949013": "An Authentic AidanBot",
+			"861571290132643850": "An Authentic AidanBot",
+			"939228285106286702": "An Authentic AidanBot"
 		}
-
-	async def ready(self):
-		if self.client.isbeta:
-			self.specalstatus["804319602292949013"] = "The inferior bot 💩"
-		else:
-			self.specalstatus["861571290132643850"] = "The inferior bot 💩"
 
 	@user_command(name="Info")
 	async def uinfo(self, ctx:AC, user:discord.Member|discord.User):
