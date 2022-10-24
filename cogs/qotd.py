@@ -109,6 +109,8 @@ class QOTDCog(discord.Cog):
 	async def list(self, ctx:AC):	
 		if await command_checks(ctx, self.client, is_guild=True, has_value="qotd_channel"): return
 		questions = self.client.CON.get_value(ctx.guild, "questions")
+		if len(questions) == 0:
+			return await ctx.respond("Seems like we're out of questions... Use /qotd add to add some more!")
 
 		def getqotdlistembed(questions):
 			fields = []
@@ -157,19 +159,6 @@ class QOTDCog(discord.Cog):
 		questions = [q for q in questions if q["id"] != questionid]
 		await self.client.CON.set_value(ctx.guild, "questions", questions)
 		await ctx.respond(embed=getComEmbed(ctx, self.client, f"Removed question!"))
-
-	@qotdgroup.command(name="convert", description="Add ID's to every question.")
-	async def convert(self, ctx:AC):	
-		if await command_checks(ctx, self.client, is_owner=True, is_guild=True, has_value="qotd_channel"): return
-		questions = self.client.CON.get_value(ctx.guild, "questions")
-		newquestions = []
-		for question in questions:
-			if "id" in question:
-				newquestions.append({ "question": question["question"], "author": question["author"], "id": question["id"] })
-			else:
-				newquestions.append({ "question": question["question"], "author": question["author"], "id": self.generateID(newquestions) })
-		await self.client.CON.set_value(ctx.guild, "questions", newquestions)
-		await ctx.respond(embed=getComEmbed(ctx, self.client, f"Converted question!"))
 
 	@qotdgroup.command(name="post", description="Forcefully post a question.")
 	async def post(self, ctx:AC,
