@@ -141,7 +141,6 @@ class AidanBot(commands.Bot):
 		await self.CON.remove_group(guild)
 
 	async def handle_invites(self, msg:discord.Message):
-		print("are you at least making it her!?!?!?!?!?")
 		channels = self.CON.get_value(msg.guild, "remove_invites_exempt_channels", guild=msg.guild)
 		roles = self.CON.get_value(msg.guild, "remove_invites_exempt_roles", guild=msg.guild)
 		hasrole = False
