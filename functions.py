@@ -3,6 +3,8 @@ from discord.ext import commands
 from discord.utils import get
 from discord import Embed, Color
 
+#from aidanbot import AidanBot
+
 import traceback, datetime, math
 
 # embeds
@@ -14,28 +16,26 @@ def getEmbed(title, content, color, fields):
 			emb.add_field(name=f[0], value=f[1], inline=inline)
 	return emb
 
-def getComEmbed(ctx:commands.Context=None, client:commands.Bot=None, title=Embed.Empty, content=Embed.Empty, color=Color.from_rgb(20, 29, 37), fields=None):
+def getComEmbed(user:str=None, client:commands.Bot=None, title=None, content=None, color=Color.from_rgb(20, 29, 37), fields=None):
 	emb = getEmbed(title, content, color, fields)
 	emb.timestamp = datetime.datetime.utcnow()
 	emb.set_author(name=f"{client.name} > Version: {client.version}", icon_url=client.pfp)
-	if ctx:
-		emb.set_footer(text=f"Requested by {str(ctx.author)}")
-	else:
-		emb.set_footer(text=f"Requested by a user")
+	if user:
+		emb.set_footer(text=f"Requested by {user}")
 	return emb
-
-def getErrorEmbed(client:commands.Bot, error="ha"):
-	emb = getComEmbed(None, client, f"Oh noes! {client.name} ran into an error:", f"```{error}```", Color.from_rgb(220, 29, 37))
+	
+def getCheckEmbed(user, client:commands.Bot, details):
+	emb = getComEmbed(user, client, f"Such a naughty! Checks failed!", f"```{details}```", Color.from_rgb(120, 29, 37))
 	emb.remove_footer()
 	return emb
 
-def getComErrorEmbed(ctx:commands.Context, client:commands.Bot, error="ha"):
-	emb = getComEmbed(None, client, f"Oh noes! {client.name} ran into an error while prossesing {ctx.command}:", f"```{error}```", Color.from_rgb(220, 29, 37))
+def getCooldownEmbed(ctx:commands.Context, client:commands.Bot, retryafter):
+	emb = getComEmbed(str(ctx.author), client, f"Gotta go slow!", f"```Command is currently on cooldown, try again in {retryafter:.2f} seconds!```", Color.from_rgb(120, 29, 37))
 	emb.remove_footer()
 	return emb
 
-def getCheckErrorEmbed(ctx:commands.Context, client:commands.Bot, error="ha"):
-	emb = getComEmbed(None, client, f"Oh noes! One or more checks failed while prossesing {ctx.command}:", f"```{error}```", Color.from_rgb(120, 29, 37))
+def getErrorEmbed(ctx:commands.Context, client:commands.Bot, error="ha"):
+	emb = getComEmbed(str(ctx.author), client, f"Oh noes! {client.name} ran into an error:", f"```{error}```", Color.from_rgb(220, 29, 37))
 	emb.remove_footer()
 	return emb
 

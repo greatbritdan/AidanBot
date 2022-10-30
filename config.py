@@ -1,6 +1,8 @@
 import discord, copy
-from discord.ext import commands
 from discord.utils import get
+import discord.ext.commands as CM
+
+#from aidanbot import AidanBot
 
 import json
 with open('./data/values.json') as file:
@@ -16,7 +18,7 @@ class ConfigManager():
 	def __getitem__(self, key):
 		return getattr(self, key)
 
-	def __init__(self, client:commands.Bot, ctype):
+	def __init__(self, client:CM.Bot, ctype):
 		self.client = client
 		self.type = ctype
 
@@ -30,7 +32,7 @@ class ConfigManager():
 
 		list = None
 		if self.type == "guild":
-			self.logname = "guild-logs" #"beta-logs"
+			self.logname = "guild-logs"
 			list = VALUES
 		if self.type == "user":
 			self.logname = "user-logs"
@@ -75,7 +77,7 @@ class ConfigManager():
 			return int(val)
 		except ValueError:
 			return False
-
+			
 	def savevalues(self, values):
 		valuescopy = copy.deepcopy(values)
 		for id in valuescopy:
@@ -158,8 +160,9 @@ class ConfigManager():
 			string_limit = 500
 		if self.get_stackable(name) and len(val.replace(" ","").split(",")) > stackable_limit:
 			return "Stackable values like `{name}` can't have more than {limit} {type}s.".format(limit=stackable_limit, name=name, type=self.get_type(name))
-		if self.get_type(name) == "string" and len(val) > string_limit:
-			return "String values like `{name}` can't have more than {limit} letters.".format(limit=string_limit, name=name)
+		if self.get_type(name) == "string":
+			if val != True and val != False and len(val) > string_limit:
+				return "String values like `{name}` can't have more than {limit} letters.".format(limit=string_limit, name=name)
 		return False
 	async def set_value(self, obj:discord.Object, name, val, guild:discord.Guild=None, noupdate=False):
 		self.fix_model(obj)
@@ -261,7 +264,7 @@ class ConfigManager():
 				if guild:
 					obj = get(guild.members, id=int(id))
 				else:
-					obj = await self.client.get_or_fetch_user(int(id))
+					obj = await self.client.fetch_user(int(id))
 			if obj:
 				chomk.append(obj)
 		return chomk

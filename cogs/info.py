@@ -1,14 +1,15 @@
 import discord
-from discord.ext import commands
-from discord.commands import slash_command, user_command
+import discord.ext.commands as CM
+import discord.app_commands as AC
+from discord import Interaction as Itr
 from discord.utils import format_dt
-from discord import Option
 
+from aidanbot import AidanBot
 from functions import dateToStr, getComEmbed
+from cooldowns import cooldown_etc
 
-AC = discord.ApplicationContext
-class UserCog(discord.Cog):
-	def __init__(self, client:commands.Bot):
+class InfoCog(CM.Cog):
+	def __init__(self, client:AidanBot):
 		self.client = client
 		self.specalstatus = {
 			"384439774972215296": "Bot Owner 💻",
@@ -18,16 +19,24 @@ class UserCog(discord.Cog):
 			"939228285106286702": "An Authentic AidanBot"
 		}
 
-	@user_command(name="Info")
-	async def uinfo(self, ctx:AC, user:discord.Member|discord.User):
-		await self.info(ctx, user)
+		self.uinfo = AC.ContextMenu(name="Info", callback=self.userinfo)
+		self.client.tree.add_command(self.uinfo, guilds=self.client.debug_guilds)
 
-	@slash_command(name="userinfo")
-	async def sinfo(self, ctx:AC, user:Option(discord.Member, "User to get info on, you can use an id for users not in server.")):
-		await self.info(ctx, user)
+	async def cog_unload(self):
+		self.client.tree.remove_command(self.uinfo.name, type=self.uinfo.type)
+		
+	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
+	async def userinfo(self, itr:Itr, user:discord.Member|discord.User):
+		await self.info(itr, user)
 
-	async def info(self, ctx:AC, user:discord.Member|discord.User):	
-		user = user or ctx.author
+	@AC.command(name="userinfo", description="Get info on a user in the server.")
+	@AC.describe(user="User to get info on, you can use an id for users not in server.")
+	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
+	async def slashinfo(self, itr:Itr, user:discord.Member):
+		await self.info(itr, user)
+
+	async def info(self, itr:Itr, user:discord.Member|discord.User):	
+		user = user or itr.user
 		inguild = True
 		if isinstance(user, discord.User):
 			inguild = False
@@ -40,7 +49,7 @@ class UserCog(discord.Cog):
 			desc += "**[ This User isn't in the server so details are minimal ]**\n"
 		if str(user.id) in self.specalstatus:
 			desc += f"**[ {self.specalstatus[str(user.id)]} ]**\n"
-		if ctx.guild.owner_id == user.id:
+		if itr.guild.owner_id == user.id:
 			desc += f"**[ Server Owner 👑 ]**\n"
 		if inguild and user.premium_since:
 			desc += f"**[ Server Booster 💎 ]**\n"
@@ -63,24 +72,34 @@ class UserCog(discord.Cog):
 			desc += f"**Joined:** {format_dt(user.joined_at, 'F')}\n"
 		if inguild and user.premium_since:
 			desc += f"**Boosted:** {format_dt(user.premium_since, 'F')}\n"
-		if inguild and user.communication_disabled_until and ctx.channel.permissions_for(ctx.author).moderate_members:
-			desc += f"**Timed-out until:** {format_dt(user.communication_disabled_until, 'F')}\n"
+		if inguild and user.timed_out_until and itr.channel.permissions_for(itr.user).moderate_members:
+			desc += f"**Timed-out until:** {format_dt(user.timed_out_until, 'F')}\n"
 			
 		desc += f"**Url's:**"
+		first = True
 		if user.avatar:
+			if not first: desc += " |"
+			first = False
 			desc += f" [Avatar]({user.avatar.url})"
-		if user.default_avatar:	
+		if user.default_avatar:
+			if not first: desc += " |"
+			first = False
 			desc += f" [Default Avatar]({user.default_avatar})"
+		if inguild and user.guild_avatar:
+			if not first: desc += " |"
+			first = False
+			desc += f" [Guild Avatar]({user.guild_avatar})"
 		ruser = await self.client.fetch_user(user.id)
 		if ruser.banner:
+			if not first: desc += " |"
+			first = False
 			desc += f" [Banner]({ruser.banner.url})"
 			
 		color = discord.Color.from_rgb(20, 29, 37)
 		if user.colour.value:
 			color = user.colour
 
-		await ctx.interaction.response.defer()
-
+		await itr.response.defer()
 		fields = False
 		if inguild:
 			roletxt = "No roles"
@@ -90,20 +109,28 @@ class UserCog(discord.Cog):
 					if not role.is_default():
 						roletxt += role.mention + " "
 
-			lastmsgtxt = await ctx.channel.history(limit=500).find(lambda m: m.author.id == user.id)
+			lastmsgtxt = None
+			async for message in itr.channel.history(limit=2000):
+				if message.author == user:
+					lastmsgtxt = message
+					break
 			if lastmsgtxt is None:
 				lastmsgtxt = "This user hasn't talked in a while..."
+			elif lastmsgtxt.clean_content == "":
+				lastmsgtxt = f"[Jump to message]({lastmsgtxt.jump_url})"
 			else:
 				lastmsgtxt = "'" + lastmsgtxt.clean_content + f"' [Jump to message]({lastmsgtxt.jump_url})"
 
 			fields = [["Roles:", roletxt], ["Latest Message:", lastmsgtxt]]
 
-		embed = getComEmbed(ctx, self.client, title, desc, color, fields=fields)
+		embed = getComEmbed(str(itr.user), self.client, title, desc, color, fields=fields)
 		if user.avatar:
 			embed.set_thumbnail(url=user.avatar)
 		elif user.default_avatar:
 			embed.set_thumbnail(url=user.default_avatar)
-		await ctx.respond(embed=embed)
+		if ruser.banner:
+			embed.set_image(url=ruser.banner.url)
+		await itr.edit_original_response(embed=embed)
 
-def setup(client):
-	client.add_cog(UserCog(client))
+async def setup(client:AidanBot):
+	await client.add_cog(InfoCog(client), guilds=client.debug_guilds)

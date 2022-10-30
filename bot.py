@@ -1,34 +1,33 @@
 from aidanbot import AidanBot
 from github import Github
-import os, json
+import os, json, discord
+from typing import Literal
 
+### DON'T LEAK! ###
 github = Github(os.getenv("GITHUB_TOKEN"))
 githubrepo = github.get_repo("Aid0nModder/AidanBot")
 token = os.getenv("DISCORD_TOKEN")
+### DON'T LEAK! ###
 
+debug_guilds = [discord.Object(760987756985843733), discord.Object(836936601824788520)]
+
+def getnames(path):
+	names = []
+	with open(f'./data/{path}.json') as file:
+		list = json.load(file)
+		for val in list:
+			if "restricted" not in list[val]:
+				names.append(val)
+	return Literal[tuple(names)]
 def getCONnames():
-	names = []
-	with open('./data/values.json') as file:
-		list = json.load(file)
-		for val in list:
-			if "restricted" not in list[val]:
-				names.append(val)
-	return names
-	
+	return getnames("values")
 def getUCONnames():
-	names = []
-	with open('./data/uservalues.json') as file:
-		list = json.load(file)
-		for val in list:
-			if "restricted" not in list[val]:
-				names.append(val)
-	return names
-
+	return getnames("uservalues")
 def getGithubtags():
-	return [tag.name for tag in githubrepo.get_labels()]
+	return Literal[tuple([tag.name for tag in githubrepo.get_labels()])]
 
 def main():
-	client = AidanBot(githubrepo)
+	client = AidanBot(githubrepo, debug_guilds)
 	client.run(token)
 	
 if __name__ == '__main__':
@@ -42,40 +41,40 @@ Slash Command Hierarchy!
 	/ping -      Get bots latency.
 	/echo -      Make the bot say something.
 	/embed -     Create a custom embed.
+	/clone -     Say something as another user.
 	/issue -     Create an issue on github.
+	/role -      Add/Remove a [r] role to/from yourself or any role to/from anyone if you have manage roles. (GUILD ONLY)
 	/userinfo -  Get info on a user.
 
 	/config
-	-	/config guild -       Edit guild configeration. (GUILD ONLY) (REQUIRES KICK MEMBERS)
-	-	/config user -        Edit user configeration.
-	/role
-	-	/role add -           Add a [r] role to yourself or any role to anyone if you have manage roles. (GUILD ONLY)
-	-	/role remove -        Remove a role, same restrictions as above. (GUILD ONLY)
+	-	/config guild -  Edit guild configeration. (GUILD ONLY) (REQUIRES KICK MEMBERS)
+	-	/config user -   Edit user configeration.
 
 	/opinion
-	-	/opinion rate -       Rate a thing.
-	-	/opinion percent -    Get percent of thing.
-	-	/opinion ask -        Ask a thing.
-	-	/opinion decide -     Decinde on thing.
+	-	/opinion rate -      Rate a thing.
+	-	/opinion percent -   Get percent of thing.
+	-	/opinion ask -       Ask a thing.
+	-	/opinion decide -    Decinde on thing.
+	-	/opinion tierlist -  AidanBot will make a very cool tier list.
+	-	/opinion poll -      Create a poll.
 	/games
 	-	/games rps -           Rock, paper, sissors.
 	-	/games fight -         Fight people or bots.
 	-	/games fightclassic -  Fight people or bots, but classic.
 	
 	/birthday
-	-	/birthday set -       Set your birthday.
-	-	/birthday remove -    Remove your birthday.
+	-	/birthday change -    Set your birthday.
 	-	/birthday upcoming -  See upcoming birthdays.
+
 	/qotd (MUST HAVE 'qotd_channel' CONFIG SETUP!)
-	-	/qotd ask -           Forcefully ask a question. (OWNER ONLY)
-	-	/qotd config -        Add, remove and see all questions.
+	-	/qotd post -    Forcefully ask a question. (OWNER ONLY)
+	-	/qotd list -    List all questions.
+	-	/qotd ask -     Ask a question.
+	-	/qotd remove -  Remove a question.
 
-	/owner
-	-	/owner change_status -  Change a guilds status
-
-	(message) UwU -  Uwuifys a message. :3
+	(message) UwU -         Uwuifys a message. :3
 	(message) Eval -        Eval dat text. (OWNER ONLY)
 	(message) Eval-rerun -  Eval dat text but you can rerun it. (OWNER ONLY)
-	(user) Info -    Get info on a user.
+	(user) Info -           Get info on a user.
 
 '''

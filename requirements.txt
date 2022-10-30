@@ -1,4 +1,4 @@
-﻿git+https://github.com/Pycord-Development/pycord
+﻿git+https://github.com/Rapptz/discord.py
 dnspython==1.16.0
 async-timeout==4.0.2
 emoji==1.7.0

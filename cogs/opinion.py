@@ -1,13 +1,16 @@
 import discord
-from discord.ext import commands
-from discord.commands import SlashCommandGroup
+import discord.ext.commands as CM
+import discord.app_commands as AC
+from discord import Interaction as Itr
 from discord.utils import format_dt
-from discord import Option
 
 import time, hashlib, re, asyncio, datetime
 import emoji as em
 from random import random, randint, seed, choice
+
+from aidanbot import AidanBot
 from functions import getComEmbed, getBar
+from cooldowns import cooldown_opinion
 
 def getLikeness(string):
 	days = datetime.date.today() - datetime.date(2022,6,28)
@@ -19,24 +22,22 @@ def limitLikeness(score, newhigh):
 def replaceWord(text, find, replace):
 	return re.sub(r"\b" + find + r"\b", replace, text)
 
-AC = discord.ApplicationContext
-class OpinionCog(discord.Cog):
-	def __init__(self, client:commands.Bot):
+class OpinionCog(CM.Cog):
+	def __init__(self, client:AidanBot):
 		self.client = client
 
-	opiniongroup = SlashCommandGroup("opinion", "Opinion based commands.")
+	opiniongroup = AC.Group(name="opinion", description="Commands to do with opinion.")
 
 	'''@opiniongroup.command(name="likeness", description="Get your likeness score.")
-	async def likeness(self, ctx, 
-		thing:Option(str, "Thing to get likeness score of. Defaults to you", required=False)
-	):
-		thing = thing or str(ctx.author)
-		await ctx.respond(f"Likeness score for '{thing}': {getLikeness(thing)}")'''
+	@AC.describe(thing="Thing to get likeness score of. Defaults to you")
+	async def likeness(self, itr, thing:str=None):
+		thing = thing or str(itr.user)
+		await itr.response.send_message(f"Likeness score for '{thing}': {getLikeness(thing)}")'''
 
 	@opiniongroup.command(name="rate", description="I will rate a thing.")
-	async def rate(self, ctx:AC, 
-		thing:Option(str, "Thing I will rate.", required=True)
-	):
+	@AC.describe(thing="Thing I will rate.")
+	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
+	async def rate(self, itr:Itr, thing:str):
 		repwords = {
 			"your":"my","you":"me","yourself":"myself","my":"your","me":"you","i":"you","myself":"yourself","this":"that","these":"those","that":"this","those":"these",
 			"Your":"My","You":"Me","Yourself":"Myself","My":"Your","Me":"You","Myself":"Yourself","This":"That","These":"Those","That":"This","Those":"These",
@@ -63,30 +64,29 @@ class OpinionCog(discord.Cog):
 		r = responses[str(score)]
 		response = choice(responses[r]) if type(r) == str else choice(r)
 
-		embed = getComEmbed(ctx, self.client, response.format(thing), f"**Score:** `{score}/10`")
-		await ctx.respond(embed=embed)
+		embed = getComEmbed(str(itr.user), self.client, response.format(thing), f"**Score:** `{score}/10`")
+		await itr.response.send_message(embed=embed)
 
 	@opiniongroup.command(name="percent", description="I will say what part of something is something.")
-	async def percent(self, ctx:AC, 
-		something:Option(str, "The something.", required=True),
-		someone:Option(str, "The someone.", default="False")
-	):
+	@AC.describe(something="The something.", someone="The someone.")
+	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
+	async def percent(self, itr:Itr, something:str, someone:str="False"):
 		if someone == "False":
-			score = getLikeness(something.lower() + ":" + ctx.author.name.lower())
+			score = getLikeness(something.lower() + ":" + itr.user.name.lower())
 		else:
 			score = getLikeness(something.lower() + ":" + someone.lower())
 		end = getBar(score, 100, 10, True)
 		embed = False
 		if someone == "False":
-			embed = getComEmbed(ctx, self.client, f"You are **{str(score)}%** {something}.", end)
+			embed = getComEmbed(str(itr.user), self.client, f"You are **{str(score)}%** {something}.", end)
 		else:
-			embed = getComEmbed(ctx, self.client, f"{someone} is **{str(score)}%** {something}.", end)
-		await ctx.respond(embed=embed)
+			embed = getComEmbed(str(itr.user), self.client, f"{someone} is **{str(score)}%** {something}.", end)
+		await itr.response.send_message(embed=embed)
 
 	@opiniongroup.command(name="ask", description="I will answer your burning questions.")
-	async def ask(self, ctx:AC, 
-		question:Option(str, "The question you ask.", required=True)
-	):
+	@AC.describe(question="The question you ask.")
+	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
+	async def ask(self, itr:Itr, question:str):
 		starts = []
 		answers = []
 		answer = ""
@@ -124,22 +124,21 @@ class OpinionCog(discord.Cog):
 		fullans = start + answer
 		allbutone = len(fullans)-1
 		fullans = fullans[:-allbutone].capitalize() + fullans[1:]
-		embed = getComEmbed(ctx, self.client, fields=[["Question:", question], ["Answer:", fullans]])
-		await ctx.respond(embed=embed)
+		embed = getComEmbed(str(itr.user), self.client, fields=[["Question:", question], ["Answer:", fullans]])
+		await itr.response.send_message(embed=embed)
 
 	@opiniongroup.command(name="decide", description="I will decide on something for you.")
-	async def decide(self, ctx:AC, 
-		options:Option(str, "All the options sepperated by commas", required=True),
-	):
+	@AC.describe(options="All the options sepperated by commas.")
+	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
+	async def decide(self, itr:Itr, options:str):
 		options = [i.strip() for i in options.split(",") if i]
-		embed = getComEmbed(ctx, self.client, f"I choose... {choice(options)}")
-		await ctx.respond(embed=embed)
+		embed = getComEmbed(str(itr.user), self.client, f"I choose... {choice(options)}")
+		await itr.response.send_message(embed=embed)
 
 	@opiniongroup.command(name="tierlist", description="I will make a tier list to annoy you lol.")
-	async def tierlist(self, ctx:AC,
-		options:Option(str, "All the options sepperated by commas", required=True),
-		tiers:Option(str, "List of tier names/emojis (CAN'T HAVE BOTH) sepperated by commas",  required=False),
-	):
+	@AC.describe(options="All the options sepperated by commas.", tiers="List of tier names/emojis (CAN'T HAVE BOTH) sepperated by commas.")
+	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
+	async def tierlist(self, itr:Itr, options:str, tiers:str=None):
 		allemoji = True
 		if tiers:
 			tieremojisidx = []
@@ -147,8 +146,8 @@ class OpinionCog(discord.Cog):
 			tierlists = {}
 			
 			tierssplit = [i.strip() for i in tiers.split(",") if i]
-			if (len(tierssplit) < 2 or len(tierssplit) > 10) and (not await self.client.is_owner(ctx.author)):
-				return await ctx.respond("Invalid number of tiers! There must be at least 2 and no more than 10!")
+			if (len(tierssplit) < 2 or len(tierssplit) > 10) and (not self.client.aidan == itr.user.id):
+				return await itr.response.send_message("Invalid number of tiers! There must be at least 2 and no more than 10!")
 			
 			for tier in tierssplit:
 				if not "<" in tier:
@@ -203,20 +202,20 @@ class OpinionCog(discord.Cog):
 				tier = (-limitLikeness(getLikeness(em.core.demojize(option).lower()),tiercount))+tiercount
 			tierlists[tieremojisidx[tier]].append(option)
 		
-		emb = getComEmbed(ctx, self.client, "Tier List", makeTierList())
-		await ctx.respond(embed=emb)
+		emb = getComEmbed(str(itr.user), self.client, "Tier List", makeTierList())
+		await itr.response.send_message(embed=emb)
 
 	@opiniongroup.command(name="poll", description="Create a poll for people to vote on.")
-	async def poll(self, ctx:AC,
-		question:Option(str, "The question you are asking.", required=True),
-		answers:Option(str, "All the answers sepperated by commas", required=True),
-		duration:Option(int, "The timelimit of the poll.", min_value=15, max_value=1800, default=300)
-	):
+	@AC.describe(question="The question you are asking.", answers="LAll the answers sepperated by commas.", duration="The timelimit of the poll.")
+	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
+	async def poll(self, itr:Itr, question:str, answers:str, duration:AC.Range[int,30,1500]):
 		answers = [i.strip() for i in answers.split(",")]
-		if (len(answers) < 2 or len(answers) > 10) and (not await self.client.is_owner(ctx.author)):
-			return await ctx.respond("Invalid number of answers! There must be at least 2 and no more than 10!")
+		if (len(answers) < 2 or len(answers) > 10) and (not self.client.aidan == itr.user.id):
+			return await itr.response.send_message("Invalid number of answers! There must be at least 2 and no more than 10!")
 		if len(answers) != len(set(answers)):
-			return await ctx.respond("Invalid answer! It can not contain duplicates!")
+			return await itr.response.send_message("Invalid answers! It can not contain duplicates!")
+		if "_end_" in answers or "_revoke_" in answers:
+			return await itr.response.send_message("Invalid answers! It can not contain system button names (`_end_` & `_revoke_`)!")
 		totalvotes = 0
 		votes = [0 for i in answers]
 		votesusers = {}
@@ -232,7 +231,7 @@ class OpinionCog(discord.Cog):
 		endtime = now() + datetime.timedelta(seconds=duration)
 		def getPollEmbed(timeout=False):
 			txt = ""
-			view = []
+			view = discord.ui.View(timeout=None)
 			for i in range(0, len(answers)):
 				ans = answers[i]
 				while len(ans) < strmax:
@@ -245,10 +244,10 @@ class OpinionCog(discord.Cog):
 				bar = getBar(percent, 100, 10, True)
 				txt += f"`{ans}:` {bar} **({str(percent)}%) ({votes[i]} votes)**\n"
 
-				view.append( discord.ui.Button(label=answers[i], style=discord.ButtonStyle.blurple, custom_id=answers[i], disabled=timeout) )
+				view.add_item( discord.ui.Button(label=answers[i], style=discord.ButtonStyle.blurple, custom_id=answers[i], disabled=timeout) )
 			
-			view.append( discord.ui.Button(label="Remove Vote", style=discord.ButtonStyle.gray, custom_id="_revoke_", disabled=timeout, row=2) )
-			view.append( discord.ui.Button(label="End Poll (Author only)", style=discord.ButtonStyle.red, custom_id="_end_", disabled=timeout, row=2) )
+			view.add_item( discord.ui.Button(label="Remove Vote", style=discord.ButtonStyle.gray, custom_id="_revoke_", disabled=timeout, row=2) )
+			view.add_item( discord.ui.Button(label="End Poll (Author only)", style=discord.ButtonStyle.red, custom_id="_end_", disabled=timeout, row=2) )
 
 			quest = question + " (finished)" if timeout else question
 
@@ -257,61 +256,61 @@ class OpinionCog(discord.Cog):
 			else:
 				txt = txt + f"\n**Total Votes**: {totalvotes}\n**Time Remaining**: {format_dt(endtime,'R')}"
 
-			embed = getComEmbed(ctx, self.client, quest, txt)
-			return embed, discord.ui.View(*view)
+			embed = getComEmbed(str(itr.user), self.client, quest, txt)
+			return embed, view
 
 		embed, view = getPollEmbed()
-		response = await ctx.respond(embed=embed, view=view)
-		MSG = await response.original_message()
+		await itr.response.send_message(embed=embed, view=view)
+		MSG = await itr.original_response()
 
-		def check(interaction:discord.Interaction):
-			return (interaction.message.id == MSG.id)
-			
+		def check(checkitr:Itr):
+			try:
+				return (checkitr.message.id == MSG.id)
+			except:
+				return False
 		start = now()
 		while True:
 			try:
 				seconds = ((start+datetime.timedelta(seconds=duration))-now()).seconds # but hacky but it works
-				interaction = await self.client.wait_for("interaction", timeout=seconds, check=check)
-				await interaction.response.defer()
+				butitr:Itr = await self.client.wait_for("interaction", timeout=seconds, check=check)
 
-				if interaction.data["custom_id"] == "_revoke_":
-					if str(interaction.user.id) in votesusers:
-						votes[votesusers[str(interaction.user.id)]] -= 1
-						votesusers.pop(str(interaction.user.id))
+				await butitr.response.defer()
+				if butitr.data["custom_id"] == "_revoke_":
+					if str(butitr.user.id) in votesusers:
+						votes[votesusers[str(butitr.user.id)]] -= 1
+						votesusers.pop(str(butitr.user.id))
 						totalvotes -= 1
-
-				elif interaction.user.id == ctx.author.id and interaction.data["custom_id"] == "_end_":
-					embed, view = getPollEmbed(True)
-					await ctx.edit(embed=embed, view=view)
-					return
-
+				elif butitr.data["custom_id"] == "_end_":
+					if butitr.user.id == itr.user.id:
+						embed, view = getPollEmbed(True)
+						await itr.edit_original_response(embed=embed, view=view)
+						return
 				else:
-					if str(interaction.user.id) in votesusers: # change vote
-						votes[votesusers[str(interaction.user.id)]] -= 1
+					if str(butitr.user.id) in votesusers: # change vote
+						votes[votesusers[str(butitr.user.id)]] -= 1
 					else:
 						totalvotes += 1 # first vote
 
 					for i in range(0, len(answers)):
-						if answers[i] == interaction.data["custom_id"]:
-							votesusers[str(interaction.user.id)] = i
+						if answers[i] == butitr.data["custom_id"]:
+							votesusers[str(butitr.user.id)] = i
 							votes[i] += 1
 							break
 				
 				embed, view = getPollEmbed()
-				await ctx.edit(embed=embed, view=view)
-
+				await itr.edit_original_response(embed=embed, view=view)
 			except asyncio.TimeoutError:
 				embed, view = getPollEmbed(True)
-				await ctx.edit(embed=embed, view=view)
-
+				await itr.edit_original_response(embed=embed, view=view)
+				
 def str_time_prop(start, end, time_format):
-    stime = time.mktime(time.strptime(start, time_format))
-    etime = time.mktime(time.strptime(end, time_format))
-    ptime = stime + random() * (etime - stime)
-    return time.strftime(time_format, time.localtime(ptime))
+	stime = time.mktime(time.strptime(start, time_format))
+	etime = time.mktime(time.strptime(end, time_format))
+	ptime = stime + random() * (etime - stime)
+	return time.strftime(time_format, time.localtime(ptime))
 
 def random_date(start, end):
-    return str_time_prop(start, end, '%m/%d/%Y %I:%M %p')
+	return str_time_prop(start, end, '%m/%d/%Y %I:%M %p')
 
-def setup(client):
-	client.add_cog(OpinionCog(client))
+async def setup(client:AidanBot):
+	await client.add_cog(OpinionCog(client), guilds=client.debug_guilds)

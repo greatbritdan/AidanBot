@@ -5,6 +5,12 @@
         "type":"string",
         "restricted":true
     },
+
+    "nitront": {
+        "default":false,
+        "help":"If users without nitro can use animated emojis in your server by typing the name.",
+        "type":"boolean"
+    },
     
     "mod_role": {
         "default":false,
@@ -14,8 +20,8 @@
 
     "join_message": {
         "default":"Please welcome {name}!",
-        "help":"The message that sends when a user joins your server, only works if 'welcome_message_channel' is set.",
-        "type":"string"
+        "help":"The message that sends when a user joins your server, if there is more than 1 it will pick a random one. Only works if 'welcome_message_channel' is set.",
+        "type":"[]string"
     },
     "join_message_channel": {
         "default":false,

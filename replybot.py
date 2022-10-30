@@ -1,13 +1,13 @@
 # inspired by NH's reply bot, don't give me any credit for the idea.
 
 import discord
-from discord.utils import get
+import discord.ext.commands as CM
 
 import re, emoji
 from random import choice, randint
 
 class replyBot():
-    def __init__(self, client):
+    def __init__(self, client:CM.Bot):
         self.client = client
         self.states = {}
 
@@ -40,7 +40,7 @@ class replyBot():
         self.states["funny"] = replyBotState( matchwords=["lol","lmao","ha"], reply=["lol","lmao","ha","What's so funny?"], noendpunc=True )
         self.states["uwu"] = replyBotState( findwords=["uwu","owo",":3","nya"], reply=["uwu","owo",":3","~nya"], replychance=2 )
         self.states["sus"] = replyBotState( findwords=["sus","sussy","amogus","amongus","among us","among","vent"], reply=["AMOGUS!","Oh god... sus","SUSSY BAKA?","Tha's sus","{name} vented."], replychance=2 )
-        self.states["like"] = replyBotState( matchwords=["good","great","cool"], reply=["Thanks","You too","You think so?","That's nice of you!"] )
+        self.states["like"] = replyBotState( matchwords=["good","like","great","cool"], reply=["Thanks","You too","You think so?","That's nice of you!"] )
         self.states["love"] = replyBotState( matchwords=["love","cute","luve"], reply=["Thanks","You too",":flushed:","You think so?",":heart:","That's nice of you!"] )
         self.states["hate"] = replyBotState( matchwords=["bad","dislike","hate","suck","sucks","ugly","dumbass","stupid"], reply=["That's not nice",":(","Please don't say things like that","Bruh","+ratio",":("] )
         self.states["unsad"] = replyBotState( matchwords=["sad","cry","depressed","depression",":("], reply=["Aww, everything will be ok","I'm here for you",":heart:","chear up :p"] )
@@ -62,7 +62,7 @@ class replyBot():
         self.endpunctuation = [".","!"]
 
     # what states does the message trigger
-    def get_state(self, message):
+    def get_state(self, message:discord.Message):
         message = message.clean_content.lower()
         messagewords = message.replace("."," ").replace(","," ").replace("!"," ").replace("?"," ").replace(":"," ").split()
 
@@ -73,7 +73,7 @@ class replyBot():
         return states
 
     # when message is received, main client handdles channel checking.
-    async def on_message(self, message):
+    async def on_message(self, message:discord.Message):
         states = self.get_state(message)
 
         txt = ""
@@ -136,7 +136,7 @@ class replyBot():
             stinker = choice(message.stickers)
             try:
                 return await message.channel.send(stickers=[stinker])
-            except:
+            except Exception:
                 h = False
         if randint(1,8) == 8:
             return await message.channel.send(str(choice(message.guild.emojis)))

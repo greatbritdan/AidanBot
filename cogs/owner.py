@@ -1,53 +1,54 @@
 import discord
-from discord.ext import commands
-from discord.commands import message_command
-from discord.utils import get
-from discord import Option
+import discord.ext.commands as CM
+import discord.app_commands as AC
+from discord import Interaction as Itr
 
 import io, contextlib, textwrap
 from traceback import format_exception
 
+from aidanbot import AidanBot
 from functions import getComEmbed
-from checks import command_checks
+from checks import ab_check, ab_check_slient
 
-AC = discord.ApplicationContext
-class OwnerCog(discord.Cog):
-	def __init__(self, client:commands.Bot):
+class OwnerCog(CM.Cog):
+	def __init__(self, client:AidanBot):
 		self.client = client
 
+		self.eval = AC.ContextMenu(name="Eval", callback=self._eval)
+		self.client.tree.add_command(self.eval, guilds=self.client.debug_guilds)
+
+		self.evalrerun = AC.ContextMenu(name="Eval-rerun", callback=self._evalr)
+		self.client.tree.add_command(self.evalrerun, guilds=self.client.debug_guilds)
+
+	async def cog_unload(self):
+		self.client.tree.remove_command(self.eval.name, type=self.eval.type)
+		self.client.tree.remove_command(self.evalrerun.name, type=self.evalrerun.type)
+
 	class EvalView(discord.ui.View):
-		def __init__(self, client:commands.Bot, cog:discord.Cog, ctx:AC, code):
+		def __init__(self, client:AidanBot, cog:CM.Cog, code:str, messageid:int):
 			self.client = client
 			self.cog = cog
-			self.ctx = ctx
 			self.code = code
+			self.messageid = messageid
 			super().__init__()
 
-		@discord.ui.button(label="Re-run", emoji="🔁", style=discord.ButtonStyle.green)
-		async def rerun(self, button:discord.ui.Button, interaction:discord.Interaction):
-			embed = await self.cog.true_eval(self.ctx, self.code)
-			await interaction.response.edit_message(embed=embed)
+		@discord.ui.button(label="Re-run", emoji="🔁", style=discord.ButtonStyle.gray)
+		async def rerun(self, itr:Itr, _):
+			message = await itr.channel.fetch_message(self.messageid)
+			self.code = clean_code(message.clean_content)
+			embed = await self.cog.true_eval(itr, self.code)
+			await itr.response.edit_message(embed=embed)
 
-		@discord.ui.button(label="Disable", emoji="✖️", style=discord.ButtonStyle.red)
-		async def disable(self, button:discord.ui.Button, interaction:discord.Interaction):
-			if await command_checks(self.ctx, self.client, user=interaction.user, is_owner=True, ephemeral=True): return
-			await interaction.response.edit_message(view=None)
+		@discord.ui.button(label="Disable", emoji="🇽", style=discord.ButtonStyle.gray)
+		async def disable(self, itr:Itr, _):
+			if not await ab_check_slient(itr, self.client, user=itr.user, is_owner=True):
+				embed = await self.cog.true_eval(itr, self.code, "Only Aidan can end this Eval!")
+				await itr.response.edit_message(embed=embed)
+				return
+			await itr.response.edit_message(view=None)
 
-	@message_command(name="Eval-Rerun")
-	async def _evalr(self, ctx:AC, message:discord.Message):
-		if await command_checks(ctx, self.client, is_owner=True): return
-		embed = await self.true_eval(ctx, clean_code(message.clean_content))
-		view = self.EvalView(self.client, self, ctx, clean_code(message.clean_content))
-		await ctx.respond(embed=embed, view=view)
-
-	@message_command(name="Eval")
-	async def _eval(self, ctx:AC, message:discord.Message):
-		if await command_checks(ctx, self.client, is_owner=True): return
-		embed = await self.true_eval(ctx, clean_code(message.clean_content))
-		await ctx.respond(embed=embed)
-
-	async def true_eval(self, ctx:AC, code):
-		local_variables = { "self": self.client, "client": self.client, "ctx": ctx, "author": ctx.author, "channel": ctx.channel, "guild": ctx.guild }
+	async def true_eval(self, itr:Itr, code, title=None):
+		local_variables = { "self": self.client, "client": self.client, "interaction": itr, "user": itr.user, "author": itr.user, "channel": itr.channel, "guild": itr.guild }
 		stdout = io.StringIO()
 		try:
 			with contextlib.redirect_stdout(stdout):
@@ -58,9 +59,22 @@ class OwnerCog(discord.Cog):
 			result = "".join(format_exception(e, e, e.__traceback__))
 
 		if result == "":
-			return getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```")
+			return getComEmbed(str(itr.user), self.client, title=title, content=f"Code: ```py\n{code}\n```")
 		else:
-			return getComEmbed(ctx, self.client, content=f"Code: ```py\n{code}\n```\nResults: ```\n{str(result)}\n```")
+			return getComEmbed(str(itr.user), self.client, title=title, content=f"Code: ```py\n{code}\n```\nResults: ```\n{str(result)}\n```")
+
+	async def _evalr(self, itr:Itr, message:discord.Message):
+		if not await ab_check(itr, self.client, is_owner=True):
+			return
+		embed = await self.true_eval(itr, clean_code(message.clean_content))
+		view = self.EvalView(self.client, self, clean_code(message.clean_content), message.id)
+		await itr.response.send_message(embed=embed, view=view)
+
+	async def _eval(self, itr:Itr, message:discord.Message):
+		if not await ab_check(itr, self.client, is_owner=True):
+			return
+		embed = await self.true_eval(itr, clean_code(message.clean_content))
+		await itr.response.send_message(embed=embed, ephemeral=True)
 
 def clean_code(content):
 	if content.startswith("```") and content.endswith("```"):
@@ -68,5 +82,5 @@ def clean_code(content):
 	else:
 		return content
 
-def setup(client):
-	client.add_cog(OwnerCog(client))
+async def setup(client:AidanBot):
+	await client.add_cog(OwnerCog(client), guilds=client.debug_guilds)
