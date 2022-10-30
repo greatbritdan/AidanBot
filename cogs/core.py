@@ -82,16 +82,17 @@ class CoreCog(CM.Cog):
 	def __init__(self, client:AidanBot):
 		self.client = client
 
-		self.uwuify = AC.ContextMenu(name="UwU", callback=self._uwuify)
-		self.client.tree.add_command(self.uwuify, guilds=self.client.debug_guilds)
+		#self.uwuify = AC.ContextMenu(name="UwU", callback=self._uwuify)
+		#self.client.tree.add_command(self.uwuify, guilds=self.client.debug_guilds)
 
 	async def cog_unload(self):
-		self.client.tree.remove_command(self.uwuify.name, type=self.uwuify.type)
+		#self.client.tree.remove_command(self.uwuify.name, type=self.uwuify.type)
+		pass
 
 	@AC.command(name="info", description="Get info about the bot.")
 	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def list(self, itr:Itr):
-		states = await permissionStates(itr, self.client)
+		stats = await permissionStates(itr, self.client)
 		page = 0
 		pages = [
 			getComEmbed(str(itr.user), self.client, "Info > General", f'''
@@ -104,7 +105,7 @@ class CoreCog(CM.Cog):
 
 				**Guild Status:** `{self.client.CON.get_value(itr.guild, "guild_status")}`
 			'''),
-			getComEmbed(str(itr.user), self.client, "Info > Permissions", "```(options marked with a * may become optional in the future)\n\n- Required: must be enabled as it can cause serious issues to both user and bot.\n- Optional: can be enabled or disabled without major disturbance, though some functionality can be lost.\n- Unnecessary: aren't required yet and should be disabled to keep safe.\n\n(Permissions not mentioned are fine as is, enabled or not.)```", fields=states),
+			getComEmbed(str(itr.user), self.client, "Info > Permissions", "```(options marked with a * may become optional in the future)\n\n- Required: must be enabled as it can cause serious issues to both user and bot.\n- Optional: can be enabled or disabled without major disturbance, though some functionality can be lost.\n- Unnecessary: aren't required yet and should be disabled to keep safe.\n\n(Permissions not mentioned are fine as is, enabled or not.)```", fields=stats),
 		]
 
 		def getView(timeout=False):
@@ -222,7 +223,8 @@ class CoreCog(CM.Cog):
 		except ValueError:
 			return await itr.response.send_message("Embed was too boog.", ephemeral=True)
 
-	@AC.command(name="clone", description="Say something as another user.")
+	# broken rate limit
+	'''@AC.command(name="clone", description="Say something as another user.")
 	@AC.describe(user="User you want to clone.", message="Message you want to send as them.", attachment="What attachment to attach.")
 	@CM.dynamic_cooldown(cooldown_core, CM.BucketType.user)
 	async def clone(self, itr:Itr, user:discord.Member, message:str, attachment:discord.Attachment=None):
@@ -237,7 +239,7 @@ class CoreCog(CM.Cog):
 			else:
 				files = []
 			await self.client.sendWebhook(itr.channel, user, message, files, f" (Cloned by {str(itr.user)})")
-			await itr.edit_original_response(content="Sent!")
+			await itr.edit_original_response(content="Sent!")'''
 
 	@AC.command(name="issue", description="Create an issue on GitHub.")
 	@AC.describe(title="Title of the post.", body="Body of the embed.", label1="Tag to insert into the post.", label2="Tag to insert into the post.", label3="Tag to insert into the post.")
@@ -254,7 +256,8 @@ class CoreCog(CM.Cog):
 			issue:Issue = self.client.botrepo.create_issue(title=title, body=body)
 		await itr.response.send_message(f"Submitted!\n\n{issue.html_url}")
 
-	@CM.dynamic_cooldown(cooldown_UwU, CM.BucketType.channel)
+	# broken rate limit
+	'''@CM.dynamic_cooldown(cooldown_UwU, CM.BucketType.channel)
 	async def _uwuify(self, itr:Itr, message:discord.Message):
 		endings = [";;w;;", ";w;", "UwU", "OwO", ":3", "X3", "^_^", "\\* *sweats* *", "\\* *screams* *", "\\* *huggles tightly* *"]
 
@@ -290,8 +293,7 @@ class CoreCog(CM.Cog):
 			await self.client.sendWebhook(itr.channel, message.author, msg, [], f" (uwuified by {str(itr.user)})")
 			await itr.edit_original_response(content="UwUified!")
 		except Exception:
-			await itr.edit_original_response(content="Error! Try again later!")
-
+			await itr.edit_original_response(content="Error! Try again later!")'''
 
 	@AC.command(name="role", description="Add a role to you or someone. Can only add [r] roles to yourself without manage_roles.")
 	@AC.describe(action="If you want to add or remove a role.", role="Role to add/remove to yourself.", user="User to add/remove the role to.")

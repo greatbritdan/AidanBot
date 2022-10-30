@@ -88,7 +88,6 @@ class AidanBot(commands.Bot):
 	async def on_message(self, message:discord.Message):
 		if self.settingup or message.author.bot or message.webhook_id:
 			return
-
 		if message.guild:
 			if self.isbeta:
 				if message.channel.name == "aidanbetabot-talk":
@@ -100,6 +99,7 @@ class AidanBot(commands.Bot):
 				if await ab_check_slient(None, self, user=message.author, guild=message.guild, channel=message.channel, is_guild=True, bot_has_permission="manage_messages"):
 					if await self.handle_invites(message): # remove invites
 						return
+					return # broken rate limit
 					nitront = self.CON.get_value(message.guild, "nitront", guild=message.guild) # not so nitro or some s#it
 					if nitront and await self.handle_emojis(message):
 						return
@@ -141,6 +141,7 @@ class AidanBot(commands.Bot):
 		await self.CON.remove_group(guild)
 
 	async def handle_invites(self, msg:discord.Message):
+		print("are you at least making it her!?!?!?!?!?")
 		channels = self.CON.get_value(msg.guild, "remove_invites_exempt_channels", guild=msg.guild)
 		roles = self.CON.get_value(msg.guild, "remove_invites_exempt_roles", guild=msg.guild)
 		hasrole = False
