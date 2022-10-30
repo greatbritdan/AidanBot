@@ -53,7 +53,7 @@ def permissionStates(itr:Itr, client:AidanBot):
 		"change_nickname","manage_nicknames","kick_members","ban_members","moderate_members","create_public_threads","create_private_threads",
 		"add_reactions","manage_threads","send_tts_messages","use_application_commands","manage_events","administrator"
 	]
-	clientmember = itr.guild.fetch_member(client.user.id)
+	clientmember = await itr.guild.fetch_member(client.user.id)
 
 	rtxt = ""
 	for perm in requiredperms:
