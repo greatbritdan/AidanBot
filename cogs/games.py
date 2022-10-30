@@ -234,7 +234,7 @@ class GamesCog(CM.Cog):
 			return
 		await self.fight(itr, "classic", user1, user2, aiuser1, aiuser2)
 
-	@gamesgroup.command(name="fight-wip", description="Fight against another user or one of the main AI levels. Not Finished.")
+	'''@gamesgroup.command(name="fight-wip", description="Fight against another user or one of the main AI levels. Not Finished.")
 	@AC.describe(user1="The first player.", user2="The second player.", ailevel="AI level for the bot.",
 		ailevel1="AI level for player 1 if a bot, overrides master.", ailevel2="AI level for player 2 if a bot, overrides master."
 	)
@@ -248,7 +248,7 @@ class GamesCog(CM.Cog):
 		user1, user2 = await self.defaultUsers(itr, user1, user2)
 		if not ((itr.user == user1 or await self.canPlay(itr, user1)) and (itr.user == user2 or await self.canPlay(itr, user2))):
 			return
-		await self.fight(itr, "cards", user1, user2, aiuser1, aiuser2)
+		await self.fight(itr, "cards", user1, user2, aiuser1, aiuser2)'''
 	
 	###
 
