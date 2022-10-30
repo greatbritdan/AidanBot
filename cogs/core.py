@@ -24,7 +24,7 @@ UCONvalues = getUCONnames()
 def replaceWord(text, find, replace):
 	return re.sub(r"\b" + find + r"\b", replace, text)
 
-def permissionStates(itr:Itr, client:AidanBot):
+async def permissionStates(itr:Itr, client:AidanBot):
 	permissions = [
 		"read_messages","manage_channels","manage_roles","manage_emojis_and_stickers","view_audit_log","view_guild_insights","manage_webhooks","manage_guild", "create_instant_invite",
 		"change_nickname","manage_nicknames","kick_members","ban_members","moderate_members","send_messages","send_messages_in_threads","create_public_threads","create_private_threads",
@@ -91,6 +91,7 @@ class CoreCog(CM.Cog):
 	@AC.command(name="info", description="Get info about the bot.")
 	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def list(self, itr:Itr):
+		states = await permissionStates(itr, self.client)
 		page = 0
 		pages = [
 			getComEmbed(str(itr.user), self.client, "Info > General", f'''
@@ -103,7 +104,7 @@ class CoreCog(CM.Cog):
 
 				**Guild Status:** `{self.client.CON.get_value(itr.guild, "guild_status")}`
 			'''),
-			getComEmbed(str(itr.user), self.client, "Info > Permissions", "```(options marked with a * may become optional in the future)\n\n- Required: must be enabled as it can cause serious issues to both user and bot.\n- Optional: can be enabled or disabled without major disturbance, though some functionality can be lost.\n- Unnecessary: aren't required yet and should be disabled to keep safe.\n\n(Permissions not mentioned are fine as is, enabled or not.)```", fields=permissionStates(itr, self.client)),
+			getComEmbed(str(itr.user), self.client, "Info > Permissions", "```(options marked with a * may become optional in the future)\n\n- Required: must be enabled as it can cause serious issues to both user and bot.\n- Optional: can be enabled or disabled without major disturbance, though some functionality can be lost.\n- Unnecessary: aren't required yet and should be disabled to keep safe.\n\n(Permissions not mentioned are fine as is, enabled or not.)```", fields=states),
 		]
 
 		def getView(timeout=False):
