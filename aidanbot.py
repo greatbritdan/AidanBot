@@ -97,7 +97,7 @@ class AidanBot(commands.Bot):
 				channels = self.CON.get_value(message.guild, "replybot_channel", guild=message.guild) # reply bot uwu
 				if channels and message.channel in channels:
 					return await self.replybot.on_message(message)
-				if ab_check_slient(None, self, user=message.author, guild=message.guild, channel=message.channel, is_guild=True, bot_has_permission="manage_messages"):
+				if await ab_check_slient(None, self, user=message.author, guild=message.guild, channel=message.channel, is_guild=True, bot_has_permission="manage_messages"):
 					if await self.handle_invites(message): # remove invites
 						return
 					nitront = self.CON.get_value(message.guild, "nitront", guild=message.guild) # not so nitro or some s#it
