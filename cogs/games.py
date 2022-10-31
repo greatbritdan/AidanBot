@@ -167,9 +167,11 @@ class GamesCog(CM.Cog):
 				move = ""
 				if turn.nextturn:
 					move = turn.nextturn
+					butid = False
 					await asyncio.sleep(2.5)
 				elif turn.bot:
 					move = core.userMoveAI()
+					butid = False
 					await asyncio.sleep(2.5)
 				else:
 					butitr:Itr = await self.client.wait_for("interaction", check=check, timeout=180)
