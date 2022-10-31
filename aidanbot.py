@@ -215,7 +215,7 @@ class AidanBot(commands.Bot):
 			
 		return files
 
-	async def sendWebhook(self, channel:discord.TextChannel, user:discord.Member, txt, files, nameadd=None):
+	async def sendWebhook(self, channel:discord.TextChannel, user:discord.Member, txt, files, nameadd=None, repeat=None):
 		hook = False
 		for w in await channel.webhooks():
 			if w.name == "AidanBotCloneHook":
@@ -230,7 +230,8 @@ class AidanBot(commands.Bot):
 				await hook.send(txt, username=user.display_name, avatar_url=user.display_avatar, files=files, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
 		except Exception:
 			await hook.delete()
-			await self.sendWebhook(channel, user, txt, files, nameadd)
+			if (not repeat): # No more infinite loop
+				await self.sendWebhook(channel, user, txt, files, nameadd, True)
 
 	def make_ordinal(self, n):
 		if 11 <= (n % 100) <= 13:
