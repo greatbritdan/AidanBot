@@ -99,7 +99,6 @@ class AidanBot(commands.Bot):
 				if await ab_check_slient(None, self, user=message.author, guild=message.guild, channel=message.channel, is_guild=True, bot_has_permission="manage_messages"):
 					if await self.handle_invites(message): # remove invites
 						return
-					return # broken rate limit
 					nitront = self.CON.get_value(message.guild, "nitront", guild=message.guild) # not so nitro or some s#it
 					if nitront and await self.handle_emojis(message):
 						return
