@@ -278,7 +278,6 @@ class FightMoves():
 				butdisable = (timeout or butdisable)
 
 			if b.ui:
-				print(value,val)
 				view.add_item(discord.ui.Button( style=butstyle, label=f"{butname} "+b.ui.format(cval=val, val=value, maxval=max(value,val)), custom_id=b.name, row=b.row, disabled=butdisable, emoji=b.emoji))
 			else:
 				view.add_item(discord.ui.Button( style=butstyle, label=butname, custom_id=b.name, row=b.row, disabled=butdisable, emoji=b.emoji))
