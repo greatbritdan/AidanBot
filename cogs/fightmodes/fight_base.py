@@ -191,7 +191,7 @@ class FightManager():
 						actiontxt += f"> {player.name} lost {loss} {name}\n"
 				elif v.changestyle == "new":
 					if playerbefore[name] != playerafter[name]:
-						actiontxt += f"> {player.name}'s {name} changed to {loss}\n"
+						actiontxt += f"> {player.name}'s {name} changed to {playerafter[name]}\n"
 				elif v.changestyle == "use":
 					if playerbefore[name] != playerafter[name]:
 						if playerafter[name] == 0:
