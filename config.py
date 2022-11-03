@@ -153,24 +153,39 @@ class ConfigManager():
 		else:
 			return val
 	def can_set_value(self, obj:discord.Object, name, val):
-		stackable_limit = 5
-		string_limit = 250
-		if self.type == "guild" and self.get_value(obj, "guild_status"):
-			stackable_limit = 15
-			string_limit = 500
-		if self.get_stackable(name) and len(val.replace(" ","").split(",")) > stackable_limit:
-			return "Stackable values like `{name}` can't have more than {limit} {type}s.".format(limit=stackable_limit, name=name, type=self.get_type(name))
-		if self.get_type(name) == "string":
-			if val != True and val != False and len(val) > string_limit:
-				return "String values like `{name}` can't have more than {limit} letters.".format(limit=string_limit, name=name)
-		return False
+		string_limit, number_limit, stackable_limit = 250, 5, 10
+		if self.type == "guild" and obj.member_count >= 40:
+			string_limit, number_limit, stackable_limit = 1000, 10, 25
+
+		vals = False
+		if self.get_stackable(name):
+			vals = [v.strip(" ") for v in val.split(",")]
+			if len(vals) > stackable_limit:
+				return "Stackable values like `{name}` can't have more than {limit} {type}s.".format(limit=stackable_limit, name=name, type=self.get_type(name))
+
+		def single_check(val):
+			if self.get_type(name) == "string":
+				if val != True and val != False and len(val) > string_limit:
+					return "String values like `{name}` can't have more than {limit} letters.".format(limit=string_limit, name=name)
+			if self.get_type(name) == "number":
+				if len(val) > number_limit:
+					return "Number values like `{name}` can't have more than {limit} didgets.".format(limit=number_limit, name=name)
+			return False
+		
+		if self.get_stackable(name):
+			for nval in vals:
+				err = single_check(nval)
+				if err: return err
+			return False
+		else:
+			return single_check(val)
 	async def set_value(self, obj:discord.Object, name, val, guild:discord.Guild=None, noupdate=False):
 		self.fix_model(obj)
 		err = self.can_set_value(obj, name, val)
 		if err:
 			return False, err
 		if self.get_stackable(name):
-			vals = val.replace(" ","").split(",")
+			vals = [v.strip(" ") for v in val.split(",")]
 			result = []
 			for nval in vals:
 				result.append( self._set_value(obj, name, nval, guild) )

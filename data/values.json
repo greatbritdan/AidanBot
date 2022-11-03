@@ -1,11 +1,4 @@
 {
-    "guild_status": {
-        "default":"Basic",
-        "help":"The status of the server, determents if the server has access to additional benefits.",
-        "type":"string",
-        "restricted":true
-    },
-
     "nitront": {
         "default":false,
         "help":"If users without nitro can use animated emojis in your server by typing the name.",

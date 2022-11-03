@@ -87,11 +87,16 @@ class CoreCog(CM.Cog):
 
 	async def cog_unload(self):
 		self.client.tree.remove_command(self.uwuify.name, type=self.uwuify.type)
+		pass
 
 	@AC.command(name="info", description="Get info about the bot.")
 	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def list(self, itr:Itr):
+		configcounts = "Your server has lower limits, get **40** or more members to unlock larger config values!\n\n`String length limit:` 250\n`Number length limit:` 5\n`Stackable objects limit:` 10"
+		if itr.guild.member_count >= 40:
+			configcounts = "This is only avalable for servers with **40** or more members!\n\n`String length limit:` 750\n`Number length limit:` 10\n`Stackable objects limit:` 25"
 		stats = await permissionStates(itr, self.client)
+
 		page = 0
 		pages = [
 			getComEmbed(str(itr.user), self.client, "Info > General", f'''
@@ -101,10 +106,9 @@ class CoreCog(CM.Cog):
 				[Aidan's Discord Server](https://discord.gg/KXrDUZfBpq)
 				[{self.client.name}'s Privacy Policy](https://github.com/Aid0nModder/AidanBot#privacy-policy)
 				[{self.client.name}'s Terms of Service](https://github.com/Aid0nModder/AidanBot#terms-of-service)
-
-				**Guild Status:** `{self.client.CON.get_value(itr.guild, "guild_status")}`
 			'''),
 			getComEmbed(str(itr.user), self.client, "Info > Permissions", "```(options marked with a * may become optional in the future)\n\n- Required: must be enabled as it can cause serious issues to both user and bot.\n- Optional: can be enabled or disabled without major disturbance, though some functionality can be lost.\n- Unnecessary: aren't required yet and should be disabled to keep safe.\n\n(Permissions not mentioned are fine as is, enabled or not.)```", fields=stats),
+			getComEmbed(str(itr.user), self.client, "Info > Config", configcounts),
 		]
 
 		def getView(timeout=False):
