@@ -1,6 +1,6 @@
 # AidanBot
 ## Latest Version: V2.1
-### AidanBot is a community bot, designed to bring communities togteher through a wide vareity of commands and configiration.
+### AidanBot is a community bot, designed to bring communities togteher through a wide variety of commands and configuration.
 
 ---
 
