@@ -1,6 +1,6 @@
 # AidanBot
-## Latest Version: V2
-### AidanBot is a dumb bot i made that i run on my server. Originaly designed to do nothing bur rate things, now transformed into a half utility, half entertainment bot.
+## Latest Version: V2.1
+### AidanBot is a community bot, designed to bring communities togteher through a wide vareity of commands and configiration.
 
 ---
 
