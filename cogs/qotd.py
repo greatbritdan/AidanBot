@@ -206,7 +206,6 @@ class QOTDCog(CM.Cog):
 		await itr.response.send_message("Question has been askified.")'''
 
 	@qotdgroup.command(name="reroll", description="Repost a question if the last one wasn't good.")
-	@AC.describe(dontremove="If the question isn't removed from the questions list.", dontping="If the question doesn't ping the qotd_role")
 	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def reroll(self, itr:Itr):
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
