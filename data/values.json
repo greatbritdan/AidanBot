@@ -75,6 +75,11 @@
         "help":"The role that gets pinged when a new qotd is posted.",
         "type":"role"
     },
+    "qotd_reroll_role": {
+        "default":false,
+        "help":"The role(s) that can reroll the qotd.",
+        "type":"[]role"
+    },
     "qotd_posttime": {
         "default":15,
         "help":"The time of day that questions will be asked",
