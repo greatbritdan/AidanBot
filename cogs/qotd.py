@@ -224,9 +224,8 @@ class QOTDCog(CM.Cog):
 			if len(rols) == 1:
 				return await itr.response.send_message(f"You don't have the approprite roles to reroll this, Only people with {rols[0]} can reroll.")
 			else:
-				rols = rols[:-1]
-				return await itr.response.send_message(f"You don't have the approprite roles to reroll this, Only people with {', '.join(rols)} and {rols[:-1]} can reroll.")
-			
+				return await itr.response.send_message(f"You don't have the approprite roles to reroll this, Only people with {', '.join(rols[:-1])} and {rols[-1]} can reroll.")
+
 		await self.askQuestion(False, True, itr.guild)
 		await itr.response.send_message("Question has been askified.", ephemeral=True)
 
