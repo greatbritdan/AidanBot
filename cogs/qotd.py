@@ -210,24 +210,49 @@ class QOTDCog(CM.Cog):
 	async def reroll(self, itr:Itr):
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
-		roles:list[discord.Role] = self.client.CON.get_value(itr.guild, "qotd_reroll_role", guild=itr.guild)
-		if not roles:
-			return await itr.response.send_message(f"Rerolling isn't set up on this server, you need to setup `qotd_reroll_role` first.")
-		valid = False
-		for r in roles:
-			if r in itr.user.roles:
-				valid = True
-				break
 
-		if not valid:
-			rols = [r.mention for r in roles]
-			if len(rols) == 1:
-				return await itr.response.send_message(f"You don't have the approprite roles to reroll this, Only people with {rols[0]} can reroll.")
-			else:
-				return await itr.response.send_message(f"You don't have the approprite roles to reroll this, Only people with {', '.join(rols[:-1])} and {rols[-1]} can reroll.")
+		votes = 1
+		voters = [itr.user.id]
+		threshold = self.client.CON.get_value(itr.guild, "qotd_reroll_threshold", guild=itr.guild)
 
+		def getEmbed():
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} is requesting a reroll, press here to agree!", "Votes: {votes}/{threshold}"), discord.ui.View(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree"))
+		def getTimeoutEmbed():
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, not enough votes!", "Votes: {votes}/{threshold}"), discord.ui.View(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
+		def getSuccessEmbed():
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, got enough votes and rerolled!", "Votes: {votes}/{threshold}"), discord.ui.View(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
+
+		embed, view = getEmbed()
+		await itr.response.send_message(embed=embed, view=view)
+		MSG = await itr.original_response()
+
+		def check(checkitr:Itr):
+			try:
+				return (checkitr.message.id == MSG.id)
+			except:
+				return False
+		while True:
+			try:
+				butitr:Itr = await self.client.wait_for("interaction", timeout=150, check=check)
+				await butitr.response.defer()
+				if butitr.data["custom_id"] == "agree" and butitr.user.id not in voters:
+					votes += 1
+					voters.append(butitr.user.id)
+			
+				if votes >= threshold:
+					embed, view = getSuccessEmbed()
+					await itr.edit_original_response(embed=embed, view=view)
+					break
+				else:
+					embed, view = getEmbed()
+					await itr.edit_original_response(embed=embed, view=view)
+
+			except asyncio.TimeoutError:
+				embed, view = getTimeoutEmbed()
+				await itr.edit_original_response(embed=embed, view=view)
+				return
+		
 		await self.askQuestion(False, True, itr.guild)
-		await itr.response.send_message("Question has been askified.", ephemeral=True)
 
 def divide_chunks(l, n):
 	for i in range(0, len(l), n):
