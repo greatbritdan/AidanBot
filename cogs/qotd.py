@@ -78,7 +78,7 @@ class QOTDCog(CM.Cog):
 						quest = choice(defaultquestions)
 						emb = getComEmbed(None, self.client, "Question Of The Day", quest)
 						emb.set_footer(text=f"Question submitted by AidanBot | 0 questions left!!!")
-						await channel.send(txt, embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
+						await channel.send("", embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
 					
 					else:
 						questioni = randint(0, len(questions)-1)
@@ -218,15 +218,15 @@ class QOTDCog(CM.Cog):
 		def getEmbed():
 			view = discord.ui.View(timeout=None)
 			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree"))
-			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} is requesting a reroll, press here to agree!", "Votes: {votes}/{threshold}"), view
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} is requesting a reroll, press here to agree!", f"Votes: {votes}/{threshold}"), view
 		def getTimeoutEmbed():
 			view = discord.ui.View(timeout=None)
 			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
-			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, not enough votes!", "Votes: {votes}/{threshold}"), view
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, not enough votes!", f"Votes: {votes}/{threshold}"), view
 		def getSuccessEmbed():
 			view = discord.ui.View(timeout=None)
 			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
-			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, got enough votes and rerolled!", "Votes: {votes}/{threshold}"), view
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, got enough votes and rerolled!", f"Votes: {votes}/{threshold}"), view
 		
 		embed, view = getEmbed()
 		await itr.response.send_message(embed=embed, view=view)
