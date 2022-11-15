@@ -75,10 +75,10 @@
         "help":"The role that gets pinged when a new qotd is posted.",
         "type":"role"
     },
-    "qotd_reroll_role": {
-        "default":false,
-        "help":"The role(s) that can reroll the qotd.",
-        "type":"[]role"
+    "qotd_reroll_threshold": {
+        "default":3,
+        "help":"The number of votes needed for a reroll to happen.",
+        "type":"number"
     },
     "qotd_posttime": {
         "default":15,
