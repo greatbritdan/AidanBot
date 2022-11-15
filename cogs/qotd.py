@@ -216,12 +216,18 @@ class QOTDCog(CM.Cog):
 		threshold = self.client.CON.get_value(itr.guild, "qotd_reroll_threshold", guild=itr.guild)
 
 		def getEmbed():
-			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} is requesting a reroll, press here to agree!", "Votes: {votes}/{threshold}"), discord.ui.View(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree"))
+			view = discord.ui.View(timeout=None)
+			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree"))
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} is requesting a reroll, press here to agree!", "Votes: {votes}/{threshold}"), view
 		def getTimeoutEmbed():
-			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, not enough votes!", "Votes: {votes}/{threshold}"), discord.ui.View(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
+			view = discord.ui.View(timeout=None)
+			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, not enough votes!", "Votes: {votes}/{threshold}"), view
 		def getSuccessEmbed():
-			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, got enough votes and rerolled!", "Votes: {votes}/{threshold}"), discord.ui.View(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
-
+			view = discord.ui.View(timeout=None)
+			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, got enough votes and rerolled!", "Votes: {votes}/{threshold}"), view
+		
 		embed, view = getEmbed()
 		await itr.response.send_message(embed=embed, view=view)
 		MSG = await itr.original_response()
