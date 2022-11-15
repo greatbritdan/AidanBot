@@ -72,7 +72,7 @@ class QOTDCog(CM.Cog):
 			if (not postguild) or postguild == guild:
 				channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
 				if channel:
-					questions = self.client.CON.get_value(guild, "qotd_questions")
+					questions = self.client.CON.get_value(guild, "questions")
 
 					if len(questions) == 0:
 						quest = choice(defaultquestions)
@@ -102,7 +102,7 @@ class QOTDCog(CM.Cog):
 						if not dontremove:
 							questions.pop(questioni)
 							try:
-								await self.client.CON.set_value(guild, "qotd_questions", questions)
+								await self.client.CON.set_value(guild, "questions", questions)
 							except Exception:
 								await sendCustomError(self.client, "QOTD Error", "Questions was unable to save, please manualy remove question!")
 
@@ -119,7 +119,7 @@ class QOTDCog(CM.Cog):
 	async def list(self, itr:Itr):	
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
-		questions = self.client.CON.get_value(itr.guild, "qotd_questions")
+		questions = self.client.CON.get_value(itr.guild, "questions")
 		if len(questions) == 0:
 			return await itr.response.send_message("No questions added. Try adding some with /qotd ask!")
 
@@ -173,13 +173,13 @@ class QOTDCog(CM.Cog):
 	async def ask(self, itr:Itr, question:str):	
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
-		questions = self.client.CON.get_value(itr.guild, "qotd_questions")
+		questions = self.client.CON.get_value(itr.guild, "questions")
 		if len(question) > 250:
 			return await itr.response.send_message("Too many characters! Questions mustn't be more than 250 characters.")
 		if len([q for q in questions if q["question"] == question]) > 0:
 			return await itr.response.send_message("You can't send the same question as someone else.")
 		questions.append({ "question": question, "author": itr.user.id, "id": generateID(questions) })
-		await self.client.CON.set_value(itr.guild, "qotd_questions", questions)
+		await self.client.CON.set_value(itr.guild, "questions", questions)
 		await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Added question!"))
 
 	@qotdgroup.command(name="remove", description="Remove one of your questions from the daily questions, Mods can remove anyones question.")
@@ -188,12 +188,12 @@ class QOTDCog(CM.Cog):
 	async def remove(self, itr:Itr, questionid:str):	
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
-		questions = self.client.CON.get_value(itr.guild, "qotd_questions")
+		questions = self.client.CON.get_value(itr.guild, "questions")
 		questions = [q for q in questions if q["id"] != questionid]
 		if not await ab_check_slient(itr, self.client, has_mod_role=True):
 			await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"You can't remove this question, make sure to only delete your own."))
 		else:
-			await self.client.CON.set_value(itr.guild, "qotd_questions", questions)
+			await self.client.CON.set_value(itr.guild, "questions", questions)
 			await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Removed question!"))
 
 	'''@qotdgroup.command(name="post", description="Forcefully post a question.")
