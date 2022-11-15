@@ -211,13 +211,21 @@ class QOTDCog(CM.Cog):
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
 		roles:list[discord.Role] = self.client.CON.get_value(itr.guild, "qotd_reroll_role", guild=itr.guild)
-		if (not roles) or (roles not in itr.user.roles):
+		if not roles:
+			return await itr.response.send_message(f"Rerolling isn't set up on this server, you need to setup `qotd_reroll_role` first.")
+		valid = False
+		for r in roles:
+			if r in itr.user.roles:
+				valid = True
+				break
+
+		if not valid:
 			rols = [r.mention for r in roles]
 			if len(rols) == 1:
-				return await itr.response.send_message(f"You don't have the approprite roles to reroll this, Only people with {rols[0]} can rerole.")
+				return await itr.response.send_message(f"You don't have the approprite roles to reroll this, Only people with {rols[0]} can reroll.")
 			else:
 				rols = rols[:-1]
-				return await itr.response.send_message(f"You don't have the approprite roles to reroll this, Only people with {', '.join(rols)} and {rols[0]} can rerole.")
+				return await itr.response.send_message(f"You don't have the approprite roles to reroll this, Only people with {', '.join(rols)} and {rols[:-1]} can reroll.")
 			
 		await self.askQuestion(False, True, itr.guild)
 		await itr.response.send_message("Question has been askified.", ephemeral=True)
