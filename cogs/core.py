@@ -222,7 +222,7 @@ class CoreCog(CM.Cog):
 					emb.add_field(name=field3[0], value=field3[1], inline=False)
 
 			await itr.channel.send(embed=emb)
-			await itr.response.send_message("Embeded!", ephemeral=True)
+			await itr.edit_original_response("Embeded!", ephemeral=True)
 		except ValueError:
 			return await itr.response.send_message("Embed was too boog.", ephemeral=True)
 
