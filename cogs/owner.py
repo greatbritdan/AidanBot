@@ -66,15 +66,17 @@ class OwnerCog(CM.Cog):
 	async def _evalr(self, itr:Itr, message:discord.Message):
 		if not await ab_check(itr, self.client, is_owner=True):
 			return
+		await itr.response.defer()
 		embed = await self.true_eval(itr, clean_code(message.clean_content))
 		view = self.EvalView(self.client, self, clean_code(message.clean_content), message.id)
-		await itr.response.send_message(embed=embed, view=view)
+		await itr.edit_original_response(embed=embed, view=view)
 
 	async def _eval(self, itr:Itr, message:discord.Message):
 		if not await ab_check(itr, self.client, is_owner=True):
 			return
+		await itr.response.defer()
 		embed = await self.true_eval(itr, clean_code(message.clean_content))
-		await itr.response.send_message(embed=embed, ephemeral=True)
+		await itr.edit_original_response(embed=embed)
 
 def clean_code(content):
 	if content.startswith("```") and content.endswith("```"):
