@@ -89,7 +89,7 @@ class QOTDCog(CM.Cog):
 
 						emb = getComEmbed(None, self.client, "Question Of The Day", quest)
 						if len(questions) == 2:
-							emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! Consier adding some now!")
+							emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! Consider adding some now!")
 						else:
 							emb.set_footer(text=f"Question submitted by {str(author)} | {len(questions)-1} questions left.")
 
