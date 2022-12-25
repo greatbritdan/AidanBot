@@ -242,7 +242,7 @@ class AidanBot(commands.Bot):
 	@tasks.loop(minutes=15)
 	async def status_loop(self):
 		status = {
-			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "A very dangerous game", "One Word Story", "Aidan's videos on repeat", "badbot", "soon at least", "Polish Grass Simulator", "rock paper scissors" ],
+			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "A very dangerous game", "One Word Story", "Aidan's videos on repeat", "badbot", "soon at least", "Polish Grass Simulator", "rock paper scissors", "consiering ading sum typos" ],
 			"watching": [ "the world fall apart...", "out for Waluigi!", "Aidan sleep", "the Bucket Wars", "Aidan rewrite me for the {nthtime} time", "Not So Shrimple now is it",
 				"people stop using me :(", "{servercount} Servers!", "{membercount} Members!", "One Word Story: The Movie", "other bots suck!" ],
 			"streaming": [ "Polish Grass in 4K", "absolutely nothing", "the screams of my victims", "\"I may be stupid, but wtf\"", "1's and 0's across the interwebs", "something... but you'll never know :)", "and screaming" ],
