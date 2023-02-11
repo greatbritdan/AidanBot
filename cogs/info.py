@@ -41,6 +41,8 @@ class InfoCog(CM.Cog):
 		if isinstance(user, discord.User):
 			inguild = False
 
+		today = datetime.datetime.now()
+
 		title = f"Info on {str(user)}"
 		if inguild and user.nick: title += f" ({user.nick})"
 
@@ -67,11 +69,14 @@ class InfoCog(CM.Cog):
 			if borth:
 				day, month = borth.split("-")
 				desc += f"**Birthday:** {dateToStr(int(day), int(month))}\n"
-		desc += f"**Created:** {format_dt(user.created_at, 'F')}\n"
+		createddays = today - user.created_at.replace(tzinfo=None)
+		desc += f"**Created:** {format_dt(user.created_at, 'F')} ({createddays.days} Days)\n"
 		if inguild:
-			desc += f"**Joined:** {format_dt(user.joined_at, 'F')}\n"
+			joindays = today - user.joined_at.replace(tzinfo=None)
+			desc += f"**Joined:** {format_dt(user.joined_at, 'F')} ({joindays.days} Days)\n"
 		if inguild and user.premium_since:
-			desc += f"**Boosted:** {format_dt(user.premium_since, 'F')}\n"
+			boostdays = today - user.premium_since.replace(tzinfo=None)
+			desc += f"**Boosted:** {format_dt(user.premium_since, 'F')} ({boostdays.days} Days)\n"
 		if inguild and user.timed_out_until and itr.channel.permissions_for(itr.user).moderate_members:
 			desc += f"**Timed-out until:** {format_dt(user.timed_out_until, 'F')}\n"
 			
