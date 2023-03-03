@@ -190,7 +190,7 @@ class QOTDCog(CM.Cog):
 			return
 		questions = self.client.CON.get_value(itr.guild, "questions")
 		questions = [q for q in questions if q["id"] != questionid]
-		if not await ab_check_slient(itr, self.client, has_mod_role=True):
+		if not await ab_check_slient(itr, self.client, is_guild=True, has_mod_role=True):
 			await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"You can't remove this question, make sure to only delete your own."))
 		else:
 			await self.client.CON.set_value(itr.guild, "questions", questions)
