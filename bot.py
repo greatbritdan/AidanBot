@@ -11,6 +11,7 @@ token = os.getenv("DISCORD_TOKEN")
 
 debug_guilds = False #[discord.Object(760987756985843733), discord.Object(836936601824788520)]
 
+
 def getnames(path):
 	names = []
 	with open(f'./data/{path}.json') as file:
