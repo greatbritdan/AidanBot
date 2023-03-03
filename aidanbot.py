@@ -23,6 +23,7 @@ class AidanBot(commands.Bot):
 		self.offline = offline
 		self.botrepo = githubrepo
 
+		self.isbeta = True
 		self.settingup = True
 		self.version = "V2.1 (Slash)"
 		self.aidan = 384439774972215296
@@ -206,9 +207,8 @@ class AidanBot(commands.Bot):
 				paths.append(path)
 				await file.save(path)
 
-		files = None
+		files = []
 		if len(attachments) > 0: # create discord file objects of attachments
-			files = []
 			for idx, _ in enumerate(paths):
 				files.append(discord.File(paths[idx], filenames[idx]))
 			
