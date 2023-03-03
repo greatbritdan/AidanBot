@@ -4,6 +4,8 @@ import discord.app_commands as AC
 from discord import Interaction as Itr
 from discord.utils import format_dt
 
+import datetime
+
 from aidanbot import AidanBot
 from functions import dateToStr, getComEmbed
 from cooldowns import cooldown_etc
