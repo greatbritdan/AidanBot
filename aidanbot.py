@@ -25,7 +25,7 @@ class AidanBot(commands.Bot):
 
 		self.isbeta = True
 		self.settingup = True
-		self.version = "V2.1 (Slash)"
+		self.version = "V2.1.1 (Slash)"
 		self.aidan = 384439774972215296
 		if debug_guilds:
 			self.debug_guilds = debug_guilds
