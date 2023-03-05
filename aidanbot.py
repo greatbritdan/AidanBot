@@ -242,12 +242,18 @@ class AidanBot(commands.Bot):
 	@tasks.loop(minutes=15)
 	async def status_loop(self):
 		status = {
-			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "A very dangerous game", "One Word Story", "Aidan's videos on repeat", "badbot", "soon at least", "Polish Grass Simulator", "rock paper scissors", "consiering ading sum typos" ],
+			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "A very dangerous game", "One Word Story", "Aidan's videos on repeat", "badbot",
+	        	"soon at least", "Polish Grass Simulator", "rock paper scissors" ],
+			
 			"watching": [ "the world fall apart...", "out for Waluigi!", "Aidan sleep", "the Bucket Wars", "Aidan rewrite me for the {nthtime} time", "Not So Shrimple now is it",
 				"people stop using me :(", "{servercount} Servers!", "{membercount} Members!", "One Word Story: The Movie", "other bots suck!" ],
-			"streaming": [ "Polish Grass in 4K", "absolutely nothing", "the screams of my victims", "\"I may be stupid, but wtf\"", "1's and 0's across the interwebs", "something... but you'll never know :)", "and screaming" ],
-			"listening": [ "the waves going over the internet", "to Aidan's nonexistant future", "to my servers overheating", "to Aidan complain about bots for the {nthtime} time", "to everyone complain" ],
-			"competing": [ "an arm pit fart contest", "stuff with my brothers", "a war crimes simulator... in minecraft", "being better than Aidans Bots", "a stupid bot contest (I'm winning)" ],
+
+			"streaming": [ "Polish Grass in 4K", "absolutely nothing", "the screams of my victims", "\"I may be stupid, but wtf\"", "1's and 0's across the interwebs",
+		 		"something... but you'll never know :)", "and screaming" ],
+				 
+			"listening": [ "the waves going over the internet", "Aidan's nonexistant future", "my servers overheating", "Aidan complain about bots for the {nthtime} time", "everyone complain" ],
+			
+			"competing": [ "an arm pit fart contest", "stuff with my brothers", "war crimes simulator... in minecraft", "being better than Aidans Bots", "a stupid bot contest (I'm winning)" ],
 		}
 		activity_type, group = choice(list(status.items()))
 
