@@ -268,7 +268,7 @@ class CoreCog(CM.Cog):
 	
 	@configgroup.command(name="guild", description="Guild configerations.")
 	@AC.describe(action="Config action.", name="Variable you're performing action on.", value="New value for this variable.")
-	async def guildconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw","timezone"], name:CONvalues=None, value:str=None):
+	async def guildconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw","Timezone"], name:CONvalues=None, value:str=None):
 		if not await ab_check(itr, self.client, is_guild=True, has_mod_role=True):
 			return
 		await self.config_command(itr, self.client.CON, itr.guild, action, name, value)
@@ -323,7 +323,7 @@ class CoreCog(CM.Cog):
 					embed = getComEmbed(str(itr.user), self.client, content=f"Set {name} to {CON.display_value(name, val)}!\n\n{format_dt(newtime,'t')} should show `12:00` if corrected to your timezone.")
 				else:
 					embed = getComEmbed(str(itr.user), self.client, content=f"Set {name} to {CON.display_value(name, val)}!")
-		elif action == "timezone":
+		elif action == "Timezone":
 			utc = datetime.datetime.now(tz=datetime.timezone.utc)
 			def fdt(time, hr):
 				ntime:datetime.datetime = time+datetime.timedelta(hours=hr)
