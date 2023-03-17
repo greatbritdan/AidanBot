@@ -7,7 +7,7 @@ from pyyoutube import Api as YouApi
 from typing import Literal
 from dotenv import load_dotenv
 
-load_dotenv()
+#load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 github = Github(os.getenv("GITHUB_TOKEN"))
 githubrepo = github.get_repo("Aid0nModder/AidanBot")
