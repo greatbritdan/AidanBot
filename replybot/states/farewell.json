@@ -1,0 +1,38 @@
+{
+    "contain": [ "bye","goodbye","see you later","cya","got to go","gtg","farewell" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "happy":   [ "Bye","Goodbye","See you later","Cya","Take care" ],
+        "neutral": [ "Bye","Goodbye","See you later","Cya" ],
+        "sad":     [ "Bye","Goodbye" ],
+        "angry":   [ "Ok","Bye" ]
+    },
+
+    "replystartchance": 3,
+    "replystart": {
+        "happy":     [ "Alright,","Awww ok,","That sucks," ],
+        "neutral":   [ "Alright," ],
+        "sad":       [ "Oh...","Ok..." ],
+        "angry":     [ "Thank god," ]
+    },
+
+    "replyendchance": 3,
+    "replyend": {
+        "happy":   [ "it was lovely taking to you","talk to you again soon","{author_displayname}",":wave:" ],
+        "neutral": [ "{author_displayname}",":wave:" ],
+        "angry":   [ "now please go away","now please leave" ]
+    },
+
+    "punctuation": {
+        "happy":   [ ".","!","!!!" ],
+        "neutral": [ "." ],
+        "sad":     [ ".","..." ],
+        "angry":   [ "." ]
+    },
+
+    "changefocus": "reset"
+}

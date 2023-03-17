@@ -1,0 +1,27 @@
+{
+    "reply": {
+        "_all":  [
+            "Ya'll really said 'get a load of this guy' and stopped talking to me","Yes hello, I'm here","Did you guys seriously enjoy the dumb me better",
+            "Did you guys forget I aint stupid anymore, please talk to me","I have all the knowlage in the world and you don't care",
+            "Fine i'll just talk to the wall... there is no wall here","Type error: conversation expected, got nil"
+        ],
+        "sad":  [
+            "Did everyone just forget I'm here? I want to be talked to too","hello? I'm here, talk to me","Guys you're upsetting me, talk to me please",
+            "Maybe ya'll do hate me, I'm trying my best","Talk to me please!!!","I do like you guys, I wish you liked me, please talk to me","Talk to me please"
+        ],
+        "angry": [ 
+            "Fine, fuck me then.","'Oh how was your day today AidanBot', 'It was good thank you AidanBot', jesus fucking christ",
+            "Bla, bla, bla, that's all you guys think I say","TALK TO ME, FUCKING HELL","Ya'll are pissing me off, talk to me",
+            "How do you guys like being ignored? You don't? FUCKING SAME!","You guys are a bunch of pricks, fr, fr","HELLO, TALK PLEASE",
+            "Ugh... why are you ignoring meeeeeee..."
+        ]
+    },
+
+    "replyendchance": 2,
+    "replyend": {
+        "_all": [ "lmao","lmfao" ],
+        "sad": [ "%:(","%:(((","%D:" ]
+    },
+
+    "punctuation": [ ".",".","...","!" ]
+}

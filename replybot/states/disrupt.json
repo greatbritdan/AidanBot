@@ -1,0 +1,22 @@
+{
+    "ignorereplies": true,
+    "ignorementions": true,
+
+    "reply": {
+        "_all":  [
+            "Can't you see I'm talking to {focus_displayname} right now","I'm in the middle of a conversation",
+            "Please don't distrupt my conversation with {focus_displayname}","Wait your turn please"
+        ],
+        "angry": [
+            "Can't you fucking see, I'm talking to {focus_displayname} right now","I'm in the middle of a fucking conversation",
+            "Don't distrupt my conversation with {focus_displayname}, piss off","I'm talking, fuck off."
+        ]
+    },
+
+    "replystartchance": 3,
+    "replystart": {
+        "angry": [ "Hey jackass,","Jesus fucki-,","Sigh..." ]
+    },
+
+    "punctuation": [ ".","!","!!!" ]
+}

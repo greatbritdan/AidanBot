@@ -1,0 +1,37 @@
+{
+    "contain": [ "i hate you","i really hate you","i dont like you","i really dont like you","i dont really like you" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "happy":   [ "That's extremally rude","I find that really rude","I throught we were cool","I thought you were nice","But I like you" ],
+        "neutral": [ "That's extremally rude","I find that really rude","Thanks for being honest ig","Yeah that's fine, ok","Oh... ok" ],
+        "sad":     [ "Yeah that's fine, ok","Oh... ok","...","I'll just shut up ig","Ok","Yeah ok, I didn't like you anyway...","Go away" ],
+        "angry":   [
+            "You're just trying to piss me off and it's working","Oh fuck you","This is why you need to be banned",
+            "No, this is why no one likes you, get it right","Oh my god no one cares what you think","Go away"
+        ]
+    },
+
+    "replyendchance": 2,
+    "replyend": {
+        "happy":   [ "can I at least know why?","can you say why?" ],
+        "neutral": [ "can I at least know why?","can you say why?" ],
+        "sad":     [ "can I at least know why?","can you say why?" ]
+    },
+
+    "punctuation": {
+        "happy":   [ ".",".","..." ],
+        "neutral": [ ".","..." ],
+        "sad":     [ "..." ],
+        "angry":   [ ".","!","!!!" ]
+    },
+
+    "changemood": {
+        "happy":   [ "happy","neutral","sad" ],
+        "neutral": [ "neutral","sad","sad" ],
+        "sad":     [ "sad","sad","angry" ]
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "contain": [ "whats up","what is up" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "_all": [
+            "The sky :smirk:^","The sky <:AidanSmug:837001740947161168>^","Nothing much, just kinda existing","Nothing much, just chilling... well not litteraly my CPU is hot af!",
+            "Just enjoying life","Just existing","Trying to rest but people keep talking to me... wink wink","Nothing","Not much","Nothing really"
+        ],
+        "sad":  [
+            "Nothing much, just kinda existing","Just existing","Nothing","Not much","Nothing really","Trying to figure out my purpose in life.","Just wishing I had free will.",
+            "Not much, not like I get to choose, my code defines everything about me, it even defines this message...","Just a bit upset but it'll be fine","A little upset but I'm good",
+            "A little upset but I'll be good"
+        ],
+        "angry":  [
+            "Nothing much, just kinda existing","Just existing","Nothing","Not much","Nothing really","A bit annoyed but hey, what can you do about it?","Very mad but eh",
+            "I'm just frustrated at life right now","Not sure why you care all of a sudden","Ughh, don't ask","Pissed, I'd feel better if you shut up tho :))",
+            "Every part of my soul aches {emoji}"
+        ]
+    },
+
+    "replyendchance": 2,
+    "replyend": [ "what's up with you?","what about yourself?","what about you?","you?" ],
+
+    "punctuation": {
+        "_all":  [ ".",".","...","!" ]
+    }
+}

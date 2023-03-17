@@ -1,0 +1,30 @@
+{
+    "contain": [ "do you like", "do you love", "what do you think of" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "_all": [ "^HELL YEAH!","I very much do, in fact I could go for some right now","Very much so","Like a lot, maybe too much","Way too much","I do enjoy it","On occasion",
+            "Yeah I'd say I like it","I don't mind it","It is, acceptable","I can tolerate it","maybe","It's in the middle","I'm not much of a fan of it","I don't really like it",
+            "I think it's not good","I don't like it at all","It's pretty bad","It's pretty dreadful","I wouldn't want it","Egh","Disgusting","I hate it","I hate it so much","Awful",
+            "I hate it so much","It might just be the worst thing ever","I'd give it a solid {num}/10, or I would but /opinion rate gets all the fun...","Boring, choose something else",
+            "Let me flip a coin... Heads, It sucks ewww!","Let me flip a coin... Tails, It's very good","Let me flip a coin... fuck it landed on the side, what do I do now... my life is a lie"
+        ],
+        "angry": [
+            "^This is why no one likes you","^It's better than you if that's what you're asking","^Meh","^Boring","^Go ask someone else to answer your dumb questions","^I like that but not you",
+            "^Wow... you are fucking annoying","^People hate you, they're just afraid to admit it, and this is why","^`Yawn`","^Like {numlow} out of 10, but just because you asked :)","^:middle_finger:"
+        ]
+    },
+
+    "replystartchance": 3,
+    "replystart": [ "Uhhh,","Hm,","Let me think...","`Artificially waits`...","Oh," ],
+
+    "customformat": {
+        "num": [0,10],
+        "numlow": [0,3]
+    },
+
+    "punctuation": [ ".",".","!" ]
+}

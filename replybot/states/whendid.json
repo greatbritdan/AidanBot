@@ -1,0 +1,31 @@
+{
+    "contain": [ "when did","how long did","how long ago","how long since","how long has it been since" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "_all":  [ "It literally just happened","A few seconds ago","Not long ago","It happened today","It happened this week","It happened this month","It happened this year",
+            "It's been so long","It's been a good while","It happend recently but it feels like ages","It happend a while ago but it still feels recent","I have no idea",
+            "Do I look old to you, how would I know","It happened {days} days ago","It happened {weeks} weeks ago","It happened {months} months ago","It happened {years} years ago"
+        ],
+        "angry": [
+            "^When did you learn to talk? Stop doing it","^You'll be dead today if you don't shut up","^`await self.client.close()`\n...oh right I can't do that.",
+            "^Look man/mam... I don't care","^When did you learn to be a bitch, hehehe","^Talk to the... hand emoji, cuz the face aint listening :hand_splayed:",
+            "^No.","^Just no."
+        ]
+    },
+
+    "replystartchance": 5,
+    "replystart": [ "I'm not entirly sure but I think" ],
+
+    "customformat": {
+        "days": [2,14],
+        "weeks": [2,6],
+        "months": [2,24],
+        "years": [2,99]
+    },
+
+    "punctuation": [ ".",".","..." ]
+}

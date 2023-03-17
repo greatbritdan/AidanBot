@@ -1,0 +1,24 @@
+{
+    "contain": [ "did you like", "did you love", "what did you think of" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "_all": [ "^HELL YEAH!","I very much did, in fact I could do it again right now","Very much so","Like a lot, maybe too much","Way too much","I did enjoy it",
+            "Yeah I'd say I liked it","I didn't mind it","It was, acceptable","I tolerated it","maybe","I wasn't much of a fan of it","I didn't really like it",
+            "I think it wasn't good","I didn't like it at all","It's was pretty bad","It's was pretty dreadful","I wouldn't want it again","Egh","Disgusting","I hated it","I hated it so much","It was awful",
+            "I hated it so much","It might just be the worst thing I've ever done"
+        ],
+        "angry": [
+            "^This is why no one likes you","^It's better than you if that's what you're asking","^Meh","^Boring","^Go ask someone else to answer your dumb questions","^I like that but not you",
+            "^Wow... you are fucking annoying","^People hate you, they're just afraid to admit it, and this is why","^`Yawn`","^:middle_finger:"
+        ]
+    },
+
+    "replystartchance": 3,
+    "replystart": [ "Uhhh,","Hm,","Let me think...","`Artificially waits`...","Oh," ],
+
+    "punctuation": [ ".",".","!" ]
+}

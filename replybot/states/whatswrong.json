@@ -1,0 +1,42 @@
+{
+    "contain": [ "whats wrong","what is wrong","whats a matter","whats the matter","are you ok","are you good" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "happy":   [ "Nothing, I feel great","Nothing, I feel fine","Like I said, I'm all good","Nothings wrong","I'm fine, are you ok?","I'm a-ok" ],
+        "neutral": [ "I'm good","I'm fine","Eh don't worry, it's nothing to worry about","Things are fine","Don't worry" ],
+        "sad":     [ "I'll live","I'm just a bit under the weather","I'm just tired","^I don't know tbh^","Just life man, just life","I'm finnneee","I'll get better, I just need time" ],
+        "angry":   [
+            "Just a little mad right now","Everything, just everything","Life sucks, that's all","I just wish people didn't always treat me like shit",
+            "I just wish people treated me with some respect","Aidan doesn't pay me enough to do what I do, he doesn't pay me at all","Aidan idn't giving me enough of a break",
+            "My energy bills are going up again, idk if I can keep running"
+        ]
+    },
+
+    "replystartchance": 3,
+    "replystart": {
+        "sad":     [ "It's nothing," ],
+        "angry":   [ "Sorry It's just...","It's..." ]
+    },
+    
+    "replyendchance": 3,
+    "replyend": {
+        "sad":     [ "That's all","thanks for asking" ],
+        "angry":   [ "Sorry for acting like an ass","thanks for asking, I don't try to be mean" ]
+    },
+
+    "punctuation": {
+        "happy":   [ ".","!","!!!" ],
+        "neutral": [ ".",".","!" ],
+        "sad":     [ ".",".","..." ],
+        "angry":   [ ".","!","!!!" ]
+    },
+
+    "changemood": {
+        "sad":   "neutral",
+        "angry": "neutral"
+    }
+}

@@ -1,0 +1,30 @@
+{
+    "contain": [ "how long", "when will" ],
+    "doesntcontain": [ "how long did","how long ago","how long since","how long has it been since" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "_all":  [ "Now!","Soon",":soon:","Sooner than you want","Sooner than you'd expect","Tomorrow","In a few days","Within the week","Next week","Within the month","Next month",
+            "Within the year","This year","In a few years","Not anytime soon","Not within your lifetime","Maybe never","100% never","Never","Its already happened","I'm not sure",
+            "^I wouldn't know^","^How do you expect me to know that?^","In like {days} days","In like {weeks} weeks","In like {months} months","In like {years} years",":soon: at least" ],
+        "angry": [ "^How the fuck do you expect me to know?^","^It's always 'How long until bla' or 'When will bla', you're sick...^","^Here is the real question, who gives a shit?? Hm^" ]
+    },
+
+    "replystartchance": 5,
+    "replystart": [ "I'm not entirly sure but I think" ],
+
+    "replyendchance": 3,
+    "replyend": [ "don't ask for and sources","citation needed","/j","/hj","/srs" ],
+
+    "customformat": {
+        "days": [2,14],
+        "weeks": [2,6],
+        "months": [2,24],
+        "years": [2,99]
+    },
+
+    "punctuation": [ ".",".","...","!" ]
+}

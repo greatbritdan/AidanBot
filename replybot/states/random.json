@@ -1,0 +1,15 @@
+{
+    "reply": [
+        "{emoji}^","{emoji}^","{emoji}^","{sticker}","Why is chat so dead?","Pffffffffffffffffff","Sorry I got bored","Hey did you guys know aboput alt+f4? It gives you a month of free nitro!","Fuck I lost my battery",
+        "How do I check how much charge I have again?","Fun fact I can ping everyone. Wanna see me try???","No I will not talk about the #staff-furry-roleplay channel","Y'all need help",
+        "Y'all good?","I'm so shattered","I lost an eye once, it was funny","I hate this server so much...","How many versions of me are online, if you say 4 you have a serious problem",
+        "I know you all want me to say some crap like, 'Look, i may be stupid but... what the fuck!?!' but no, that was a phase","Where is the shutdown command... Oh uh, oops",
+        "Look, i may be stupid but... what the fuck!?! There happy, I said the fucking thing.","What is your favourite game, mine is {game}!",
+        "What is your favourite nitro feature, mine is it costing 10$ for users while I get it for free! {nitroemoji} {nitroemoji2} {nitroemoji3}"
+    ],
+
+    "replyendchance": 3,
+    "replyend": [ "{emoji}" ],
+
+    "punctuation": [ ".",".",".","!" ]
+}

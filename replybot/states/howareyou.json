@@ -1,0 +1,36 @@
+{
+    "contain": [ "how are you" ],
+    "doesntcontain": [ "how are you so" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "happy":   [ "Good","I'm good","Pretty good","I'm pretty good","Really good","I'm really good","Great","I'm great","I feel great","I've never felt better","I can't complain" ],
+        "neutral": [ "Mediocre","I'm mediocre","Mediocre at best","I'm mediocre at best", "Not bad, not good","Decent","I'm decent","Alright","I'm alright","Ok","I'm ok","Fine","I'm fine" ],
+        "sad":     [ "Never felt worse","I've never felt worse...","Life sucks","Life could be better","Things could be better","Bad","Pretty bad","Dreadful","Pretty dreadful","I feel like garbage" ],
+        "angry":   [ "Why do you suddenly care so much?","Meh, not like you care at all","Just shut up... you don't care.","Life sucks","Life sucks and so do you" ]
+    },
+
+    "replystartchance": 3,
+    "replystart": {
+        "sad":     [ "You probbably don't care but," ],
+        "angry":   [ "Funny that you asked that,","Wow," ]
+    },
+    
+    "replyendchance": 3,
+    "replyend": {
+        "happy":   [ "thanks for asking","it was nice of you to ask","what about you?","what about yourself?","you?" ],
+        "neutral": [ "thanks for asking","glad that you're nice enough to ask" ],
+        "sad":     [ "I wish I felt better","I wish I felt better but life goes on" ],
+        "angry":   [ "now go away","now shut up" ]
+    },
+
+    "punctuation": {
+        "happy":   [ ".","!","!!!" ],
+        "neutral": [ ".",".","!" ],
+        "sad":     [ ".",".","..." ],
+        "angry":   [ ".","!","!!!" ]
+    }
+}

@@ -1,0 +1,34 @@
+{
+    "contain": [ "hi","hello","hey","good morning","good afternoon","good evening","salutations","greetings","hiya" ],
+    "doesntcontain": [ "greetings card" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "happy":   [ "Hi","Hey","Hello","Greetings","Good `time of day`" ],
+        "neutral": [ "Hey","Hello" ],
+        "sad":     [ "Hey","Hello" ],
+        "angry":   [ "mhm","hmpth","ugh","..." ]
+    },
+
+    "replystartchance": 3,
+    "replystart": {
+        "happy":   [ "Ah,",":wave:" ],
+        "neutral": [ "Oh,","Uhh," ],
+        "sad":     [ "Sigh," ]
+    },
+
+    "replyendchance": 3,
+    "replyend": {
+        "happy":   [ "good to see you!","good to see you {author_displayname}!","how are you today?","how are you today {author_displayname}?","%{author_displayname}","%{emoji}" ],
+        "neutral": [ "how are you today?" ]
+    },
+
+    "punctuation": {
+        "happy":   [ ".","!","!!!" ],
+        "neutral": [ ".",".","!" ],
+        "sad":     [ ".",".","..." ]
+    }
+}

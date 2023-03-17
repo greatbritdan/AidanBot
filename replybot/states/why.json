@@ -1,0 +1,21 @@
+{
+    "contain": [ "why" ],
+    "afterstate": [ "doyoulike" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "_all":  [
+            "Do I need a reason?","I don't need to tell you why","I ain't saying shit","Why not?","Life isn't about why, it's about why not!","Because",
+            "Because I do","I like it, that's all I need to say",":zipper_mouth:","Why? what do you mean why??? Are you saying my opinion is wrong!"
+        ],
+        "angry": [
+            "Why, as in why are you annoying???","Why do you think talking is a good idea","I liked it better when you didn't talk",
+            "Why not?","Because I do","Why did your parents give birth to you?... ok that was too far."
+        ]
+    },
+
+    "punctuation": [ ".",".","!" ]
+}

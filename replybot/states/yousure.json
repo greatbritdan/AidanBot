@@ -1,0 +1,40 @@
+{
+    "contain": [ "you sure" ],
+
+    "ignorereplies": true,
+    "ignorementions": true,
+    "messagetype": "reply",
+
+    "reply": {
+        "happy":   [
+            "I'm always sure","You know me","When was the last time I wasn't","Maybe, maybe not, I'm just accepting the way I feel for now",
+            "If I wasn't that would be scray","I have no idea","I'm not sure, my brain is mush"
+        ],
+        "neutral": [
+            "I'm pretty sure","When was the last time I wasn't","Maybe, maybe not, who knows",
+            "I wish I wasn't but oh well, life is life","I have no idea","I'm not sure, my brain is mush"
+        ],
+        "sad":     [
+            "Sadly yes","I wish I wasn't","I could feel worse","It's fine trust me","I'll live, don't worry",
+            "I'll be ok, I just need some time"
+        ],
+        "angry":   [
+            "OMFG, why are you suddenly such a ''caring person'', fuck off!","I'm sorry i'm being a bit of an ass, i'm just not having a good day",
+            "Things could be worse","Yes, now please fuck off!","Yes... oh I'm sorry did you expect a deep answer???"
+        ]
+    },
+
+    "replyendchance": 2,
+    "replyend": {
+        "happy":   [ "thanks for asking" ],
+        "neutral": [ "thanks for asking" ],
+        "sad":   [ "thanks for asking","thanks for asking, it's nice to know people care from time to time" ]
+    },
+
+    "punctuation": {
+        "happy":   [ ".",".","!" ],
+        "neutral": [ "." ],
+        "sad":     [ ".","..." ],
+        "angry":   [ ".","!" ]
+    }
+}
