@@ -7,9 +7,8 @@ from discord.ext import tasks
 import datetime, asyncio
 
 from aidanbot import AidanBot
-from functions import getComEmbed, dateToStr
-from checks import ab_check_slient
-from cooldowns import cooldown_etc
+from utils.functions import getComEmbed, dateToStr
+from utils.checks import ab_check_slient
 
 class BirthdayCog(CM.Cog):
 	def __init__(self, client:AidanBot):
@@ -17,10 +16,10 @@ class BirthdayCog(CM.Cog):
 
 	async def ready(self):
 		self.borths = await self.getBirthdays()
-		self.daily_task.start()
+		self.birthtask.start()
 
 	def cog_unload(self):
-		self.daily_task.cancel()
+		self.birthtask.cancel()
 	
 	async def getBirthdays(self):
 		borths = []
@@ -77,8 +76,8 @@ class BirthdayCog(CM.Cog):
 				if user in guild.members:
 					member = guild.get_member(user.id)
 
-					channel = self.client.CON.get_value(guild, "birthday_announcement_channel", guild=guild)
-					msg = self.client.CON.get_value(guild, "birthday_announcement_message")
+					channel = self.client.CON.get_value(guild, "birthday_channel", guild=guild)
+					msg = self.client.CON.get_value(guild, "birthday_message")
 					if channel and msg:
 						await channel.send(msg.format(name=user.name, mention=user.mention, user=user, member=user))
 					
@@ -88,7 +87,7 @@ class BirthdayCog(CM.Cog):
 							await member.add_roles(role)
 
 	@tasks.loop(time=datetime.time(0, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def daily_task(self):
+	async def birthtask(self):
 		await self.nextDay()
 
 	###
@@ -97,7 +96,6 @@ class BirthdayCog(CM.Cog):
 
 	@borthgroup.command(name="change", description="Set or remove your birthday. To remove leave day and month arguments blank")
 	@AC.describe(day="Day of your birthday.", month="Month of your birthday.")
-	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def change(self, itr:Itr, day:AC.Range[int,1,31], month:AC.Range[int,1,12]):
 		if (not day) and (not month):
 			await self.client.UCON.set_value(itr.user, "birthday", False)
@@ -112,7 +110,6 @@ class BirthdayCog(CM.Cog):
 				await itr.response.send_message(f"Nice try but the {dateToStr(day, month)} isn't real, Enter a valid date please.")
 
 	@borthgroup.command(name="upcoming", description="Upcoming birthdays.")
-	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def upcoming(self, itr:Itr):	
 		await itr.response.defer()
 		birthlist = await self.getUpcomingBirthdays(itr)

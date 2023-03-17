@@ -3,11 +3,12 @@ from discord.ext import commands, tasks
 from discord.utils import find, get
 
 from github.Repository import Repository
+from pyyoutube import Api as YouApi
 
-from replybot import replyBot
-from config import ConfigManager
-from checks import ab_check_slient
-from functions import SendDM, sendError, sendCustomError, getCooldownEmbed, getComEmbed, sendComError, getErrorEmbed
+from replybot.replybot import replyBot
+from utils.config import ConfigManager
+from utils.checks import ab_check_slient
+from utils.functions import SendDM, sendError, sendCustomError, getComEmbed, sendComError, getErrorEmbed
 
 import json, os, traceback, sys, re
 from random import choice, randint
@@ -18,20 +19,25 @@ class AidanBot(commands.Bot):
 		setattr(self, key, value)
 	def __getitem__(self, key):
 		return getattr(self, key)
-
-	def __init__(self, githubrepo:Repository, debug_guilds=False, offline=False):
+	
+	def __init__(self, debug_guilds, githubrepo:Repository=False, youtube:YouApi=False, offline=False):
 		self.offline = offline
 		self.botrepo = githubrepo
+		self.youtube_api = youtube
 
 		self.isbeta = True
 		self.settingup = True
-		self.version = "V2.1.1 (Slash)"
+		self.version = "V3 (Slash)"
 		self.aidan = 384439774972215296
 		if debug_guilds:
 			self.debug_guilds = debug_guilds
 		else:
 			self.debug_guilds = []
 		super().__init__(command_prefix="$",intents=discord.Intents.all())
+
+		if not self.offline:
+			with open("./data/times.json") as file:
+				self.timetable = json.load(file)
 
 	async def setup_hook(self):
 		if not self.offline:
@@ -42,11 +48,12 @@ class AidanBot(commands.Bot):
 			for filename in os.listdir('./cogs'):
 				if filename.endswith('.py'):
 					await self.load_extension(f'cogs.{filename[:-3]}')
-			if len(self.debug_guilds) > 0:
-				for guild in self.debug_guilds:
-					await self.tree.sync(guild=guild)
-			else:
-				await self.tree.sync()
+
+		if len(self.debug_guilds) > 0:
+			for guild in self.debug_guilds:
+				await self.tree.sync(guild=guild)
+		else:
+			await self.tree.sync()
 
 	async def on_ready(self):
 		if self.offline:
@@ -72,19 +79,16 @@ class AidanBot(commands.Bot):
 		await dict(self.cogs)["BirthdayCog"].ready()
 		await dict(self.cogs)["QOTDCog"].ready()
 
-	async def on_error(self, event):
+	async def on_error(self, event, *args, **kwargs):
 		await sendError(self, event, sys.exc_info())
 
 	async def on_command_error(self, ctx:commands.Context, error):
-		if isinstance(error, commands.CommandOnCooldown):
-			await ctx.respond(embed=getCooldownEmbed(ctx, self, error.retry_after), ephemeral=True)
+		await ctx.send(embed=getErrorEmbed(ctx, self, str(error)))
+		if self.isbeta:
+			print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
+			traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 		else:
-			await ctx.respond(embed=getErrorEmbed(ctx, self, str(error)))
-			if self.isbeta:
-				print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
-				traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
-			else:
-				await sendComError(self, ctx, error)
+			await sendComError(self, ctx, error)
 
 	async def on_message(self, message:discord.Message):
 		if self.settingup or message.author.bot or message.webhook_id:
@@ -190,7 +194,7 @@ class AidanBot(commands.Bot):
 					files = await self.attachmentsToFiles(msg.attachments)
 				else:
 					files = []
-				await self.sendWebhook(msg.channel, msg.author, txt, files)
+				await self.sendWebhook(msg.channel, msg.author.display_name, msg.author.display_avatar, txt, files)
 				await msg.delete()
 				return True
 		return False
@@ -213,8 +217,8 @@ class AidanBot(commands.Bot):
 				files.append(discord.File(paths[idx], filenames[idx]))
 			
 		return files
-
-	async def sendWebhook(self, channel:discord.TextChannel, user:discord.Member, txt, files, nameadd=None, repeat=None):
+	
+	async def sendWebhook(self, channel:discord.TextChannel, name, avatar, txt, files, repeat=None):
 		hook = False
 		for w in await channel.webhooks():
 			if w.name == "AidanBotCloneHook":
@@ -223,15 +227,17 @@ class AidanBot(commands.Bot):
 			hook = await channel.create_webhook(name="AidanBotCloneHook")
 
 		try:
-			if nameadd:
-				await hook.send(txt, username=user.display_name+nameadd, avatar_url=user.display_avatar, files=files, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
-			else:
-				await hook.send(txt, username=user.display_name, avatar_url=user.display_avatar, files=files, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
+			msg = await hook.send(txt, username=name, avatar_url=avatar, files=files, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
+			if msg:
+				return msg
+			return False
 		except Exception:
 			await hook.delete()
 			if (not repeat): # No more infinite loop
-				await self.sendWebhook(channel, user, txt, files, nameadd, True)
+				return await self.sendWebhook(channel, name, avatar, txt, files, True)
+			return False
 
+	# No idea how this works, probbably stole it
 	def make_ordinal(self, n):
 		if 11 <= (n % 100) <= 13:
 			suffix = 'th'
@@ -239,7 +245,7 @@ class AidanBot(commands.Bot):
 			suffix = ['th', 'st', 'nd', 'rd', 'th'][min(n % 10, 4)]
 		return str(n) + suffix
 
-	@tasks.loop(minutes=15)
+	@tasks.loop(minutes=10)
 	async def status_loop(self):
 		status = {
 			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "A very dangerous game", "One Word Story", "Aidan's videos on repeat", "badbot",

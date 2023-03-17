@@ -7,12 +7,10 @@ from discord.utils import get
 
 import datetime, asyncio
 from random import randint, choice
-from typing import Literal
 
 from aidanbot import AidanBot
-from functions import getComEmbed, sendCustomError
-from checks import ab_check, ab_check_slient
-from cooldowns import cooldown_etc
+from utils.functions import getComEmbed, sendCustomError
+from utils.checks import ab_check, ab_check_slient
 
 defaultquestions = [
 	"What games would be your top recommendations?",
@@ -59,63 +57,207 @@ class QOTDCog(CM.Cog):
 		self.client = client
 
 	async def ready(self):
-		self.daily_task.start()
+		self.qotdtask0.start()
+		self.qotdtask1.start()
+		self.qotdtask2.start()
+		self.qotdtask3.start()
+		self.qotdtask4.start()
+		self.qotdtask5.start()
+		self.qotdtask6.start()
+		self.qotdtask7.start()
+		self.qotdtask8.start()
+		self.qotdtask9.start()
+		self.qotdtask10.start()
+		self.qotdtask11.start()
+		self.qotdtask12.start()
+		self.qotdtask13.start()
+		self.qotdtask14.start()
+		self.qotdtask15.start()
+		self.qotdtask16.start()
+		self.qotdtask17.start()
+		self.qotdtask18.start()
+		self.qotdtask19.start()
+		self.qotdtask20.start()
+		self.qotdtask21.start()
+		self.qotdtask22.start()
+		self.qotdtask23.start()
 		
 	def cog_unload(self):
-		self.daily_task.cancel()
+		self.qotdtask0.cancel()
+		self.qotdtask1.cancel()
+		self.qotdtask2.cancel()
+		self.qotdtask3.cancel()
+		self.qotdtask4.cancel()
+		self.qotdtask5.cancel()
+		self.qotdtask6.cancel()
+		self.qotdtask7.cancel()
+		self.qotdtask8.cancel()
+		self.qotdtask9.cancel()
+		self.qotdtask10.cancel()
+		self.qotdtask11.cancel()
+		self.qotdtask12.cancel()
+		self.qotdtask13.cancel()
+		self.qotdtask14.cancel()
+		self.qotdtask15.cancel()
+		self.qotdtask16.cancel()
+		self.qotdtask17.cancel()
+		self.qotdtask18.cancel()
+		self.qotdtask19.cancel()
+		self.qotdtask20.cancel()
+		self.qotdtask21.cancel()
+		self.qotdtask22.cancel()
+		self.qotdtask23.cancel()
 		
-	async def askQuestion(self, dontremove=False, dontping=False, postguild:discord.Guild=False):
+	async def askQuestion(self, guild:discord.Guild=False, dontremove=False, dontping=False):
 		if self.client.isbeta and (not dontremove):
 			return
 
+		channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
+		questions = self.client.CON.get_value(guild, "questions")
+
+		if len(questions) == 0:
+			quest = choice(defaultquestions)
+			emb = getComEmbed(None, self.client, "Question Of The Day", quest)
+			emb.set_footer(text=f"Question submitted by AidanBot | 0 questions left!!!")
+			await channel.send("", embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
+		
+		else:
+			questioni = randint(0, len(questions)-1)
+			question = questions[questioni]
+			quest:str
+
+			quest, author = question["question"], get(guild.members, id=question["author"])
+			if not quest.endswith("?"): quest += "?"
+
+			emb = getComEmbed(None, self.client, "Question Of The Day", quest)
+			if len(questions) == 2:
+				emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! Consier adding some now!")
+			else:
+				emb.set_footer(text=f"Question submitted by {str(author)} | {len(questions)-1} questions left.")
+
+			txt = ""
+			role = self.client.CON.get_value(guild, "qotd_role", guild=guild)
+			if (not dontping) and role:
+				txt = f"Wake up sussy's, New QOTD dropped. {role.mention}"
+
+			await channel.send(txt, embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
+			if not dontremove:
+				questions.pop(questioni)
+				try:
+					await self.client.CON.set_value(guild, "questions", questions)
+				except Exception:
+					await sendCustomError(self.client, "QOTD Error", "Questions was unable to save, please manualy remove question!")
+
+	async def checktime(self, time):
 		for guild in await self.client.CON.loopdata():
-			if (not postguild) or postguild == guild:
-				channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
-				if channel:
-					questions = self.client.CON.get_value(guild, "questions")
+			channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
+			if channel:
+				timezone = self.client.CON.get_value(guild, "timezone", guild=guild)
+				posttime = self.client.CON.get_value(guild, "qotd_posttime", guild=guild)
+				if self.client.timetable[timezone][time] == posttime:
+					self.askQuestion(guild)
 
-					if len(questions) == 0:
-						quest = choice(defaultquestions)
-						emb = getComEmbed(None, self.client, "Question Of The Day", quest)
-						emb.set_footer(text=f"Question submitted by AidanBot | 0 questions left!!!")
-						await channel.send("", embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
-					
-					else:
-						questioni = randint(0, len(questions)-1)
-						question = questions[questioni]
+	@tasks.loop(time=datetime.time(0, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask0(self):
+		await self.checktime("0 AM")
 
-						quest, author = question["question"], get(guild.members, id=question["author"])
-						if not quest.endswith("?"): quest += "?"
+	@tasks.loop(time=datetime.time(1, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask1(self):
+		await self.checktime("1 AM")
 
-						emb = getComEmbed(None, self.client, "Question Of The Day", quest)
-						if len(questions) == 2:
-							emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! Consider adding some now!")
-						else:
-							emb.set_footer(text=f"Question submitted by {str(author)} | {len(questions)-1} questions left.")
+	@tasks.loop(time=datetime.time(2, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask2(self):
+		await self.checktime("2 AM")
 
-						txt = ""
-						role = self.client.CON.get_value(guild, "qotd_role", guild=guild)
-						if (not dontping) and role:
-							txt = f"Wake up sussy's, New QOTD dropped. {role.mention}"
+	@tasks.loop(time=datetime.time(3, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask3(self):
+		await self.checktime("3 AM")
 
-						await channel.send(txt, embed=emb, allowed_mentions=discord.AllowedMentions(roles=True))
-						if not dontremove:
-							questions.pop(questioni)
-							try:
-								await self.client.CON.set_value(guild, "questions", questions)
-							except Exception:
-								await sendCustomError(self.client, "QOTD Error", "Questions was unable to save, please manualy remove question!")
+	@tasks.loop(time=datetime.time(4, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask4(self):
+		await self.checktime("4 AM")
+
+	@tasks.loop(time=datetime.time(5, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask5(self):
+		await self.checktime("5 AM")
+		
+	@tasks.loop(time=datetime.time(6, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask6(self):
+		await self.checktime("6 AM")
+
+	@tasks.loop(time=datetime.time(7, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask7(self):
+		await self.checktime("7 AM")
+	
+	@tasks.loop(time=datetime.time(8, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask8(self):
+		await self.checktime("8 AM")
+
+	@tasks.loop(time=datetime.time(9, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask9(self):
+		await self.checktime("9 AM")
+
+	@tasks.loop(time=datetime.time(10, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask10(self):
+		await self.checktime("10 AM")
+
+	@tasks.loop(time=datetime.time(11, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask11(self):
+		await self.checktime("11 AM")
+
+	@tasks.loop(time=datetime.time(12, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask12(self):
+		await self.checktime("12 PM")
+
+	@tasks.loop(time=datetime.time(13, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask13(self):
+		await self.checktime("1 PM")
+		
+	@tasks.loop(time=datetime.time(14, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask14(self):
+		await self.checktime("2 PM")
 
 	@tasks.loop(time=datetime.time(15, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def daily_task(self):
-		await self.askQuestion()
+	async def qotdtask15(self):
+		await self.checktime("3 PM")
+	
+	@tasks.loop(time=datetime.time(16, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask16(self):
+		await self.checktime("4 PM")
+
+	@tasks.loop(time=datetime.time(17, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask17(self):
+		await self.checktime("5 PM")
+
+	@tasks.loop(time=datetime.time(18, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask18(self):
+		await self.checktime("6 PM")
+
+	@tasks.loop(time=datetime.time(19, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask19(self):
+		await self.checktime("7 PM")
+
+	@tasks.loop(time=datetime.time(20, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask20(self):
+		await self.checktime("8 PM")
+
+	@tasks.loop(time=datetime.time(21, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask21(self):
+		await self.checktime("9 PM")
+		
+	@tasks.loop(time=datetime.time(22, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask22(self):
+		await self.checktime("10 PM")
+
+	@tasks.loop(time=datetime.time(23, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask23(self):
+		await self.checktime("11 PM")
 
 	###
 
 	qotdgroup = AC.Group(name="qotd", description="Question Of The Day commands.")
 
 	@qotdgroup.command(name="list", description="List all questions.")
-	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def list(self, itr:Itr):	
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
@@ -169,7 +311,6 @@ class QOTDCog(CM.Cog):
 
 	@qotdgroup.command(name="ask", description="Add a question to the daily questions.")
 	@AC.describe(question="The question you want to ask.")
-	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def ask(self, itr:Itr, question:str):	
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
@@ -178,35 +319,59 @@ class QOTDCog(CM.Cog):
 			return await itr.response.send_message("Too many characters! Questions mustn't be more than 250 characters.")
 		if len([q for q in questions if q["question"] == question]) > 0:
 			return await itr.response.send_message("You can't send the same question as someone else.")
-		questions.append({ "question": question, "author": itr.user.id, "id": generateID(questions) })
+		qid = generateID(questions)
+		questions.append({ "question": question, "author": itr.user.id, "id": qid })
 		await self.client.CON.set_value(itr.guild, "questions", questions)
-		await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Added question!"))
+		await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Added question!", f"With id **{qid}**"))
 
 	@qotdgroup.command(name="remove", description="Remove one of your questions from the daily questions, Mods can remove anyones question.")
 	@AC.describe(questionid="The ID of question you want to remove.")
-	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def remove(self, itr:Itr, questionid:str):	
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
+		
 		questions = self.client.CON.get_value(itr.guild, "questions")
-		questions = [q for q in questions if q["id"] != questionid]
-		if not await ab_check_slient(itr, self.client, is_guild=True, has_mod_role=True):
-			await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"You can't remove this question, make sure to only delete your own."))
+		removequestions = []
+		if await ab_check_slient(itr, self.client, is_guild=True, has_mod_role=True):
+			removequestions = [q for q in questions if q["id"] == questionid]
 		else:
+			removequestions = [q for q in questions if q["id"] == questionid and q["author"] == itr.user.id]
+			
+		if len(removequestions) == 0:
+			await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"This question doesn't exist or you can't delete it."))
+		else:
+			questions = [q for q in questions if q["id"] != questionid]
 			await self.client.CON.set_value(itr.guild, "questions", questions)
-			await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Removed question!"))
+			await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Removed question!", f"With id **{questionid}**"))
 
-	'''@qotdgroup.command(name="post", description="Forcefully post a question.")
-	@AC.describe(dontremove="If the question isn't removed from the questions list.", dontping="If the question doesn't ping the qotd_role")
-	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
-	async def post(self, itr:Itr, dontremove:Literal["True","False"], dontping:Literal["True","False"]):
-		if not await ab_check(itr, self.client, is_owner=True, is_guild=True, has_value="qotd_channel"):
+	@qotdgroup.command(name="edit", description="Modify one of your questions from the daily questions, Mods can modify anyones question.")
+	@AC.describe(questionid="The ID of question you want to modify.", question="The modified question you want to ask.")
+	async def edit(self, itr:Itr, questionid:str, question:str=""):	
+		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
-		await self.askQuestion(tobool(dontremove), tobool(dontping), itr.guild)
-		await itr.response.send_message("Question has been askified.")'''
+		
+		questions = self.client.CON.get_value(itr.guild, "questions")
+		editquestions = []
+		if await ab_check_slient(itr, self.client, is_guild=True, has_mod_role=True):
+			editquestions = [q for q in questions if q["id"] == questionid]
+		else:
+			editquestions = [q for q in questions if q["id"] == questionid and q["author"] == itr.user.id]
+			
+		if len(editquestions) == 0:
+			await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"This question doesn't exist or you can't edit it."))
+		else:
+			if question == "":
+				questions = [q for q in questions if q["id"] != questionid]
+				await self.client.CON.set_value(itr.guild, "questions", questions)
+				await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Removed question!", f"With id **{questionid}**"))
+			else:
+				for q in questions:
+					if q["id"] == questionid:
+						q["question"] = question
+				await self.client.CON.set_value(itr.guild, "questions", questions)
+				await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Edited question!", f"With id **{questionid}**"))
 
 	@qotdgroup.command(name="reroll", description="Repost a question if the last one wasn't good.")
-	@CM.dynamic_cooldown(cooldown_etc, CM.BucketType.user)
 	async def reroll(self, itr:Itr):
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return
@@ -227,7 +392,7 @@ class QOTDCog(CM.Cog):
 			view = discord.ui.View(timeout=None)
 			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
 			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, got enough votes and rerolled!", f"Votes: {votes}/{threshold}"), view
-		
+
 		embed, view = getEmbed()
 		await itr.response.send_message(embed=embed, view=view)
 		MSG = await itr.original_response()
@@ -258,12 +423,19 @@ class QOTDCog(CM.Cog):
 				await itr.edit_original_response(embed=embed, view=view)
 				return
 		
-		await self.askQuestion(False, True, itr.guild)
+		await self.askQuestion(itr.guild, False, True)
+
+	'''@qotdgroup.command(name="post", description="Forcefully post a question.")
+	@AC.describe(dontremove="If the question isn't removed from the questions list.", dontping="If the question doesn't ping the qotd_role")
+	async def post(self, itr:Itr, dontremove:Literal["True","False"], dontping:Literal["True","False"]):
+		if not await ab_check(itr, self.client, is_owner=True, is_guild=True, has_value="qotd_channel"):
+			return
+		await self.askQuestion(itr.guild, tobool(dontremove), tobool(dontping))
+		await itr.response.send_message("Question has been askified.")'''
 
 def divide_chunks(l, n):
 	for i in range(0, len(l), n):
 		yield l[i:i + n]
 
-		
 async def setup(client:AidanBot):
 	await client.add_cog(QOTDCog(client), guilds=client.debug_guilds)

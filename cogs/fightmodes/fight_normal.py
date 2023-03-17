@@ -51,7 +51,7 @@ def makeMoveHard(player:FightPlayer): # doesn't take any chances
 	if player.energy > 0:
 		if player.energy > 1 and player.enemy.health <= player.getDamageAt(combo_damage_1)+player.getDamageAt(combo_damage_2,1): return "combo"
 		if player.enemy.health <= player.getDamageAt(punch_damage) or player.energy == 3: return "punch"
-	if player.energy > 0 and (not player.enemy.comboing) and player.enemy.energy == 0: return "defend"
+	if player.energy > 0 and (not player.enemy.nextturn == "comboend") and player.enemy.energy == 0: return "defend"
 	if player.mp == 3 and player.enemy.health <= 50: return "kamikaze"
 	if player.mp == 2 and (15 > ushd or (player.enemy.mp > 1 and 10 > ushd)): return "pierce"
 	if player.mp == 1 and ushdplus >= player.enemy.health: return "attack_up"
@@ -69,7 +69,7 @@ def makeMoveRandom(player:FightPlayer):
 ### Moves ###
 
 def punch(turn:FightPlayer, turnt:FightPlayer, butid):
-	damage, energyloss = turn.getDamage(punch_damage[turn.energy-1]), turn.energy
+	damage = turn.getDamage(punch_damage[turn.energy-1])
 	turnt.health, turn.energy = turnt.health-damage, 0
 
 def combo(turn:FightPlayer, turnt:FightPlayer, butid):
@@ -94,7 +94,7 @@ def kamikaze(turn:FightPlayer, turnt:FightPlayer, butid):
 	turn.health, turnt.health, turn.mp = turn.health-50, turnt.health-50, turn.mp-3
 
 def heal(turn:FightPlayer, turnt:FightPlayer, butid):
-	gain, loss = heal_gain[turn.mp-1], turn.mp
+	gain = heal_gain[turn.mp-1]
 	turn.health, turn.mp = turn.health+gain, 0
 
 ### The Stuffs ###
@@ -118,16 +118,15 @@ moves = [
 ]
 
 buttons = [
-	FightButton(name="punch",  label="Punch",  emoji="👊", style=Style.red,   move="punch", ui="[{maxval}]", condition="energy|>|0"),
-	FightButton(name="combo",  label="Combo",  emoji="⛓️", style=Style.red,   move="combo",  ui="[{maxval}]",  condition="energy|>|1"),
-	FightButton(name="defend", label="Defend", emoji="🛡️", style=Style.red,   move="defend", ui="[{cval}]",  condition="energy|>|0"),
-	FightButton(name="wait",   label="Wait",   emoji="🕐", style=Style.gray,  move="wait"),
-	FightButton(name="flee",   label="Flee",   emoji="✖️", style=Style.gray,  move="flee"),
-
+	FightButton(name="punch",     label="Punch",     emoji="👊", style=Style.red,     move="punch",  ui="[{maxval}]", condition="energy|>|0"),
+	FightButton(name="combo",     label="Combo",     emoji="⛓️", style=Style.red,     move="combo",  ui="[{maxval}]", condition="energy|>|1"),
+	FightButton(name="defend",    label="Defend",    emoji="🛡️", style=Style.red,     move="defend", ui="[{cval}]",   condition="energy|>|0"),
+	FightButton(name="wait",      label="Wait",      emoji="🕐", style=Style.gray,    move="wait"),
+	FightButton(name="flee",      label="Flee",      emoji="✖️", style=Style.gray,    move="flee"),
 	FightButton(name="attack_up", label="Attack-Up", emoji="⏫", style=Style.blurple, move="attack_up", row=1, ui="[{cval}]",   condition="mp|=|1"),
-	FightButton(name="pierce",    label="Pierce",    emoji="📍",  style=Style.blurple, move="pierce",     row=1, ui="[{cval}]",  condition="mp|=|2"),
+	FightButton(name="pierce",    label="Pierce",    emoji="📍", style=Style.blurple, move="pierce",    row=1, ui="[{cval}]",   condition="mp|=|2"),
 	FightButton(name="kamikaze",  label="Kamikaze",  emoji="💥", style=Style.blurple, move="kamikaze",  row=1, ui="[{cval}]",   condition="mp|=|3"),
-	FightButton(name="heal",      label="Heal",      emoji="🍷",  style=Style.green,   move="heal",      row=1, ui="[{maxval}]", condition="mp|>|0"),
+	FightButton(name="heal",      label="Heal",      emoji="🍷", style=Style.green,   move="heal",      row=1, ui="[{maxval}]", condition="mp|>|0"),
 ]
 
 general = FightGeneral(update=update, easy=makeMoveEasy, medium=makeMoveMedium, hard=makeMoveHard, random=makeMoveRandom)

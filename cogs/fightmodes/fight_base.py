@@ -5,7 +5,7 @@ from discord import Interaction as Itr
 import math
 
 from aidanbot import AidanBot
-from functions import getBar, getComEmbed
+from utils.functions import getBar, getComEmbed
 
 def clamp(n, minn, maxn):
 	return max(min(maxn, n), minn)
@@ -266,9 +266,9 @@ class FightMoves():
 				name, func, val = con[0], con[1], int(con[2])
 				value = turn[name]
 				if func == ">":
-					val+=1 
 					if value > val:
 						skip = False
+					val+=1 
 				if func == "=" and value == val:
 					skip = False
 			
@@ -288,7 +288,7 @@ class FightMoves():
 			if name == b.name:
 				move = b.move
 				if b.dynamicmove:
-					move = b.dynamicmove(move, turn, turnt)
+					move = b.dynamicmove(b.name, turn, turnt)
 				return b.move
 		return "wait"
 	def getMove(self, move):

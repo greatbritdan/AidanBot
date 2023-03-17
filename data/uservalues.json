@@ -1,13 +1,15 @@
 {
     "games_disabled": {
         "default":false,
-        "help":"If people aren't allowed to challange you in games unless you've recently talked.",
-        "type":"boolean"
+        "help":"If people aren't allowed to challenge you in games unless you've recently talked.",
+        "type":"boolean",
+        "example":"true"
     },
     "clone_disabled": {
         "default":false,
         "help":"If people can clone you withe clone command.",
-        "type":"boolean"
+        "type":"boolean",
+        "example":"true"
     },
     "birthday": {
         "default":false,

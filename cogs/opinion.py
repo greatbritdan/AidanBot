@@ -9,8 +9,7 @@ import emoji as em
 from random import random, randint, seed, choice
 
 from aidanbot import AidanBot
-from functions import getComEmbed, getBar
-from cooldowns import cooldown_opinion
+from utils.functions import getComEmbed, getBar
 
 def getLikeness(string):
 	days = datetime.date.today() - datetime.date(2022,6,28)
@@ -36,7 +35,6 @@ class OpinionCog(CM.Cog):
 
 	@opiniongroup.command(name="rate", description="I will rate a thing.")
 	@AC.describe(thing="Thing I will rate.")
-	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
 	async def rate(self, itr:Itr, thing:str):
 		repwords = {
 			"your":"my","you":"me","yourself":"myself","my":"your","me":"you","i":"you","myself":"yourself","this":"that","these":"those","that":"this","those":"these",
@@ -69,7 +67,6 @@ class OpinionCog(CM.Cog):
 
 	@opiniongroup.command(name="percent", description="I will say what part of something is something.")
 	@AC.describe(something="The something.", someone="The someone.")
-	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
 	async def percent(self, itr:Itr, something:str, someone:str="False"):
 		if someone == "False":
 			score = getLikeness(something.lower() + ":" + itr.user.name.lower())
@@ -85,7 +82,6 @@ class OpinionCog(CM.Cog):
 
 	@opiniongroup.command(name="ask", description="I will answer your burning questions.")
 	@AC.describe(question="The question you ask.")
-	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
 	async def ask(self, itr:Itr, question:str):
 		starts = []
 		answers = []
@@ -129,15 +125,24 @@ class OpinionCog(CM.Cog):
 
 	@opiniongroup.command(name="decide", description="I will decide on something for you.")
 	@AC.describe(options="All the options sepperated by commas.")
-	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
 	async def decide(self, itr:Itr, options:str):
 		options = [i.strip() for i in options.split(",") if i]
 		embed = getComEmbed(str(itr.user), self.client, f"I choose... {choice(options)}")
 		await itr.response.send_message(embed=embed)
 
+	@opiniongroup.command(name="8ball", description="I will be your personal magic 8 ball.")
+	@AC.describe(question="The question you ask.")
+	async def ball8(self, itr:Itr, question:str):
+		options = [
+			"It is certain.","It is decidedly so.","Without a doubt.","Yes definitely.","You may rely on it","As I see it, yes.","Most likely.","Outlook good.","Yes.","Signs point to yes",
+			"Reply hazy, try again.","Ask again later.","Better not tell you now.","Cannot predict now.","Concentrate and ask again.","Don't count on it.","My reply is no.","My sources say no.",
+			"Outlook not so good.","Very doubtful."
+	    ]
+		embed = getComEmbed(str(itr.user), self.client, question, choice(options))
+		await itr.response.send_message(embed=embed)	
+
 	@opiniongroup.command(name="tierlist", description="I will make a tier list to annoy you lol.")
 	@AC.describe(options="All the options sepperated by commas.", tiers="List of tier names/emojis (CAN'T HAVE BOTH) sepperated by commas.")
-	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
 	async def tierlist(self, itr:Itr, options:str, tiers:str=None):
 		allemoji = True
 		if tiers:
@@ -207,7 +212,6 @@ class OpinionCog(CM.Cog):
 
 	@opiniongroup.command(name="poll", description="Create a poll for people to vote on.")
 	@AC.describe(question="The question you are asking.", answers="LAll the answers sepperated by commas.", duration="The timelimit of the poll.")
-	@CM.dynamic_cooldown(cooldown_opinion, CM.BucketType.user)
 	async def poll(self, itr:Itr, question:str, answers:str, duration:AC.Range[int,30,1500]):
 		answers = [i.strip() for i in answers.split(",")]
 		if (len(answers) < 2 or len(answers) > 10) and (not self.client.aidan == itr.user.id):

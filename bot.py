@@ -1,16 +1,19 @@
+import discord, json, os
+
 from aidanbot import AidanBot
 from github import Github
-import os, json, discord
-from typing import Literal
+from pyyoutube import Api as YouApi
 
-### DON'T LEAK! ###
+from typing import Literal
+from dotenv import load_dotenv
+
+load_dotenv()
+token = os.getenv("DISCORD_TOKEN")
 github = Github(os.getenv("GITHUB_TOKEN"))
 githubrepo = github.get_repo("Aid0nModder/AidanBot")
-token = os.getenv("DISCORD_TOKEN")
-### DON'T LEAK! ###
+youtube = YouApi(api_key=os.getenv("YOUTUBE_KEY"))
 
-debug_guilds = False #[discord.Object(760987756985843733), discord.Object(836936601824788520)]
-
+debug_guilds = [discord.Object(760987756985843733), discord.Object(836936601824788520), discord.Object(879063875469860874), discord.Object(1041821214777278464)]
 
 def getnames(path):
 	names = []
@@ -28,7 +31,7 @@ def getGithubtags():
 	return Literal[tuple([tag.name for tag in githubrepo.get_labels()])]
 
 def main():
-	client = AidanBot(githubrepo, debug_guilds)
+	client = AidanBot(debug_guilds, githubrepo, youtube)
 	client.run(token)
 	
 if __name__ == '__main__':
@@ -41,11 +44,12 @@ Slash Command Hierarchy!
 	/info -      Bot info.
 	/ping -      Get bots latency.
 	/echo -      Make the bot say something.
-	/embed -     Create a custom embed.
 	/clone -     Say something as another user.
 	/issue -     Create an issue on github.
 	/role -      Add/Remove a [r] role to/from yourself or any role to/from anyone if you have manage roles. (GUILD ONLY)
+
 	/userinfo -  Get info on a user.
+	/guildinfo - Get info on the guild.
 
 	/config
 	-	/config guild -  Edit guild configeration. (GUILD ONLY) (REQUIRES KICK MEMBERS)
@@ -58,6 +62,7 @@ Slash Command Hierarchy!
 	-	/opinion decide -    Decinde on thing.
 	-	/opinion tierlist -  AidanBot will make a very cool tier list.
 	-	/opinion poll -      Create a poll.
+	-	/opinion 8ball -     AidanBot will shake a magic 8 ball on yur behalf.
 	/games
 	-	/games rps -           Rock, paper, sissors.
 	-	/games fight -         Fight people or bots.
@@ -68,14 +73,20 @@ Slash Command Hierarchy!
 	-	/birthday upcoming -  See upcoming birthdays.
 
 	/qotd (MUST HAVE 'qotd_channel' CONFIG SETUP!)
-	-	/qotd post -    Forcefully ask a question. (OWNER ONLY)
 	-	/qotd list -    List all questions.
 	-	/qotd ask -     Ask a question.
 	-	/qotd remove -  Remove a question.
+	-	/qotd edit -    Edit a question.
+	-	/qotd reroll -  Resend a questionm if the old one wasn't good.
 
-	(message) UwU -         Uwuifys a message. :3
+	/suggestbot
+	-	/suggestbot info     -  Info about suggestionbot.
+	-	/suggestbot generate -  Generates random suggestions.
+
+	(message) UwU -         /rpsifys a message. :3
 	(message) Eval -        Eval dat text. (OWNER ONLY)
 	(message) Eval-rerun -  Eval dat text but you can rerun it. (OWNER ONLY)
+	
 	(user) Info -           Get info on a user.
 
 '''

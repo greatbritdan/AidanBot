@@ -1,0 +1,208 @@
+CHANGELOG!
+Some older changes are lost to time! But most majour updates are accounted for:
+
+19th March 2023 - VERSION 3 (SLASH)
+- Added ReplyBot V1
+- Added Social Feeds
+- Added Suggestion Bot, /suggestbot info and /suggestbot generate
+- Added /qotd edit
+- Added /opinion 8ball
+- Added /guildinfo
+- Added server config values - timezone, qotd_posttime, feed_youtube, feed_youtube_channelid, feed_youtube_channel, feed_youtube_message, feed_youtube_ping
+- Improved /config guild - added timezone option, made info look less horrible
+- Improved /role - added more failsafes for giving invalid roles
+- Fixed /games rps just not working
+- Fixed /games fight not enabling when a move is possible.
+- New status'
+- Removed cooldowns
+- Small typo fixes
+- Small tweaks and improvements
+
+4th March 2023 - VERSION 2.1.1 (SLASH)
+- Fixed nitront
+- Fixed bug with mod_role
+
+31st October 2022 - VERSION 2.1 (SLASH)
+- Switched library - Pycord > Discord.py
+- Added Cooldowns
+- Improved /games fight - leaves logs
+- Added /games fight-replay
+- Added message command - fight
+- Added /embed
+- Added server config value - nitront
+- Changed server config value - join_message - can now have multiple messages (randomly chosen)
+- Meged commands - /role and /birtday set/remove
+- Improved Eval - better rerun support
+- Changed QOTD ID's
+- Better error handling for buttons
+- Attachment support for /clone
+- Added a changing status
+- Small tweaks and improvements
+
+15th September 2022 - VERSION 2 (SLASH)
+- Added /clone
+- Added /poll
+- Added server config value - mod_role
+- Added user config value - clone_disabled
+- Renamed user config value - dnd > games_disabled
+- Improved /info - shorter with a second page for permissions
+- Improved QOTD - added default questions
+- Changed /guild+user config - Added getraw function
+- Changed /opinion rate - Better word conversion
+- Changed /opinion tierlist - Added custom tiers
+- Fixed /games fight - several bugs
+- Shorter join message
+- Attachment support for /echo
+- Small tweaks and improvements
+
+10th September 2022 - VERSION 1.4 (SLASH)
+- Changed /qotd config, split into /qotd list, /qotd ask and /qotd remove
+- Changed /issue, Added a 3rd Tag
+- Replaced autocomplete
+- Small tweaks and improvements
+
+10th June 2022 - VERSION 1.3 (SLASH)
+- Added /opinion tierlist
+- Improved /opinion commands
+- Added server config values - remove_invites_exempt_roles, join_role
+- Renamed some server config values
+- Changed some permissions
+- Small tweaks and improvements
+
+29th May 2022 - VERSION 1.2.1 (SLASH)
+- Added Nitron't
+
+27th May 2022 - VERSION 1.2 (SLASH)
+- Improved fight
+- Added /games fightclassic
+- Added server config values - qotd_role
+- Added multiple channel support to replybot_channel and remove_invites_channel
+- Small tweaks and improvements
+
+19th May 2022 - VERSION 1.1 (SLASH)
+- Small tweaks and improvements
+
+10th May 2022 - VERSION 1 (SLASH)
+- AidanBot was ported to slash commands
+
+30th April 2022 - VERSION 2.1 (FULL)
+- Added $issue
+- Added $qotdremove
+- Improved $guildconfig / $userconfig, Changed to have a more user friendly UI.
+- Small tweaks and improvements
+
+20th March 2022 - VERSION 2 (FULL)
+- Added user config (with dnd)
+- Added server config values - prefix, birthday_announcement_channel, birthday_announcement_message, birthday_role, qotd_channel, questions
+- Added $worble
+- Added $auditbackup
+- Added Birthday - $setbirthday, $upcomingbirthdays
+- Added QOTD - $qotdadd, $qotdlist
+- Other Misc. tweaks and improvements
+
+18th February 2022 - VERSION 1.4.5 (FULL)
+- Changed $echo to owner only
+- Removed Logging
+- Small tweaks and improvements
+
+16th January 2022 - VERSION 1.3.5b (FULL)
+- Added server config values - remove_invites, allow_invites_channel
+
+15th January 2022 - VERSION 1.3.5 (FULL)
+- Added server config
+
+12th January 2022 - VERSION 1.3.1 (FULL)
+- Added GIF support for image commands
+- Added $timeout
+- Small tweaks and improvements
+
+21st December 2021 - VERSION 1.3 (FULL)
+- Improved $rps, has multiplayer
+- Added $fact
+- Small tweaks and improvements
+
+11th December 2021 - VERSION 1.2.1 (FULL)
+- Removed $meme
+
+9th December 2021 - VERSION 1.2 (FULL)
+- Added Image Commands ($emulogic, $killoverlay, $fakequote)
+- Added $meme
+- Improved Errors
+- Small tweaks and improvements
+
+3rd December 2021 - VERSION 1.1.2 (FULL)
+- Removed $info and $invite
+
+21th November 2021 - VERSION 1.1.1 (FULL)
+- Major refactor
+- $info and $invite are set to be retired start of December.
+- His status now changes!
+- Small tweaks and improvements
+
+17th November 2021 - VERSION 1.1 (FULL)
+- Refactored client
+- Added $poll
+- Small tweaks and improvements
+
+7th November 2021 - VERSION 1 (FULL)
+- Switched to pycord
+- Switched all commands to buttons
+- Added slowmodes to most commands
+- Added $rps
+- Added Mod commands ($slowmode, $kick, $ban, $clear)
+- Improved $ask
+- Fixed multi-word options in $decision
+- Rewrote most descriptions
+- Refactored a lot of code
+- Other Misc. bugfixes
+- Small tweaks and improvements
+
+16th October 2021 - VERSION 4 (LEGACY)
+- Improved $help, uses pages because was getting too long
+- Small tweaks and improvements
+
+7th October 2021 - VERSION 3.9 (LEGACY)
+- Added QOTD
+
+4th October 2021 - VERSION 3.5 (LEGACY)
+- Added $percent
+- Added $punish
+- Small tweaks and improvements
+
+7th September 2021 - VERSION 3.1 (LEGACY)
+- General Cleanup
+
+1st September 2021 - VERSION 3 (LEGACY)
+- Added $user and $guild (stats)
+- Improved $help
+- Removed Per server vars
+- Removed $poll
+- Small tweaks and improvements
+
+24th August 2021 - VERSION 2.9b Patch (LEGACY)
+- Improved $help, you can do $help <command name>
+- Improved $rate
+- Small tweaks and improvements
+
+22nd August 2021 - VERSION 2.9 (LEGACY)
+- Improved per server vars, they're no longer stored on peoples servers.
+
+22nd August 2021 - VERSION 2.7 (LEGACY)
+- Added misc. owner commands
+
+19th August 2021 - VERSION 2.5 (LEGACY)
+- Added $role
+- Fixed $fight bot AI
+- Small tweaks and improvements
+
+16th August 2021 - VERSION 2b Patch (LEGACY)
+- Added $ttt (Tic tac toe)
+
+14th August 2021 - VERSION 2 (LEGACY)
+
+- New Architecture
+- Added $react
+- Added $report
+
+8th August 2021 - VERSION 1.? (LEGACY)
+- Added Per server vars

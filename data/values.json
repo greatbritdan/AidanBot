@@ -1,90 +1,100 @@
 {
-    "nitront": {
-        "default":false,
-        "help":"If users without nitro can use animated emojis in your server by typing the name.",
-        "type":"boolean"
+    "timezone": {
+        "default":"UTC+0",
+        "options":["UTC-11","UTC-10","UTC-9","UTC-8","UTC-7","UTC-6","UTC-5","UTC-4","UTC-3","UTC-2","UTC-1","UTC+0","UTC+1","UTC+2","UTC+3","UTC+4","UTC+5","UTC+6","UTC+7","UTC+8","UTC+9","UTC+10","UTC+11","UTC+12"],
+        "help":"What timezone will be used for time based activities like QOTD and birthday.",
+        "type":"string",
+        "example":"UTC-5 OR UTC+5"
     },
-    
+
     "mod_role": {
         "default":false,
         "help":"The role(s) that will determent if a member can run restricted commands.",
-        "type":"[]role"
+        "type":"[]role",
+        "example":"admin, 857249746732974080"
     },
 
     "join_message": {
         "default":"Please welcome {name}!",
         "help":"The message that sends when a user joins your server, if there is more than 1 it will pick a random one. Only works if 'welcome_message_channel' is set.",
-        "type":"[]string"
+        "type":"[]string",
+        "example":"Welcome {mention}, Hello {mention}"
     },
     "join_message_channel": {
         "default":false,
         "help":"The channel that receives a message when a user joins your server.",
-        "type":"channel"
+        "type":"channel",
+        "example":"general OR 1034552227823620260"
     },
     "join_role": {
         "default":false,
         "help":"The role that a user receives when they join your server.",
-        "type":"role"
+        "type":"role",
+        "example":"admin OR 857249746732974080"
     },
 
     "remove_invites": {
         "default":false,
         "help":"If invites are removed.",
-        "type":"boolean"
+        "type":"boolean",
+        "example":"true"
     },
     "remove_invites_exempt_channels": {
         "default":false,
         "help":"The channel(s) that are exempt from invite removal.",
-        "type":"[]channel"
+        "type":"[]channel",
+        "example":"general, 1034552227823620260"
     },
     "remove_invites_exempt_roles": {
         "default":false,
         "help":"The role(s) that are exempt from invite removal.",
-        "type":"[]role"
+        "type":"[]role",
+        "example":"admin, 857249746732974080"
     },
 
     "birthday_announcement_message": {
         "default":"Happy Birthday {name}!",
         "help":"The message that sends when it's a users birthday, only works if 'birthday_announcement_channel' is set.",
-        "type":"string"
+        "type":"string",
+        "example":"Happy birthday {mention}"
     },
     "birthday_announcement_channel": {
         "default":false,
         "help":"The channel that receives a message when it's a users birthday.",
-        "type":"channel"
+        "type":"channel",
+        "example":"general OR 1034552227823620260"
     },
     "birthday_role": {
         "default":false,
         "help":"The role that members get if it's their birthday.",
-        "type":"role"
-    },
-    "birthday_posttime": {
-        "default":0,
-        "help":"The time of day that birthday messages will be sent/roles updated.",
-        "type":"number",
-        "restricted":true
+        "type":"role",
+        "example":"admin OR 857249746732974080"
     },
 
     "qotd_channel": {
         "default":false,
         "help":"The channel that question of the day questions are posted.",
-        "type":"channel"
+        "type":"channel",
+        "example":"general OR 1034552227823620260"
     },
     "qotd_role": {
         "default":false,
         "help":"The role that gets pinged when a new qotd is posted.",
-        "type":"role"
+        "type":"role",
+        "example":"admin OR 857249746732974080"
     },
     "qotd_reroll_threshold": {
         "default":3,
         "help":"The number of votes needed for a reroll to happen.",
-        "type":"number"
+        "type":"number",
+        "example":"1234, 5678"
     },
     "qotd_posttime": {
-        "default":15,
-        "help":"The time of day that questions will be asked",
-        "type":"number",
-        "restricted":true
+        "default":"3 PM",
+        "options":["12 AM","1 AM","2 AM","3 AM","4 AM","5 AM","6 AM","7 AM","8 AM","9 AM","10 AM","11 AM","12 PM","1 PM","2 PM","3 PM","4 PM","5 PM","6 PM","7 PM","8 PM","9 PM","10 PM","11 PM"],
+        "help":"The time of day where the QOTD question is posted, remebr that 0 is midnight, 12 is noon.",
+        "type":"string",
+        "example":"12 AM or 12 PM"
     },
     "questions": {
         "default":[],
@@ -93,9 +103,47 @@
         "restricted":true
     },
 
+    "feed_youtube": {
+        "default":false,
+        "help":"The last video ID, used for feed.",
+        "type":"string",
+        "restricted":true
+    },
+    "feed_youtube_channelid": {
+        "default":false,
+        "help":"The channel ID that vidoes are fetched from.",
+        "type":"string",
+        "example":"123456789"
+    },
+    "feed_youtube_channel": {
+        "default":false,
+        "help":"The channel that new videos are posted to.",
+        "type":"channel",
+        "example":"general OR 1034552227823620260"
+    },
+    "feed_youtube_message": {
+        "default":false,
+        "help":"The message that sends when new videos are posted.",
+        "type":"string",
+        "example":"Hey check out this new video!"
+    },
+    "feed_youtube_ping": {
+        "default":false,
+        "help":"The role that is pinged when new videos are posted.",
+        "type":"role",
+        "example":"admin OR 857249746732974080"
+    },
+
     "replybot_channel": {
         "default":false,
-        "help":"The channel/theads(s) that allows the bot to reply to people [BETA].",
-        "type":"[]channel/thread"
+        "help":"The channel/theads(s) that allows the bot to reply to people.",
+        "type":"[]channel/thread",
+        "example":"general, 1034552227823620260"
+    },
+    "nitront": {
+        "default":false,
+        "help":"If users without nitro can use animated emojis in your server by typing the name.",
+        "type":"boolean",
+        "example":"false"
     }
 }

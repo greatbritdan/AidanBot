@@ -1,11 +1,12 @@
-import discord
 import discord.ext.commands as CM
 import discord.app_commands as AC
 from discord import Interaction as Itr
 
+import os, sys
+
 from aidanbot import AidanBot
-from functions import getComEmbed
-from checks import ab_check
+from utils.functions import getComEmbed
+from utils.checks import ab_check
 
 from typing import Literal
 
@@ -16,7 +17,7 @@ class DashCog(CM.Cog):
 
 	@AC.command(name="owner-dashboard", description="The dashboard for the owner.")
 	@AC.describe(function="The function to run.", argument="Argument for function.")
-	async def dashboard(self, itr:Itr, function:Literal["test"]=None, argument:str=None):
+	async def dashboard(self, itr:Itr, function:Literal["test","reloadcon","reloaducon","restart"]=None, argument:str=None):
 		if not await ab_check(itr, self.client, is_owner=True):
 			return
 		c = self.client
@@ -29,6 +30,12 @@ class DashCog(CM.Cog):
 		outputfields = False
 		if function == "test":
 			output = f"Test command: {argument}"
+		elif function == "reloadcon":
+			await c.CON.values_msgupdate("load")
+			output = "Reloaded guild config"
+		elif function == "reloaducon":
+			await c.UCON.values_msgupdate("load")
+			output = "Reloaded user config"
 
 		emb = getComEmbed(str(itr.user), c, f"- Owner Dashboard > {function} -", output, fields=outputfields)
 		await itr.response.send_message(embed=emb)

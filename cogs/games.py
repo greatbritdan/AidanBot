@@ -3,14 +3,12 @@ import discord.ext.commands as CM
 import discord.app_commands as AC
 from discord import Interaction as Itr
 
-import asyncio, datetime, json
+import asyncio, json
 from random import choice
 from typing import Literal
 
 from aidanbot import AidanBot
-from checks import ab_check
-from cooldowns import cooldown_games
-from functions import getComEmbed, userPostedRecently
+from utils.functions import getComEmbed, userPostedRecently
 
 rps_options = ["rock", "paper", "scissors"]
 rps_optionsemoji = {"rock":"👊", "paper":"✋", "scissors":"✌️"}
@@ -18,7 +16,6 @@ rps_optionsemoji = {"rock":"👊", "paper":"✋", "scissors":"✌️"}
 from cogs.fightmodes.fight_base import FightPlayer as FP
 from cogs.fightmodes.fight_normal import startFightNormal
 from cogs.fightmodes.fight_classic import startFightClassic
-#from cogs.fightmodes.fight_cards import startFightCards
 
 class GamesCog(CM.Cog):
 	def __init__(self, client:AidanBot):
@@ -67,7 +64,6 @@ class GamesCog(CM.Cog):
 
 	@gamesgroup.command(name="rps", description="Rock, paper, scissors!")
 	@AC.describe(user1="The first player.", user2="The second player.")
-	@CM.dynamic_cooldown(cooldown_games, CM.BucketType.guild)
 	async def rps(self, itr:Itr, user1:discord.Member=None, user2:discord.Member=None):
 		user1, user2 = await self.defaultUsers(itr, user1, user2)
 		if not ((itr.user == user1 or await self.canPlay(itr, user1)) and (itr.user == user2 or await self.canPlay(itr, user2))):
@@ -101,10 +97,10 @@ class GamesCog(CM.Cog):
 			while True:
 				try:
 					butitr:Itr = await self.client.wait_for("interaction", timeout=30, check=check)
-					if butitr.user == player1:
+					if butitr.user.id == player1.id:
 						player1.pick = butitr.data["custom_id"]
 						await butitr.response.send_message(f"Pick set to {player1.getEmoji}!", ephemeral=True)
-					else:
+					elif butitr.user.id == player2.id:
 						player2.pick = butitr.data["custom_id"]
 						await butitr.response.send_message(f"Pick set to {player2.getEmoji}!", ephemeral=True)
 					if player1.pick != "" and player2.pick != "":
@@ -140,12 +136,10 @@ class GamesCog(CM.Cog):
 			core = startFightNormal(user1, user2, aiuser1, aiuser2)
 		elif mode == "classic":
 			core = startFightClassic(user1, user2, aiuser1, aiuser2)
-		elif mode == "cards":
-			core = startFightCards(user1, user2, aiuser1, aiuser2)
 		turn:FP = core.turn
 		turnt:FP = core.turnt
 
-		LOG = {"version":"V0.2","embeds":[]}
+		LOG = {"version":"V0.2","mode":mode,"player1ai":aiuser1,"player2ai":aiuser2,"embeds":[]}
 		def addLog(embed:discord.Embed):
 			LOG["embeds"].append(embed.to_dict())
 		def endLog():
@@ -212,7 +206,6 @@ class GamesCog(CM.Cog):
 	@AC.describe(user1="The first player.", user2="The second player.", ailevel="AI level for the bot.",
 		ailevel1="AI level for player 1 if a bot, overrides master.", ailevel2="AI level for player 2 if a bot, overrides master."
 	)
-	@CM.dynamic_cooldown(cooldown_games, CM.BucketType.guild)
 	async def fight_normal(self, itr:Itr, user1:discord.Member=None, user2:discord.Member=None,
 		ailevel:Literal["dead","random","easy","medium","hard"]="medium", ailevel1:Literal["dead","random","easy","medium","hard"]=None, ailevel2:Literal["dead","random","easy","medium","hard"]=None
 	):
@@ -226,7 +219,6 @@ class GamesCog(CM.Cog):
 	@AC.describe(user1="The first player.", user2="The second player.", ailevel="AI level for the bot.",
 		ailevel1="AI level for player 1 if a bot, overrides master.", ailevel2="AI level for player 2 if a bot, overrides master."
 	)
-	@CM.dynamic_cooldown(cooldown_games, CM.BucketType.guild)
 	async def fight_classic(self, itr:Itr, user1:discord.Member=None, user2:discord.Member=None,
 		ailevel:Literal["dead","random","easy","hard"]="easy", ailevel1:Literal["dead","random","easy","hard"]=None, ailevel2:Literal["dead","random","easy","hard"]=None
 	):
@@ -236,31 +228,13 @@ class GamesCog(CM.Cog):
 			return
 		await self.fight(itr, "classic", user1, user2, aiuser1, aiuser2)
 
-	'''@gamesgroup.command(name="fight-wip", description="Fight against another user or one of the main AI levels. Not Finished.")
-	@AC.describe(user1="The first player.", user2="The second player.", ailevel="AI level for the bot.",
-		ailevel1="AI level for player 1 if a bot, overrides master.", ailevel2="AI level for player 2 if a bot, overrides master."
-	)
-	@CM.dynamic_cooldown(cooldown_games, CM.BucketType.guild)
-	async def fight_cards(self, itr:Itr, user1:discord.Member=None, user2:discord.Member=None,
-		ailevel:Literal["dead","random","easy","hard"]="easy", ailevel1:Literal["dead","random","easy","hard"]=None, ailevel2:Literal["dead","random","easy","hard"]=None
-	):
-		if not await ab_check(itr, self.client, is_owner=True):
-			return
-		aiuser1, aiuser2 = ailevel1 or ailevel, ailevel2 or ailevel
-		user1, user2 = await self.defaultUsers(itr, user1, user2)
-		if not ((itr.user == user1 or await self.canPlay(itr, user1)) and (itr.user == user2 or await self.canPlay(itr, user2))):
-			return
-		await self.fight(itr, "cards", user1, user2, aiuser1, aiuser2)'''
-	
 	###
 
 	@gamesgroup.command(name="fight-replay", description="Replay a fight from a fightlog file!")
 	@AC.describe(logfile="The fightlog file to read from.")
-	@CM.dynamic_cooldown(cooldown_games, CM.BucketType.guild)
 	async def fight_replay_slash(self, itr:Itr, logfile:discord.Attachment):
 		await self.fight_replay(itr, logfile)
 
-	@CM.dynamic_cooldown(cooldown_games, CM.BucketType.guild)
 	async def fight_replay_msg(self, itr:Itr, msg:discord.Message):
 		if len(msg.attachments) > 0:
 			await self.fight_replay(itr, msg.attachments[0], True)
