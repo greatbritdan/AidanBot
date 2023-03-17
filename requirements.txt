@@ -3,3 +3,4 @@ dnspython==1.16.0
 async-timeout==4.0.2
 emoji==1.7.0
 PyGithub==1.55
+python-youtube==0.9.0
