@@ -13,7 +13,7 @@ github = Github(os.getenv("GITHUB_TOKEN"))
 githubrepo = github.get_repo("Aid0nModder/AidanBot")
 youtube = YouApi(api_key=os.getenv("YOUTUBE_KEY"))
 
-debug_guilds = [discord.Object(760987756985843733), discord.Object(836936601824788520), discord.Object(879063875469860874), discord.Object(1041821214777278464)]
+debug_guilds = False #[discord.Object(760987756985843733), discord.Object(836936601824788520), discord.Object(879063875469860874), discord.Object(1041821214777278464)]
 
 def getnames(path):
 	names = []
