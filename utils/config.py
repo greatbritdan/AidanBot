@@ -32,6 +32,7 @@ class ConfigManager():
 		self.stackable_values = {}
 		self.option_values = {}
 		self.example_values = {}
+		self.private_values = {}
 
 		list = None
 		if self.type == "guild":
@@ -55,12 +56,15 @@ class ConfigManager():
 			self.restrict_values[val] = False
 			self.option_values[val] = False
 			self.example_values[val] = False
+			self.private_values[val] = False
 			if "restricted" in list[val]:
 				self.restrict_values[val] = list[val]["restricted"]
 			if "options" in list[val]:
 				self.option_values[val] = deepcopy(list[val]["options"])
 			if "example" in list[val]:
 				self.example_values[val] = list[val]["example"]
+			if "private" in list[val]:
+				self.private_values[val] = list[val]["private"]
 
 	async def ready(self):
 		await self.values_msgupdate("load")
@@ -126,6 +130,8 @@ class ConfigManager():
 		return self.option_values[name]
 	def get_example(self, name):
 		return self.example_values[name]
+	def is_private(self, name):
+		return self.private_values[name]
 		
 	async def remove_group(self, obj:discord.Object):
 		if str(obj.id) in self.values:
@@ -278,13 +284,15 @@ class ConfigManager():
 		if self.get_stackable(name) and type(val) == list:
 			result = []
 			for nval in val:
-				result.append(self._display_value(nval))
+				result.append(self._display_value(nval, name))
 			return ", ".join(result)
 		else:
-			return self._display_value(val)
-	def _display_value(self, val):
+			return self._display_value(val, name)
+	def _display_value(self, val, name):
 		if isinstance(val, discord.TextChannel) or isinstance(val, discord.Thread) or isinstance(val, discord.Role):
 			return val.mention
+		if self.is_private(name):
+			return f"`{'*' * len(str(val))}`"
 		return f"`{val}`"
 
 	# loop through each user/guild and return their object, using the guild parameter limits it to a spesific guild.

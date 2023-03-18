@@ -18,7 +18,7 @@ class SuggestCog(CM.Cog):
 
 	@suggestgroup.command(name="info", description="Information about suggestbot.")
 	async def info(self, itr:Itr):
-		await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, "What is suggestbot?", "Suggestbot is a remake of the [Mari0 Suggestion Bot](https://twitter.com/Mari0AE_Bot) from twitter made by NH1507#5915 but for discord, it creates fake and silly suggestions for the game.", color=discord.Color.brand_red()))
+		await itr.response.send_message(getComEmbed(str(itr.user), self.client, "What is suggestbot?", "Suggestbot is a remake of the [Mari0 Suggestion Bot](https://twitter.com/Mari0AE_Bot) from twitter made by NH1507#5915 but for discord, it creates fake and silly suggestions for the game.", color=discord.Color.brand_red()))
 	
 	@suggestgroup.command(name="generate", description="Generate some Mari0 AE suggestions.")
 	@AC.describe(logs="If older suggestions are saved to a thread.",)
