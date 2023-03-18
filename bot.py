@@ -31,7 +31,7 @@ def getGithubtags():
 	return Literal[tuple([tag.name for tag in githubrepo.get_labels()])]
 
 def main():
-	client = AidanBot(debug_guilds, githubrepo, youtube)
+	client = AidanBot(debug_guilds, githubrepo, youtube, True)
 	client.run(token)
 	
 if __name__ == '__main__':
