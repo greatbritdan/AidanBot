@@ -346,9 +346,9 @@ Ignore Max Time:  {self.ignoremaxtime}
         
         # Time to send!
         if s.messagetype == "reply":
-            await ctx.reply(txt, stickers=stickers, mention_author=False)
+            await ctx.reply(txt, stickers=stickers, mention_author=False, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
         elif s.messagetype == "message":
-            await ctx.send(txt, stickers=stickers)
+            await ctx.send(txt, stickers=stickers, allowed_mentions=discord.AllowedMentions(everyone=False, roles=False))
         else:
             print(txt)
         return True
