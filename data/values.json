@@ -113,7 +113,8 @@
         "default":false,
         "help":"The channel ID that vidoes are fetched from.",
         "type":"string",
-        "example":"123456789"
+        "example":"123456789",
+        "private":true
     },
     "feed_youtube_channel": {
         "default":false,
