@@ -155,7 +155,7 @@ class QOTDCog(CM.Cog):
 				timezone = self.client.CON.get_value(guild, "timezone", guild=guild)
 				posttime = self.client.CON.get_value(guild, "qotd_posttime", guild=guild)
 				if self.client.timetable[timezone][time] == posttime:
-					self.askQuestion(guild)
+					await self.askQuestion(guild)
 
 	@tasks.loop(time=datetime.time(0, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
 	async def qotdtask0(self):
