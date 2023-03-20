@@ -37,13 +37,13 @@ class FeedsCog(CM.Cog):
 	async def checkFeed(self, guild, testchannelid=None):
 		channels:list[discord.TextChannel] = self.client.CON.get_value(guild, "feed_youtube_channel", guild=guild)
 		channelids:list[str] = self.client.CON.get_value(guild, "feed_youtube_channelid", guild=guild)
-		videoids:list[str] = self.client.CON.get_value(guild, "feed_youtube", guild=guild)
 
-		if (not channels) or (not channelids) or (not videoids):
+		if (not channels) or (not channelids):
 			return
 		
+		videoids:list[str] = self.client.CON.get_value(guild, "feed_youtube", guild=guild)
 		messages:list[str] = self.client.CON.get_value(guild, "feed_youtube_message", guild=guild)
-		pings:list[discord.Role] = self.client.CON.get_value(guild, "feed_youtube_ping", guild=guild)
+		pings:list[discord.Role] = self.client.CON.get_value(guild, "feed_youtube_ping", guild=guild) 
 
 		for idx, channelid in enumerate(channelids):
 			if testchannelid and testchannelid != channelid:
