@@ -55,8 +55,9 @@ class FeedsCog(CM.Cog):
 			if (not videoids) or (not videoids[idx]):
 				if not videoids:
 					videoids = []
+					for channelid in channelids:
+						videoids.append(False)
 				videoids[idx] = lastvideoidapi
-				await self.client.CON.set_value(guild, "feed_youtube", videoids)
 				return
 
 			lastvideoapi = self.getVideoFromID(lastvideoidapi)
