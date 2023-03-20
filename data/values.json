@@ -106,33 +106,33 @@
     "feed_youtube": {
         "default":false,
         "help":"The last video ID, used for feed.",
-        "type":"string",
+        "type":"[]string",
         "restricted":true
     },
     "feed_youtube_channelid": {
         "default":false,
         "help":"The channel ID that vidoes are fetched from.",
-        "type":"string",
-        "example":"123456789",
+        "type":"[]string",
+        "example":"Ug8Jnas85aBIA8JM0q, Ju8us9Hn5SAH8ahAUI1",
         "private":true
     },
     "feed_youtube_channel": {
         "default":false,
         "help":"The channel that new videos are posted to.",
-        "type":"channel",
-        "example":"general OR 1034552227823620260"
+        "type":"[]channel",
+        "example":"general, 1034552227823620260"
     },
     "feed_youtube_message": {
         "default":false,
         "help":"The message that sends when new videos are posted.",
-        "type":"string",
-        "example":"Hey check out this new video!"
+        "type":"[]string",
+        "example":"{name} uploaded a new video {url}, Check out the new video {url}"
     },
     "feed_youtube_ping": {
         "default":false,
         "help":"The role that is pinged when new videos are posted.",
-        "type":"role",
-        "example":"admin OR 857249746732974080"
+        "type":"[]role",
+        "example":"video ping, 8430420803659349313"
     },
 
     "replybot_channel": {

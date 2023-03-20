@@ -35,35 +35,45 @@ class FeedsCog(CM.Cog):
 
 		try:
 			for guild in await self.client.CON.loopdata():
-				channelid = self.client.CON.get_value(guild, "feed_youtube_channelid", guild=guild)
-				if not channelid:
-					continue
-				channel:discord.TextChannel = self.client.CON.get_value(guild, "feed_youtube_channel", guild=guild)
-				if not channel:
-					continue
+				channels:list[discord.TextChannel] = self.client.CON.get_value(guild, "feed_youtube_channel", guild=guild)
+				channelids:list[str] = self.client.CON.get_value(guild, "feed_youtube_channelid", guild=guild)
+				videoids:list[str] = self.client.CON.get_value(guild, "feed_youtube", guild=guild)
 
-				lastvideoid = self.client.CON.get_value(guild, "feed_youtube", guild=guild)
-				lastvideoidapi = self.getLastVideoIDFromChannelID(channelid)
-				lastvideoapi = self.getVideoFromID(lastvideoidapi)
-				if lastvideoidapi == None or lastvideoid == lastvideoidapi: # Failed to get video or last video is same as video
+				if (not channels) or (not channelids) or (not videoids):
 					continue
-				if lastvideoid == False:
+				
+				messages:list[str] = self.client.CON.get_value(guild, "feed_youtube_message", guild=guild)
+				pings:list[discord.Role] = self.client.CON.get_value(guild, "feed_youtube_ping", guild=guild)
+
+				for idx, channelid in enumerate(channelids):
+					lastvideoidapi = self.getLastVideoIDFromChannelID(channelid)
+					if lastvideoidapi == None or videoids[idx] == lastvideoidapi: # Failed to get video or last video is same as video
+						continue
+					if videoids[idx] == False:
+						await self.client.CON.set_value(guild, "feed_youtube", lastvideoidapi)
+						continue
+
+					lastvideoapi = self.getVideoFromID(lastvideoidapi)
+
+					ping, message, channel = pings[0], messages[0], channels[0]
+					if idx in pings:
+						ping = pings[idx]
+					if idx in messages:
+						ping = messages[idx]
+					if idx in channels:
+						channel = channels[idx]
+
+					if not ping:
+						ping = "(No ping role setup)"
+						if not message:
+							message = "**{name}** just posted a new video!\n\n> **{title}**\n\n{url}"
+					else:
+						ping = ping.mention
+						if not message:
+							message = "{ping} | **{name}** just posted a new video!\n\n> **{title}**\n\n{url}"
+
+					await channel.send(message.format(ping=ping, title=lastvideoapi["title"], name=lastvideoapi["channelTitle"], url=f"https://www.youtube.com/watch?v={lastvideoidapi}"))
 					await self.client.CON.set_value(guild, "feed_youtube", lastvideoidapi)
-					continue
-
-				message:str = self.client.CON.get_value(guild, "feed_youtube_message", guild=guild)
-				ping:discord.Role = self.client.CON.get_value(guild, "feed_youtube_ping", guild=guild)
-				if not ping:
-					ping = "(No ping role setup)"
-					if not message:
-						message = "**{channel}** just posted a new video!\n\n> **{title}**\n\n{url}"
-				else:
-					ping = ping.mention
-					if not message:
-						message = "{ping} | **{channel}** just posted a new video!\n\n> **{title}**\n\n{url}"
-
-				await channel.send(message.format(ping=ping, title=lastvideoapi["title"], channel=lastvideoapi["channelTitle"], url=f"https://www.youtube.com/watch?v={lastvideoidapi}"))
-				await self.client.CON.set_value(guild, "feed_youtube", lastvideoidapi)
 
 			self.loops = 0
 		except:
