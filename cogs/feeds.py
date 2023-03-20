@@ -111,7 +111,7 @@ class FeedsCog(CM.Cog):
 
 	@feedgroup.command(name="test", description="Test a feed.")
 	async def post(self, itr:Itr, channel:str):
-		if not await ab_check(itr, self.client, is_owner=True, is_guild=True, has_value="qotd_channel"):
+		if not await ab_check(itr, self.client, is_owner=True, is_guild=True, has_value="feed_youtube_channelid"):
 			return
 		
 		channelids:list[str] = self.client.CON.get_value(itr.guild, "feed_youtube_channelid", guild=itr.guild)
