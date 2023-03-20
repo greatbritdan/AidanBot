@@ -179,11 +179,13 @@ class ConfigManager():
 			string_limit, number_limit, stackable_limit = 99999, 999, 9999 # Technically not infinite :mmaker:
 
 		vals = False
-		if self.get_stackable(name):
+		iif self.get_stackable(name) and type(val) == "str":
 			vals = [v.strip(" ") for v in val.split(",")]
 			if len(vals) > stackable_limit:
 				return "Stackable values like `{name}` can't have more than {limit} {type}s.".format(limit=stackable_limit, name=name, type=self.get_type(name))
-
+		else:
+			vals = val
+			
 		def single_check(val):
 			if self.get_type(name) == "string":
 				if val != True and val != False and len(val) > string_limit:
@@ -209,7 +211,7 @@ class ConfigManager():
 		err = self.can_set_value(obj, name, val)
 		if err:
 			return False, err
-		if self.get_stackable(name):
+		if self.get_stackable(name) and type(val) == "str":
 			vals = [v.strip(" ") for v in val.split(",")]
 			result = []
 			for nval in vals:
