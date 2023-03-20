@@ -96,7 +96,7 @@ class FeedsCog(CM.Cog):
 				await self.client.CON.set_value(guild, "feed_youtube", videoids)
 
 	async def checkFeeds(self):
-		if self.client.settingup: #or self.client.isbeta:
+		if self.client.settingup or self.client.isbeta:
 			return
 		
 		try:
