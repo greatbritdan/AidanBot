@@ -8,6 +8,7 @@ from aidanbot import AidanBot
 from utils.functions import sendCustomError
 from utils.checks import ab_check
 
+
 class FeedsCog(CM.Cog):
 	def __init__(self, client:AidanBot):
 		self.client = client
