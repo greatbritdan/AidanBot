@@ -53,11 +53,14 @@ class FeedsCog(CM.Cog):
 			if lastvideoidapi == None or (videoids[idx] == lastvideoidapi and (not testchannelid)): # Failed to get video or last video is same as video
 				return
 			if videoids[idx] == False:
-				await self.client.CON.set_value(guild, "feed_youtube", lastvideoidapi)
+				store = self.client.CON.get_value(guild, "feed_youtube", guild=guild)
+				if not store:
+					store = []
+				store[idx] = lastvideoidapi
+				await self.client.CON.set_value(guild, "feed_youtube", store)
 				return
 
 			lastvideoapi = self.getVideoFromID(lastvideoidapi)
-
 			ping, message, channel = pings[0], messages[0], channels[0]
 			if idx < len(pings):
 				ping = pings[idx]
