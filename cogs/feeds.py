@@ -52,7 +52,7 @@ class FeedsCog(CM.Cog):
 			lastvideoidapi = self.getLastVideoIDFromChannelID(channelid)
 			if lastvideoidapi == None or (videoids[idx] == lastvideoidapi and (not testchannelid)): # Failed to get video or last video is same as video
 				return
-			if videoids[idx] == False:
+			if (not videoids) or (not videoids[idx]):
 				if not videoids:
 					videoids = []
 				videoids[idx] = lastvideoidapi
