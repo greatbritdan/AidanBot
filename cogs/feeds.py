@@ -61,13 +61,20 @@ class FeedsCog(CM.Cog):
 				return
 
 			lastvideoapi = self.getVideoFromID(lastvideoidapi)
-			ping, message, channel = pings[0], messages[0], channels[0]
+			
+			ping, message, channel = False, False, False
 			if idx < len(pings):
 				ping = pings[idx]
+			elif pings:
+				ping = pings[0]
 			if idx < len(messages):
 				message = messages[idx]
+			elif messages:
+				message = messages[0]
 			if idx < len(channels):
 				channel = channels[idx]
+			elif channels:
+				channel = channels[0]
 
 			if not ping:
 				ping = "(No ping role setup)"
