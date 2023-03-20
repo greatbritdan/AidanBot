@@ -63,15 +63,15 @@ class FeedsCog(CM.Cog):
 			lastvideoapi = self.getVideoFromID(lastvideoidapi)
 			
 			ping, message, channel = False, False, False
-			if idx < len(pings):
+			if pings and idx < len(pings):
 				ping = pings[idx]
 			elif pings:
 				ping = pings[0]
-			if idx < len(messages):
+			if messages and idx < len(messages):
 				message = messages[idx]
 			elif messages:
 				message = messages[0]
-			if idx < len(channels):
+			if channels and idx < len(channels):
 				channel = channels[idx]
 			elif channels:
 				channel = channels[0]
