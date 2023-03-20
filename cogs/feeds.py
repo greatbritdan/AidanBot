@@ -90,7 +90,10 @@ class FeedsCog(CM.Cog):
 
 			await channel.send(message.format(ping=ping, title=lastvideoapi["title"], name=lastvideoapi["channelTitle"], url=f"https://www.youtube.com/watch?v={lastvideoidapi}"))
 			if not testchannelid:
-				await self.client.CON.set_value(guild, "feed_youtube", lastvideoidapi)
+				while len(videoids) <= idx:
+					videoids.append(False)
+				videoids[idx] = lastvideoidapi
+				await self.client.CON.set_value(guild, "feed_youtube", videoids)
 
 	async def checkFeeds(self):
 		if self.client.settingup: #or self.client.isbeta:
