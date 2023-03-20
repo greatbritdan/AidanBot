@@ -179,7 +179,7 @@ class ConfigManager():
 			string_limit, number_limit, stackable_limit = 99999, 999, 9999 # Technically not infinite :mmaker:
 
 		vals = False
-		iif self.get_stackable(name) and type(val) == "str":
+		if self.get_stackable(name) and type(val) == "str":
 			vals = [v.strip(" ") for v in val.split(",")]
 			if len(vals) > stackable_limit:
 				return "Stackable values like `{name}` can't have more than {limit} {type}s.".format(limit=stackable_limit, name=name, type=self.get_type(name))
