@@ -3,12 +3,11 @@ Some older changes are lost to time! But most majour updates are accounted for:
 
 19th March 2023 - VERSION 3 (SLASH)
 - Added ReplyBot V1
-- Added Social Feeds
 - Added Suggestion Bot, /suggestbot info and /suggestbot generate
 - Added /qotd edit
 - Added /opinion 8ball
 - Added /guildinfo
-- Added server config values - timezone, qotd_posttime, feed_youtube, feed_youtube_channelid, feed_youtube_channel, feed_youtube_message, feed_youtube_ping
+- Added server config values - timezone, qotd_posttime
 - Improved /config guild - added timezone option, made info look less horrible
 - Improved /role - added more failsafes for giving invalid roles
 - Fixed /games rps just not working
