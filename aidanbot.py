@@ -3,7 +3,6 @@ from discord.ext import commands, tasks
 from discord.utils import find, get
 
 from github.Repository import Repository
-from pyyoutube import Api as YouApi
 
 from replybot.replybot import replyBot
 from utils.config import ConfigManager
@@ -20,10 +19,9 @@ class AidanBot(commands.Bot):
 	def __getitem__(self, key):
 		return getattr(self, key)
 	
-	def __init__(self, debug_guilds, githubrepo:Repository=False, youtube:YouApi=False, offline=False):
+	def __init__(self, debug_guilds, githubrepo:Repository=False, offline=False):
 		self.offline = offline
 		self.botrepo = githubrepo
-		self.youtube_api = youtube
 
 		self.isbeta = True
 		self.settingup = True
