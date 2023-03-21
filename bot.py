@@ -2,7 +2,6 @@ import discord, json, os
 
 from aidanbot import AidanBot
 from github import Github
-from pyyoutube import Api as YouApi
 
 from typing import Literal
 from dotenv import load_dotenv
@@ -11,27 +10,11 @@ from dotenv import load_dotenv
 token = os.getenv("DISCORD_TOKEN")
 github = Github(os.getenv("GITHUB_TOKEN"))
 githubrepo = github.get_repo("Aid0nModder/AidanBot")
-youtube = YouApi(api_key=os.getenv("YOUTUBE_KEY"))
 
 debug_guilds = False #[discord.Object(760987756985843733), discord.Object(836936601824788520), discord.Object(879063875469860874), discord.Object(1041821214777278464)]
 
-def getnames(path):
-	names = []
-	with open(f'./data/{path}.json') as file:
-		list = json.load(file)
-		for val in list:
-			if "restricted" not in list[val]:
-				names.append(val)
-	return Literal[tuple(names)]
-def getCONnames():
-	return getnames("values")
-def getUCONnames():
-	return getnames("uservalues")
-def getGithubtags():
-	return Literal[tuple([tag.name for tag in githubrepo.get_labels()])]
-
 def main():
-	client = AidanBot(debug_guilds, githubrepo, youtube)
+	client = AidanBot(debug_guilds, githubrepo)
 	client.run(token)
 	
 if __name__ == '__main__':
@@ -90,3 +73,18 @@ Slash Command Hierarchy!
 	(user) Info -           Get info on a user.
 
 '''
+
+def getnames(path):
+	names = []
+	with open(f'./data/{path}.json') as file:
+		list = json.load(file)
+		for val in list:
+			if "restricted" not in list[val]:
+				names.append(val)
+	return Literal[tuple(names)]
+def getCONnames():
+	return getnames("values")
+def getUCONnames():
+	return getnames("uservalues")
+def getGithubtags():
+	return Literal[tuple([tag.name for tag in githubrepo.get_labels()])]
