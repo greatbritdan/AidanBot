@@ -7,5 +7,5 @@ async def randchat_on_message(client, msg:discord.Message):
     logchannel = get(logguild.text_channels, name="randomlog-talk")
     member = choice(msg.guild.members) # get random member
     await client.sendWebhook(msg.channel, member.display_name, member.display_avatar, msg.content, [])
-    await logchannel.send(f"{str(msg.author)}: {msg.clean_content}"
+    await logchannel.send(f"{str(msg.author)}: {msg.clean_content}")
     await msg.delete()
