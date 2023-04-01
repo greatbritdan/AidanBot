@@ -1,14 +1,20 @@
 {
     "main": {
         "name": "AidanBot",
-        "pfp": "https://cdn.discordapp.com/attachments/885203191485050941/995944773091328050/aidanbot.png",
+        "pfp": "https://cdn.discordapp.com/attachments/832364164336975902/1091797599209656482/pfp_bot_big.png",
         "isbeta": false,
         "info": "I am a small Discord Bot created by [Aidan#8883](https://discordapp.com/users/384439774972215296/) for his server that now anyone can use!"
     },
     "beta": {
         "name": "AidanBetaBot",
-        "pfp": "https://cdn.discordapp.com/attachments/885203191485050941/995944780913717368/aidanbetabot.png",
+        "pfp": "https://cdn.discordapp.com/attachments/832364164336975902/1091797598970597387/pfp_beta_big.png",
         "isbeta": true,
         "info": "I am a small test Discord Bot created by [Aidan#8883](https://discordapp.com/users/384439774972215296/) to test features before being launched to the main!"
+    },
+    "alpha": {
+        "name": "AidanBetaBot",
+        "pfp": "https://cdn.discordapp.com/attachments/832364164336975902/1091797599448743976/pfp_alpha_big.png",
+        "isbeta": true,
+        "info": "You'll never see this!"
     }
 }
