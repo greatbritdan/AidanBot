@@ -5,7 +5,6 @@ from discord.utils import find, get
 from github.Repository import Repository
 
 from replybot.replybot import replyBot
-from aprilfirst.randchat import randchat_on_message
 from utils.config import ConfigManager
 from utils.checks import ab_check_slient
 from utils.functions import SendDM, sendError, sendCustomError, getComEmbed, sendComError, getErrorEmbed
@@ -97,8 +96,6 @@ class AidanBot(commands.Bot):
 				if message.channel.name == "aidanbetabot-talk":
 					return await self.replybot.on_message(message)
 			else:
-				if message.channel.name == "random-talk":
-					return await randchat_on_message(self, message)
 				channels = self.CON.get_value(message.guild, "replybot_channel", guild=message.guild) # reply bot uwu
 				if channels and message.channel in channels:
 					return await self.replybot.on_message(message)
