@@ -379,6 +379,7 @@ class QOTDCog(CM.Cog):
 			return
 		if instant == "Yes" and ab_check_slient(itr, self.client, has_mod_role=True):
 			await self.askQuestion(itr.guild, False, True)
+			await itr.response.send_message("Instant rerolled!", ephemeral=True)
 			return
 
 		votes = 1
