@@ -7,6 +7,7 @@ from discord.utils import get
 
 import datetime, asyncio
 from random import randint, choice
+from typing import Literal
 
 from aidanbot import AidanBot
 from utils.functions import getComEmbed, sendCustomError
@@ -372,8 +373,12 @@ class QOTDCog(CM.Cog):
 				await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Edited question!", f"With id **{questionid}**"))
 
 	@qotdgroup.command(name="reroll", description="Repost a question if the last one wasn't good.")
-	async def reroll(self, itr:Itr):
+	@AC.describe(instant="If the reroll should have no vote (Mods only).")
+	async def reroll(self, itr:Itr, instant:Literal["Yes","No"]):
 		if not await ab_check(itr, self.client, is_guild=True, has_value="qotd_channel"):
+			return
+		if instant == "Yes" and ab_check_slient(itr, self.client, has_mod_role=True):
+			await self.askQuestion(itr.guild, False, True)
 			return
 
 		votes = 1
