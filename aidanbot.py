@@ -5,6 +5,7 @@ from discord.utils import find, get
 from github.Repository import Repository
 
 from replybot.replybot import replyBot
+from aprilfirst.randchat import randchat_on_message
 from utils.config import ConfigManager
 from utils.checks import ab_check_slient
 from utils.functions import SendDM, sendError, sendCustomError, getComEmbed, sendComError, getErrorEmbed
@@ -25,8 +26,6 @@ class AidanBot(commands.Bot):
 
 		self.isbeta = True
 		self.settingup = True
-		self.version = "V3 (Slash)"
-		self.aidan = 384439774972215296
 		if debug_guilds:
 			self.debug_guilds = debug_guilds
 		else:
@@ -65,8 +64,23 @@ class AidanBot(commands.Bot):
 
 		with open('./data/profiles.json') as file:
 			profiles = json.load(file)
-		for name in profiles[profile]:
-			self[name] = profiles[profile][name]
+			self.name = profiles[profile]["name"]
+			self.pfp = profiles[profile]["pfp"]
+			self.isbeta = profiles[profile]["isbeta"]
+			self.info = profiles[profile]["info"]
+
+		with open('./data/info.json') as file:
+			info = json.load(file)
+			self.version     = info["version"]
+			self.lastupdate  = info["lastupdated"]
+			self.ownername   = info["ownername"]
+			self.ownerid     = info["ownerid"]
+			self.youtube     = info["youtube"]
+			self.youtubeplus = info["youtubeplus"]
+			self.discord     = info["discord"]
+			self.github      = info["github"]
+			self.privacy     = info["privacy"]
+			self.terms       = info["terms"]
 
 		self.settingup = False
 		self.status_loop.start()
@@ -95,6 +109,8 @@ class AidanBot(commands.Bot):
 			if self.isbeta:
 				if message.channel.name == "aidanbetabot-talk":
 					return await self.replybot.on_message(message)
+				if message.channel.name == "random-talk":
+					return await randchat_on_message(self, message)
 			else:
 				channels = self.CON.get_value(message.guild, "replybot_channel", guild=message.guild) # reply bot uwu
 				if channels and message.channel in channels:
@@ -133,7 +149,7 @@ class AidanBot(commands.Bot):
 				if channel.can_send():
 					chan = channel
 		if chan:
-			info = f"I'm {self.name}, a dumb bot made by **Aidan#8883**. I'm a general bot that has many features and prides myself on not having premium or selling NFT's! From fun and useless commands like /opinion and /games, to more useful features using /config. I'll make a great addition to the server!!!\n\nBefore we get started, you might want to read my:\n- [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service)\n- [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy)\n\n> **For aditional info on commands or permissions run /info!**"
+			info = f"I'm {self.name}, a dumb bot made by **Aidan (@britdan)**. I'm a general bot that has many features and prides myself on not having premium or selling NFT's! From fun and useless commands like /opinion and /games, to more useful features using /config. I'll make a great addition to the server!!!\n\nBefore we get started, you might want to read my:\n- [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service)\n- [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy)\n\n> **For aditional info on commands or permissions run /info!**"
 			emb = getComEmbed(None, self, f"Hello world!.. oh uhh i meant {guild.name}!", info)
 			await chan.send(embed=emb)
 
