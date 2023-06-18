@@ -1,3 +1,4 @@
+import typing
 import discord
 import discord.ext.commands as CM
 import discord.app_commands as AC
@@ -22,54 +23,69 @@ class InfoCog(CM.Cog):
 			"836936601824788520": "Offical Support Server 🎫"
 		}
 
-		self.uinfo = AC.ContextMenu(name="Info", callback=self.userinfo)
+		self.uinfo = AC.ContextMenu(name="Info", callback=self.appuserinfo)
 		self.client.tree.add_command(self.uinfo, guilds=self.client.debug_guilds)
 
 	async def cog_unload(self):
 		self.client.tree.remove_command(self.uinfo.name, type=self.uinfo.type)
 		
 	async def appuserinfo(self, itr:Itr, user:discord.Member|discord.User):
-		await self.userinfo(itr, user)
+		await self.userinfo(itr, user, "Full")
 
 	@AC.command(name="userinfo", description="Get info on a user in the server.")
-	@AC.describe(user="User to get info on, you can use an id for users not in server.")
-	async def slashuserinfo(self, itr:Itr, user:discord.Member|discord.User):
-		await self.userinfo(itr, user)
+	@AC.describe(
+		user="User to get info on, you can use an id for users not in server.",
+		display="If the embed will display the full data or only the essensial data. Reduces space and time"
+	)
+	async def slashuserinfo(self, itr:Itr, user:discord.Member|discord.User, display:typing.Literal["Full","Simple"]="Full"):
+		await self.userinfo(itr, user, display)
 
-	async def userinfo(self, itr:Itr, user:discord.Member|discord.User):	
+	async def userinfo(self, itr:Itr, user:discord.Member|discord.User, display:str):	
+		full = True if display == "Full" else False
 		user = user or itr.user
 		inguild = True
 		if isinstance(user, discord.User):
 			inguild = False
 
-		today = datetime.datetime.now()
-
-		title = f"Info on {str(user)}"
-		if inguild and user.nick: title += f" ({user.nick})"
+		name = user.name
+		if user.global_name:
+			name = user.global_name
+		if user.nick:
+			name = user.nick
+		title = f"Info on {name}"
 
 		desc = ""
-		if not inguild:
-			desc += "**[ This User isn't in the server so details are minimal ]**\n"
-		if str(user.id) in self.specalstatus:
-			desc += f"**[ {self.specalstatus[str(user.id)]} ]**\n"
-		if itr.guild.owner_id == user.id:
-			desc += f"**[ Server Owner 👑 ]**\n"
-		if inguild and user.premium_since:
-			desc += f"**[ Server Booster 💎 ]**\n"
-		if user.bot:
-			desc += f"**[ Bot Gang 🤖 ]**\n\n"
+		if user.nick:
+			desc = f"**aka {user.global_name} | @{user.name}**"
 		else:
-			if len(user.mutual_guilds) == 1:
-				desc += f"**[ Being watched by 1 {self.client.name} ]**\n\n"
+			desc = f"**@{user.name}**"
+		desc += "\n\n"
+
+		if full:
+			if not inguild:
+				desc += "**[ This User isn't in the server so details are minimal ]**\n"
+			if str(user.id) in self.specalstatus:
+				desc += f"**[ {self.specalstatus[str(user.id)]} ]**\n"
+			if itr.guild.owner_id == user.id:
+				desc += f"**[ Server Owner 👑 ]**\n"
+			if inguild and user.premium_since:
+				desc += f"**[ Server Booster 💎 ]**\n"
+			if user.bot:
+				desc += f"**[ Bot Gang 🤖 ]**\n\n"
 			else:
-				desc += f"**[ Being watched by {len(user.mutual_guilds)} {self.client.name}'s ]**\n\n"
-		
+				if len(user.mutual_guilds) == 1:
+					desc += f"**[ Being watched by 1 {self.client.name} ]**\n\n"
+				else:
+					desc += f"**[ Being watched by {len(user.mutual_guilds)} {self.client.name}'s ]**\n\n"
+	
 		desc += f"**Id:** {user.id}\n"
 		if inguild:
 			borth = self.client.UCON.get_value(user, 'birthday')
 			if borth:
 				day, month = borth.split("-")
 				desc += f"**Birthday:** {dateToStr(int(day), int(month))}\n"
+
+		today = datetime.datetime.now()
 		createddays = today - user.created_at.replace(tzinfo=None)
 		desc += f"**Created:** {format_dt(user.created_at, 'F')} ({createddays.days} Days)\n"
 		if inguild:
@@ -105,38 +121,45 @@ class InfoCog(CM.Cog):
 		if user.colour.value:
 			color = user.colour
 
-		await itr.response.defer()
-		fields = False
-		if inguild:
-			roletxt = "No roles"
-			if len(user.roles) > 1:
-				roletxt = ""
-				for role in reversed(user.roles):
-					if not role.is_default():
-						roletxt += role.mention + " "
+		if full:
+			await itr.response.defer()
+			fields = False
+			if inguild:
+				roletxt = "No roles"
+				if len(user.roles) > 1:
+					roletxt = ""
+					for role in reversed(user.roles):
+						if not role.is_default():
+							roletxt += role.mention + " "
 
-			lastmsgtxt = None
-			async for message in itr.channel.history(limit=2000):
-				if message.author == user:
-					lastmsgtxt = message
-					break
-			if lastmsgtxt is None:
-				lastmsgtxt = "This user hasn't talked in a while..."
-			elif lastmsgtxt.clean_content == "":
-				lastmsgtxt = f"[Jump to message]({lastmsgtxt.jump_url})"
-			else:
-				lastmsgtxt = "'" + lastmsgtxt.clean_content + f"' [Jump to message]({lastmsgtxt.jump_url})"
+				lastmsgtxt = None
+				async for message in itr.channel.history(limit=2000):
+					if message.author == user:
+						lastmsgtxt = message
+						break
+				if lastmsgtxt is None:
+					lastmsgtxt = "This user hasn't talked in a while..."
+				elif lastmsgtxt.clean_content == "":
+					lastmsgtxt = f"[Jump to message]({lastmsgtxt.jump_url})"
+				else:
+					lastmsgtxt = "'" + lastmsgtxt.clean_content + f"' [Jump to message]({lastmsgtxt.jump_url})"
 
-			fields = [["Roles:", roletxt], ["Latest Message:", lastmsgtxt]]
+				fields = [["Roles:", roletxt], ["Latest Message:", lastmsgtxt]]
+		else:
+			fields = []
 
 		embed = getComEmbed(str(itr.user), self.client, title, desc, color, fields=fields)
 		if user.avatar:
 			embed.set_thumbnail(url=user.avatar)
 		elif user.default_avatar:
 			embed.set_thumbnail(url=user.default_avatar)
-		if ruser.banner:
+		if ruser.banner and full:
 			embed.set_image(url=ruser.banner.url)
-		await itr.edit_original_response(embed=embed)
+
+		if full:
+			await itr.edit_original_response(embed=embed)
+		else:
+			await itr.response.send_message(embed=embed)
 
 	@AC.command(name="guildinfo", description="Get info on the server/guild.")
 	async def slashguildinfo(self, itr:Itr):
@@ -188,6 +211,7 @@ class InfoCog(CM.Cog):
 		channeltxt = ""
 		if len(guild.channels) > 0:
 			channeltxt = f"**Total channels:** {len(guild.channels)}\n"
+			channeltxt += f"**Total categories:** {len(guild.categories)}\n"
 			if len(guild.text_channels) > 0:
 				channeltxt += f"**Text channels:** {len(guild.text_channels)}\n"
 			if len(guild.forums) > 0:

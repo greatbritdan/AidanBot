@@ -3,23 +3,19 @@ import discord.ext.commands as CM
 import discord.app_commands as AC
 from discord import Interaction as Itr
 
-import datetime, re
+import re
 from github.Issue import Issue
-from discord.utils import format_dt
 
 from aidanbot import AidanBot
-from utils.config import ConfigManager
 from utils.functions import getComEmbed
 from utils.checks import ab_check, ab_check_slient, permission_check
-from bot import getCONnames, getUCONnames, getGithubtags
+from bot import getGithubtags
 
 import time, asyncio
 from random import choice, randint
 from typing import Literal
 
 githublabels = getGithubtags()
-CONvalues = getCONnames()
-UCONvalues = getUCONnames()
 
 def replaceWord(text, find, replace):
 	return re.sub(r"\b" + find + r"\b", replace, text)
@@ -93,19 +89,26 @@ class CoreCog(CM.Cog):
 		configcounts = "This server has lower limits, get **40** or more members to unlock larger config values!\n\n`String length limit:` 250\n`Number length limit:` 5\n`Stackable objects limit:` 10"
 		if itr.guild.member_count >= 40:
 			configcounts = "This server has higher limits because you have **40** or more members!\n\n`String length limit:` 1000\n`Number length limit:` 10\n`Stackable objects limit:` 25"
-		if itr.guild.owner.id == self.client.aidan:
+		if itr.guild.owner.id == self.client.ownerid:
 			configcounts = "This server has no limits because it's owned by **Aidan**!\n\n`String length limit:` None\n`Number length limit:` None\n`Stackable objects limit:` None"
 		stats = await permissionStates(itr, self.client)
+
+		info = self.client.info.format(ownerid=self.client.ownerid, ownername=self.client.ownername)
 
 		page = 0
 		pages = [
 			getComEmbed(str(itr.user), self.client, "Info > General", f'''
-				{self.client.info}
+				{info}
 
-				[Aidan's Youtube](https://www.youtube.com/c/AidanMapper)
-				[Aidan's Discord Server](https://discord.gg/KXrDUZfBpq)
-				[{self.client.name}'s Privacy Policy](https://github.com/Aid0nModder/AidanBot#privacy-policy)
-				[{self.client.name}'s Terms of Service](https://github.com/Aid0nModder/AidanBot#terms-of-service)
+				**VERSION: {self.client.version}**
+				**LAST UPDATED: {self.client.lastupdate}**
+
+				> [Aidan's Youtube]({self.client.youtube})
+				> [Aidan's Other Youtube]({self.client.youtubeplus})
+				> [Aidan's Discord]({self.client.discord})
+				> [AidanBot's Github]({self.client.github})
+				> [Privacy Policy]({self.client.privacy})
+				> [Terms of Service]({self.client.terms})
 			'''),
 			getComEmbed(str(itr.user), self.client, "Info > Permissions", fields=stats),
 			getComEmbed(str(itr.user), self.client, "Info > Config", configcounts),
@@ -263,109 +266,6 @@ class CoreCog(CM.Cog):
 			await itr.response.send_message(f"Removed {role.mention} from {user.mention}!")
 		else:
 			await itr.response.send_message(f"```'{action}' is not a valid action```")
-
-	configgroup = AC.Group(name="config", description="Commands to do with configeration.")
-	
-	@configgroup.command(name="guild", description="Guild configerations.")
-	@AC.describe(action="Config action.", name="Variable you're performing action on.", value="New value for this variable.")
-	async def guildconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw","Timezone"], name:CONvalues=None, value:str=None):
-		if not await ab_check(itr, self.client, is_guild=True, has_mod_role=True):
-			return
-		await self.config_command(itr, self.client.CON, itr.guild, action, name, value)
-
-	@configgroup.command(name="user", description="User configerations.")
-	@AC.describe(action="Config action.", name="Variable you're performing action on.", value="New value for this variable.")
-	async def userconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw"], name:UCONvalues=None, value:str=None):
-		await self.config_command(itr, self.client.UCON, itr.user, action, name, value)
-	
-	async def config_command(self, itr:Itr, CON:ConfigManager, obj, action="List", name:str=None, value=None):
-		values = CON.get_group(obj)
-		embed = False
-		if action == "List":
-			txt = ""
-			for name in values:
-				if CON.is_restricted(name) != True:
-					txt += f"\n**- {name}:** {CON.display_value(name, CON.get_value(obj, name, itr.guild))}"
-			embed = getComEmbed(str(itr.user), self.client, f"All values for {obj.name}:", txt)
-		elif action == "Info" and name:
-			truename = name.split("_")
-			truename = " ".join([n.capitalize() for n in truename])
-			truetype = CON.type_values[name] # font
-			if CON.stackable_values[name]:
-				truetype = f"{truetype} (Stackable)"
-			if CON.stackable_values[name]:
-				truetype = f"{truetype} (Private)"
-			truetype = f"**{truetype}**"
-			example = f"`/config guild action:Set name:{name} value:{CON.get_example(name)}`"
-
-			fields = [
-				["Current Value:", CON.display_value(name, CON.get_value(obj, name, itr.guild))],
-				["Type:",          truetype],
-				["Default Value:", CON.display_value(name, CON.default_values[name])],
-				["Example:",       example],
-			]
-			if CON.option_values[name]:
-				fields.append(["Options:", f"`{', '.join(CON.option_values[name])}`"])
-				
-			embed = getComEmbed(str(itr.user), self.client, f"Info on {truename} ({name})", CON.desc_values[name], fields=fields)
-		elif action == "Getraw" and name:
-			txt = f"```{CON.raw_value(name, values[name])}```"
-			embed = getComEmbed(str(itr.user), self.client, f"Raw of {name}:", txt)
-		elif action == "Reset" and name:
-			await CON.reset_value(obj, name)
-			embed = getComEmbed(str(itr.user), self.client, content=f"Reset {name} to `{CON.default_values[name]}`!")
-		elif action == "Set" and name and value:
-			_, error = await CON.set_value(obj, name, value, itr.guild)
-			if error:
-				embed = getComEmbed(str(itr.user), self.client, content=error)
-			else:
-				val = CON.get_value(obj, name, itr.guild)
-				if name == "timezone":
-					# Maybe I should just import some of there seperatly, generates 12am in the users timezone to test if it's correct
-					newtime = datetime.datetime(2023, 1, 1, 12, 0, 0, 0, tzinfo=datetime.timezone.utc) + datetime.timedelta(hours=int(val[4:]))
-					embed = getComEmbed(str(itr.user), self.client, content=f"Set {name} to {CON.display_value(name, val)}!\n\n{format_dt(newtime,'t')} should show `12:00` if corrected to your timezone.")
-				else:
-					embed = getComEmbed(str(itr.user), self.client, content=f"Set {name} to {CON.display_value(name, val)}!")
-		elif action == "Timezone":
-			utc = datetime.datetime.now(tz=datetime.timezone.utc)
-			def fdt(time, hr):
-				ntime:datetime.datetime = time+datetime.timedelta(hours=hr)
-				return ntime.strftime("%H:%M")
-			
-			a = f'''
-`UTC+0  : {fdt(utc,0)}`
-`UTC+1  : {fdt(utc,1)}`
-`UTC+2  : {fdt(utc,2)}`
-`UTC+3  : {fdt(utc,3)}`
-`UTC+4  : {fdt(utc,4)}`
-`UTC+5  : {fdt(utc,5)}`
-`UTC+6  : {fdt(utc,6)}`
-`UTC+7  : {fdt(utc,7)}`
-`UTC+8  : {fdt(utc,8)}`
-`UTC+9  : {fdt(utc,9)}`
-`UTC+10 : {fdt(utc,10)}`
-`UTC+11 : {fdt(utc,11)}`
-'''
-			b = f'''
-`UTC+12 : {fdt(utc,12)}`
-`UTC-11 : {fdt(utc,-11)}`
-`UTC-10 : {fdt(utc,-10)}`
-`UTC-9  : {fdt(utc,-9)}`
-`UTC-8  : {fdt(utc,-8)}`
-`UTC-7  : {fdt(utc,-7)}`
-`UTC-6  : {fdt(utc,-6)}`
-`UTC-5  : {fdt(utc,-5)}`
-`UTC-4  : {fdt(utc,-4)}`
-`UTC-3  : {fdt(utc,-3)}`
-`UTC-2  : {fdt(utc,-2)}`
-`UTC-1  : {fdt(utc,-1)}`
-'''
-			
-			fields = [["UTC : Time",a,True],["UTC : Time",b,True]]
-			embed = getComEmbed(str(itr.user), self.client, content="```The one that shows your current time is your timezone.```", fields=fields)
-		else:
-			return await itr.response.send_message("Seems like you're missing some arguments. Try again.")
-		await itr.response.send_message(embed=embed)
 
 async def setup(client:AidanBot):
 	await client.add_cog(CoreCog(client), guilds=client.debug_guilds)
