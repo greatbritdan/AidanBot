@@ -4,7 +4,8 @@
 
 ---
 
-## Privacy policy < Last updated: August 30th 2022 >
+## Privacy policy
+**< Last updated: August 30th 2022 >**
 Aidanbot does collect serveral types of data, all the data I collect is strictly confidential and no one but me has access.
 The data collected is as follows:
 - **Your basic user data** > As long as you are in one server with AidanBot, I have access stuff like username, profile, badges, mutral servers, etc, nothing major but something to be aware of.
@@ -19,7 +20,8 @@ The data collected is as follows:
 
 ---
 
-## Terms of service < Last updated: August 30th 2022 >
+## Terms of service
+**< Last updated: August 30th 2022 >**
 ### By using AidanBot you are agreeing to my **Terms of Service for users**:
 
 By agreeing to these terms as a user you are agreeing to...
