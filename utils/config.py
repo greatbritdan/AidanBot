@@ -175,7 +175,7 @@ class ConfigManager():
 		string_limit, number_limit, stackable_limit = 250, 5, 10
 		if self.type == "guild" and obj.member_count >= 40:
 			string_limit, number_limit, stackable_limit = 1000, 10, 25
-		if self.type == "guild" and obj.owner.id == self.client.owner:
+		if self.type == "guild" and obj.owner.id == self.client.ownerid:
 			string_limit, number_limit, stackable_limit = 99999, 999, 9999 # Technically not infinite :mmaker:
 
 		vals = False
