@@ -47,7 +47,7 @@ class SuggestCog(CM.Cog):
 		while True:
 			try:
 				butitr:Itr = await self.client.wait_for("interaction", timeout=90, check=check)
-				if butitr.user == itr.user or butitr.user == self.client.owner_id:
+				if butitr.user == itr.user or butitr.user == self.client.ownerid:
 					await butitr.response.defer()
 					if butitr.data["custom_id"] == "left":
 						page -= 1
