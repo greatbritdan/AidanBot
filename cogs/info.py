@@ -174,7 +174,7 @@ class InfoCog(CM.Cog):
 		title = f"Info on {guild.name}"
 
 		desc = ""
-		if guild.owner.id == 384439774972215296:
+		if guild.owner.id == self.client.ownerid:
 			desc += f"**[ Owned by Aidan <:AidanPog:839509169743593494> ]**\n"
 		if str(guild.id) in self.specalstatus:
 			desc += f"**[ {self.specalstatus[str(guild.id)]} ]**\n"
