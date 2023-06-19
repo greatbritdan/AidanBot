@@ -211,7 +211,7 @@ class ConfigManager():
 		err = self.can_set_value(obj, name, val)
 		if err:
 			return False, err
-		if self.get_stackable(name and type(val) == "str":
+		if self.get_stackable(name) and type(val) == "str":
 			vals = [v.strip(" ") for v in val.split(",")]
 			result = []
 			for nval in vals:
