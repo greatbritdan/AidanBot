@@ -147,7 +147,7 @@ class AidanBot(commands.Bot):
 				if channel.can_send():
 					chan = channel
 		if chan:
-			info = f"I'm {self.name}, a dumb bot made by **Aidan#8883**. I'm a general bot that has many features and prides myself on not having premium or selling NFT's! From fun and useless commands like /opinion and /games, to more useful features using /config. I'll make a great addition to the server!!!\n\nBefore we get started, you might want to read my:\n- [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service)\n- [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy)\n\n> **For aditional info on commands or permissions run /info!**"
+			info = f"I'm {self.name}, a dumb bot made by **{self.client.ownername}**. I'm a general bot that has many features and prides myself on not having premium or selling NFT's! From fun and useless commands like /opinion and /games, to more useful features using /config. I'll make a great addition to the server!!!\n\nBefore we get started, you might want to read my:\n- [Terms of service](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#terms-of-service)\n- [Privacy Policy](https://github.com/Aid0nModder/AidanBot/blob/main/README.md#privacy-policy)\n\n> **For aditional info on commands or permissions run /info!**"
 			emb = getComEmbed(None, self, f"Hello world!.. oh uhh i meant {guild.name}!", info)
 			await chan.send(embed=emb)
 
