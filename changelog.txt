@@ -1,6 +1,12 @@
 CHANGELOG!
 Some older changes are lost to time! But most majour updates are accounted for:
 
+19th July 2023 - VERSION 3.1 (SLASH)
+- Improved /userinfo - Added new username structure and a new option to make the embed smaller.
+- Improved /guildinfo - Shows number of categories.
+- Improved /info - Slightly cleaner first page.
+- Updated links
+
 19th March 2023 - VERSION 3 (SLASH)
 - Added ReplyBot V1
 - Added Suggestion Bot, /suggestbot info and /suggestbot generate

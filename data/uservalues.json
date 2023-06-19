@@ -15,6 +15,6 @@
         "default":false,
         "help":"Your birthday, day then month separated by a dash. Or false for no birthday",
         "type":"string",
-        "restricted":true
+        "restricted":"true"
     }
 }

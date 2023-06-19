@@ -1,4 +1,3 @@
-import typing
 import discord
 import discord.ext.commands as CM
 import discord.app_commands as AC
@@ -6,6 +5,7 @@ from discord import Interaction as Itr
 from discord.utils import format_dt
 
 import datetime
+from typing import Literal
 
 from aidanbot import AidanBot
 from utils.functions import dateToStr, getComEmbed
@@ -37,7 +37,7 @@ class InfoCog(CM.Cog):
 		user="User to get info on, you can use an id for users not in server.",
 		display="If the embed will display the full data or only the essensial data. Reduces space and time"
 	)
-	async def slashuserinfo(self, itr:Itr, user:discord.Member|discord.User, display:typing.Literal["Full","Simple"]="Full"):
+	async def slashuserinfo(self, itr:Itr, user:discord.Member|discord.User, display:Literal["Full","Simple"]="Full"):
 		await self.userinfo(itr, user, display)
 
 	async def userinfo(self, itr:Itr, user:discord.Member|discord.User, display:str):	
@@ -66,7 +66,7 @@ class InfoCog(CM.Cog):
 				desc += "**[ This User isn't in the server so details are minimal ]**\n"
 			if str(user.id) in self.specalstatus:
 				desc += f"**[ {self.specalstatus[str(user.id)]} ]**\n"
-			if itr.guild.owner_id == user.id:
+			if itr.guild.owner.id == user.id:
 				desc += f"**[ Server Owner 👑 ]**\n"
 			if inguild and user.premium_since:
 				desc += f"**[ Server Booster 💎 ]**\n"
