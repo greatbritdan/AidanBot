@@ -151,7 +151,7 @@ class OpinionCog(CM.Cog):
 			tierlists = {}
 			
 			tierssplit = [i.strip() for i in tiers.split(",") if i]
-			if (len(tierssplit) < 2 or len(tierssplit) > 10) and (not self.client.aidan == itr.user.id):
+			if (len(tierssplit) < 2 or len(tierssplit) > 10) and (not self.client.ownerid == itr.user.id):
 				return await itr.response.send_message("Invalid number of tiers! There must be at least 2 and no more than 10!")
 			
 			for tier in tierssplit:
@@ -214,7 +214,7 @@ class OpinionCog(CM.Cog):
 	@AC.describe(question="The question you are asking.", answers="LAll the answers sepperated by commas.", duration="The timelimit of the poll.")
 	async def poll(self, itr:Itr, question:str, answers:str, duration:AC.Range[int,30,1500]):
 		answers = [i.strip() for i in answers.split(",")]
-		if (len(answers) < 2 or len(answers) > 10) and (not self.client.aidan == itr.user.id):
+		if (len(answers) < 2 or len(answers) > 10) and (not self.client.ownerid == itr.user.id):
 			return await itr.response.send_message("Invalid number of answers! There must be at least 2 and no more than 10!")
 		if len(answers) != len(set(answers)):
 			return await itr.response.send_message("Invalid answers! It can not contain duplicates!")
