@@ -76,8 +76,8 @@ class BirthdayCog(CM.Cog):
 				if user in guild.members:
 					member = guild.get_member(user.id)
 
-					channel = self.client.CON.get_value(guild, "birthday_channel", guild=guild)
-					msg = self.client.CON.get_value(guild, "birthday_message")
+					channel = self.client.CON.get_value(guild, "birthday_announcement_channel", guild=guild)
+					msg = self.client.CON.get_value(guild, "birthday_announcement_message")
 					if channel and msg:
 						await channel.send(msg.format(name=user.name, mention=user.mention, user=user, member=user))
 					
