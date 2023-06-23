@@ -275,7 +275,7 @@ class CoreCog(CM.Cog):
 	
 	@configgroup.command(name="guild", description="Guild configerations.")
 	@AC.describe(action="Config action.", name="Variable you're performing action on.", value="New value for this variable.")
-	async def guildconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw","Timezone"], name:CONvalues=None, value:str=None):
+	async def guildconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw"], name:CONvalues=None, value:str=None):
 		if not await ab_check(itr, self.client, is_guild=True, has_mod_role=True):
 			return
 		await self.config_command(itr, self.client.CON, itr.guild, action, name, value)
@@ -300,8 +300,6 @@ class CoreCog(CM.Cog):
 			truetype = CON.type_values[name] # font
 			if CON.stackable_values[name]:
 				truetype = f"{truetype} (Stackable)"
-			if CON.stackable_values[name]:
-				truetype = f"{truetype} (Private)"
 			truetype = f"**{truetype}**"
 			example = f"`/config guild action:Set name:{name} value:{CON.get_example(name)}`"
 
@@ -327,49 +325,7 @@ class CoreCog(CM.Cog):
 				embed = getComEmbed(str(itr.user), self.client, content=error)
 			else:
 				val = CON.get_value(obj, name, itr.guild)
-				if name == "timezone":
-					# Maybe I should just import some of there seperatly, generates 12am in the users timezone to test if it's correct
-					newtime = datetime.datetime(2023, 1, 1, 12, 0, 0, 0, tzinfo=datetime.timezone.utc) + datetime.timedelta(hours=int(val[4:]))
-					embed = getComEmbed(str(itr.user), self.client, content=f"Set {name} to {CON.display_value(name, val)}!\n\n{format_dt(newtime,'t')} should show `12:00` if corrected to your timezone.")
-				else:
-					embed = getComEmbed(str(itr.user), self.client, content=f"Set {name} to {CON.display_value(name, val)}!")
-		elif action == "Timezone":
-			utc = datetime.datetime.now(tz=datetime.timezone.utc)
-			def fdt(time, hr):
-				ntime:datetime.datetime = time+datetime.timedelta(hours=hr)
-				return ntime.strftime("%H:%M")
-			
-			a = f'''
-`UTC+0  : {fdt(utc,0)}`
-`UTC+1  : {fdt(utc,1)}`
-`UTC+2  : {fdt(utc,2)}`
-`UTC+3  : {fdt(utc,3)}`
-`UTC+4  : {fdt(utc,4)}`
-`UTC+5  : {fdt(utc,5)}`
-`UTC+6  : {fdt(utc,6)}`
-`UTC+7  : {fdt(utc,7)}`
-`UTC+8  : {fdt(utc,8)}`
-`UTC+9  : {fdt(utc,9)}`
-`UTC+10 : {fdt(utc,10)}`
-`UTC+11 : {fdt(utc,11)}`
-'''
-			b = f'''
-`UTC+12 : {fdt(utc,12)}`
-`UTC-11 : {fdt(utc,-11)}`
-`UTC-10 : {fdt(utc,-10)}`
-`UTC-9  : {fdt(utc,-9)}`
-`UTC-8  : {fdt(utc,-8)}`
-`UTC-7  : {fdt(utc,-7)}`
-`UTC-6  : {fdt(utc,-6)}`
-`UTC-5  : {fdt(utc,-5)}`
-`UTC-4  : {fdt(utc,-4)}`
-`UTC-3  : {fdt(utc,-3)}`
-`UTC-2  : {fdt(utc,-2)}`
-`UTC-1  : {fdt(utc,-1)}`
-'''
-			
-			fields = [["UTC : Time",a,True],["UTC : Time",b,True]]
-			embed = getComEmbed(str(itr.user), self.client, content="```The one that shows your current time is your timezone.```", fields=fields)
+				embed = getComEmbed(str(itr.user), self.client, content=f"Set {name} to {CON.display_value(name, val)}!")
 		else:
 			return await itr.response.send_message("Seems like you're missing some arguments. Try again.")
 		await itr.response.send_message(embed=embed)

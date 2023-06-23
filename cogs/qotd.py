@@ -58,56 +58,12 @@ class QOTDCog(CM.Cog):
 		self.client = client
 
 	async def ready(self):
-		self.qotdtask0.start()
-		self.qotdtask1.start()
-		self.qotdtask2.start()
-		self.qotdtask3.start()
-		self.qotdtask4.start()
-		self.qotdtask5.start()
-		self.qotdtask6.start()
-		self.qotdtask7.start()
-		self.qotdtask8.start()
-		self.qotdtask9.start()
-		self.qotdtask10.start()
-		self.qotdtask11.start()
-		self.qotdtask12.start()
-		self.qotdtask13.start()
-		self.qotdtask14.start()
-		self.qotdtask15.start()
-		self.qotdtask16.start()
-		self.qotdtask17.start()
-		self.qotdtask18.start()
-		self.qotdtask19.start()
-		self.qotdtask20.start()
-		self.qotdtask21.start()
-		self.qotdtask22.start()
-		self.qotdtask23.start()
+		if not self.qotdtask.is_running():
+			self.qotdtask.start()
 		
 	def cog_unload(self):
-		self.qotdtask0.cancel()
-		self.qotdtask1.cancel()
-		self.qotdtask2.cancel()
-		self.qotdtask3.cancel()
-		self.qotdtask4.cancel()
-		self.qotdtask5.cancel()
-		self.qotdtask6.cancel()
-		self.qotdtask7.cancel()
-		self.qotdtask8.cancel()
-		self.qotdtask9.cancel()
-		self.qotdtask10.cancel()
-		self.qotdtask11.cancel()
-		self.qotdtask12.cancel()
-		self.qotdtask13.cancel()
-		self.qotdtask14.cancel()
-		self.qotdtask15.cancel()
-		self.qotdtask16.cancel()
-		self.qotdtask17.cancel()
-		self.qotdtask18.cancel()
-		self.qotdtask19.cancel()
-		self.qotdtask20.cancel()
-		self.qotdtask21.cancel()
-		self.qotdtask22.cancel()
-		self.qotdtask23.cancel()
+		if self.qotdtask.is_running():
+			self.qotdtask.cancel()
 		
 	async def askQuestion(self, guild:discord.Guild=False, dontremove=False, dontping=False):
 		if self.client.isbeta and (not dontremove):
@@ -132,9 +88,11 @@ class QOTDCog(CM.Cog):
 
 			emb = getComEmbed(None, self.client, "Question Of The Day", quest)
 			if len(questions) == 2:
-				emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left! Consier adding some now!")
+				emb.set_footer(text=f"Question submitted by {str(author)} | 1 question left!")
+			elif len(questions) == 1:
+				emb.set_footer(text=f"Question submitted by {str(author)} | 0 questions left!!! ")
 			else:
-				emb.set_footer(text=f"Question submitted by {str(author)} | {len(questions)-1} questions left.")
+				emb.set_footer(text=f"Question submitted by {str(author)} | {len(questions)-1} questions left!")
 
 			txt = ""
 			role = self.client.CON.get_value(guild, "qotd_role", guild=guild)
@@ -149,110 +107,12 @@ class QOTDCog(CM.Cog):
 				except Exception:
 					await sendCustomError(self.client, "QOTD Error", "Questions was unable to save, please manualy remove question!")
 
-	async def checktime(self, time):
+	@tasks.loop(time=datetime.time(15, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
+	async def qotdtask(self):
 		for guild in await self.client.CON.loopdata():
 			channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
 			if channel:
-				timezone = self.client.CON.get_value(guild, "timezone", guild=guild)
-				posttime = self.client.CON.get_value(guild, "qotd_posttime", guild=guild)
-				if self.client.timetable[timezone][time] == posttime:
-					await self.askQuestion(guild)
-
-	@tasks.loop(time=datetime.time(0, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask0(self):
-		await self.checktime("0 AM")
-
-	@tasks.loop(time=datetime.time(1, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask1(self):
-		await self.checktime("1 AM")
-
-	@tasks.loop(time=datetime.time(2, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask2(self):
-		await self.checktime("2 AM")
-
-	@tasks.loop(time=datetime.time(3, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask3(self):
-		await self.checktime("3 AM")
-
-	@tasks.loop(time=datetime.time(4, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask4(self):
-		await self.checktime("4 AM")
-
-	@tasks.loop(time=datetime.time(5, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask5(self):
-		await self.checktime("5 AM")
-		
-	@tasks.loop(time=datetime.time(6, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask6(self):
-		await self.checktime("6 AM")
-
-	@tasks.loop(time=datetime.time(7, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask7(self):
-		await self.checktime("7 AM")
-	
-	@tasks.loop(time=datetime.time(8, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask8(self):
-		await self.checktime("8 AM")
-
-	@tasks.loop(time=datetime.time(9, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask9(self):
-		await self.checktime("9 AM")
-
-	@tasks.loop(time=datetime.time(10, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask10(self):
-		await self.checktime("10 AM")
-
-	@tasks.loop(time=datetime.time(11, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask11(self):
-		await self.checktime("11 AM")
-
-	@tasks.loop(time=datetime.time(12, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask12(self):
-		await self.checktime("12 PM")
-
-	@tasks.loop(time=datetime.time(13, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask13(self):
-		await self.checktime("1 PM")
-		
-	@tasks.loop(time=datetime.time(14, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask14(self):
-		await self.checktime("2 PM")
-
-	@tasks.loop(time=datetime.time(15, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask15(self):
-		await self.checktime("3 PM")
-	
-	@tasks.loop(time=datetime.time(16, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask16(self):
-		await self.checktime("4 PM")
-
-	@tasks.loop(time=datetime.time(17, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask17(self):
-		await self.checktime("5 PM")
-
-	@tasks.loop(time=datetime.time(18, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask18(self):
-		await self.checktime("6 PM")
-
-	@tasks.loop(time=datetime.time(19, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask19(self):
-		await self.checktime("7 PM")
-
-	@tasks.loop(time=datetime.time(20, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask20(self):
-		await self.checktime("8 PM")
-
-	@tasks.loop(time=datetime.time(21, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask21(self):
-		await self.checktime("9 PM")
-		
-	@tasks.loop(time=datetime.time(22, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask22(self):
-		await self.checktime("10 PM")
-
-	@tasks.loop(time=datetime.time(23, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
-	async def qotdtask23(self):
-		await self.checktime("11 PM")
+				await self.askQuestion(guild)
 
 	###
 

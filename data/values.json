@@ -1,12 +1,4 @@
 {
-    "timezone": {
-        "default":"UTC+0",
-        "options":["UTC-11","UTC-10","UTC-9","UTC-8","UTC-7","UTC-6","UTC-5","UTC-4","UTC-3","UTC-2","UTC-1","UTC+0","UTC+1","UTC+2","UTC+3","UTC+4","UTC+5","UTC+6","UTC+7","UTC+8","UTC+9","UTC+10","UTC+11","UTC+12"],
-        "help":"What timezone will be used for time based activities like QOTD and birthday.",
-        "type":"string",
-        "example":"UTC-5 OR UTC+5"
-    },
-
     "mod_role": {
         "default":false,
         "help":"The role(s) that will determent if a member can run restricted commands.",
@@ -88,13 +80,6 @@
         "help":"The number of votes needed for a reroll to happen.",
         "type":"number",
         "example":"1234, 5678"
-    },
-    "qotd_posttime": {
-        "default":"3 PM",
-        "options":["12 AM","1 AM","2 AM","3 AM","4 AM","5 AM","6 AM","7 AM","8 AM","9 AM","10 AM","11 AM","12 PM","1 PM","2 PM","3 PM","4 PM","5 PM","6 PM","7 PM","8 PM","9 PM","10 PM","11 PM"],
-        "help":"The time of day where the QOTD question is posted, remebr that 0 is midnight, 12 is noon.",
-        "type":"string",
-        "example":"12 AM or 12 PM"
     },
     "questions": {
         "default":[],
