@@ -4,7 +4,7 @@ import discord.app_commands as AC
 from discord import Interaction as Itr
 from discord.ext import tasks
 
-import datetime, asyncio, pytz
+import datetime, asyncio
 
 from aidanbot import AidanBot
 from utils.functions import getComEmbed, dateToStr
@@ -86,7 +86,7 @@ class BirthdayCog(CM.Cog):
 						if role:
 							await member.add_roles(role)
 
-	@tasks.loop(time=datetime.time(0, 0, 0, 0, pytz.timezone("GB")))
+	@tasks.loop(time=datetime.time(0, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
 	async def birthtask(self):
 		await self.nextDay()
 
