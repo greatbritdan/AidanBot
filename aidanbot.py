@@ -84,8 +84,8 @@ class AidanBot(commands.Bot):
 			self.terms       = info["terms"]
 
 		self.settingup = False
-		if not self.status_loop.is_running():
-			self.status_loop.start()
+		if not self.statusloop.is_running():
+			self.statusloop.start()
 		print(f"< Logged in: {self.name} >")
 
 		await self.CON.ready()
