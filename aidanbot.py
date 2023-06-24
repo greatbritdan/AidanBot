@@ -9,7 +9,7 @@ from utils.config import ConfigManager
 from utils.checks import ab_check_slient
 from utils.functions import SendDM, sendError, sendCustomError, getComEmbed, sendComError, getErrorEmbed
 
-import json, os, traceback, sys, re
+import json, os, traceback, sys, re, asyncio
 from random import choice, randint
 
 # My Son.
@@ -34,6 +34,8 @@ class AidanBot(commands.Bot):
 		if not self.offline:
 			with open("./data/times.json") as file:
 				self.timetable = json.load(file)
+
+		self.statuslooperrors = 0
 
 	async def setup_hook(self):
 		if not self.offline:
@@ -258,34 +260,41 @@ class AidanBot(commands.Bot):
 		return str(n) + suffix
 
 	@tasks.loop(minutes=10)
-	async def status_loop(self):
+	async def statusloop(self):
 		status = {
-			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "A very dangerous game", "One Word Story", "Aidan's videos on repeat", "badbot",
-	        	"soon at least", "Polish Grass Simulator", "rock paper scissors" ],
-			
-			"watching": [ "the world fall apart...", "out for Waluigi!", "Aidan sleep", "the Bucket Wars", "Aidan rewrite me for the {nthtime} time", "Not So Shrimple now is it",
-				"people stop using me :(", "{servercount} Servers!", "{membercount} Members!", "One Word Story: The Movie", "other bots suck!" ],
-
-			"streaming": [ "Polish Grass in 4K", "absolutely nothing", "the screams of my victims", "\"I may be stupid, but wtf\"", "1's and 0's across the interwebs",
-		 		"something... but you'll never know :)", "and screaming" ],
-				 
-			"listening": [ "the waves going over the internet", "Aidan's nonexistant future", "my servers overheating", "Aidan complain about bots for the {nthtime} time", "everyone complain" ],
-			
-			"competing": [ "an arm pit fart contest", "stuff with my brothers", "war crimes simulator... in minecraft", "being better than Aidans Bots", "a stupid bot contest (I'm winning)" ],
+			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "a very dangerous game...", "One Word Story", "Aidan's videos on repeat", "badbot", "Polish Grass Simulator" ],
+			"watching": [ "the world fall apart...", "out for Waluigi!", "Aidan sleep", "the Bucket Wars", "Aidan rewrite me for the {nthtime} time", "people stop using me :(",
+				"{servercount} Servers!", "{membercount} Members!", "One Word Story: The Movie", "other bots suck!", "Pip0n's Palace crumble lol" ],
+			"streaming": [ "Polish Grass in 4K", "absolutely nothing", "the screams of my victims", "1's and 0's across the interwebs", "something... but you'll never know :)", "and screaming" ],
+			"listening_to": [ "Aidan's nonexistant future lol", "my servers overheating", "Aidan complain about bots for the {nthtime} time", "everyone complain...", "Never Gonna Give You Up!" ],
+			"competing_in": [ "an arm pit fart contest", "stuff with my brothers", "War Crimes Simulator!", "being better than Aidans Bots!", "a stupid bot contest (I'm winning)" ],
 		}
 		activity_type, group = choice(list(status.items()))
 
 		if activity_type == "playing": activity_type = discord.ActivityType.playing
 		if activity_type == "watching": activity_type = discord.ActivityType.watching
 		if activity_type == "streaming": activity_type = discord.ActivityType.streaming
-		if activity_type == "listening": activity_type = discord.ActivityType.listening
-		if activity_type == "competing": activity_type = discord.ActivityType.competing
+		if activity_type == "listening_to": activity_type = discord.ActivityType.listening
+		if activity_type == "competing_in": activity_type = discord.ActivityType.competing
 		content = choice(group).format(nthtime=self.make_ordinal(randint(1,24)), servercount=len(self.guilds), membercount=len(self.users))
 
 		try:
 			await self.change_presence(activity=discord.Activity(name=content,type=activity_type))
 		except Exception:
 			await sendCustomError(self, "Staus Change", f"Status failed to change to: {activity_type} {content}")
+		self.statuslooperrors = 0
+
+	@statusloop.error
+	async def statuslooperror(self, error):
+		self.statuslooperrors += 1
+		if self.statuslooperrors >= 5:
+			await sendCustomError(self, "Status Task Error", f"Status Task failed 5 times and has been shutdown, please fix and restart!\n\n{error}")
+			if self.statusloop.is_running():
+				self.statusloop.cancel()
+		else:
+			await sendCustomError(self, "Status Task Error", f"Status Task failed and will restart shortly!")
+			if not self.statusloop.is_running():
+				self.statusloop.start()
 
 	def itrFail(self):
 		if randint(1,6) == 1:
