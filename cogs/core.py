@@ -201,11 +201,13 @@ class CoreCog(CM.Cog):
 
 	@issue.autocomplete("label1")
 	async def issue_label1(self, itr:Itr, current:str):
-		return [AC.Choice(name=tag.name, value=tag.name) for tag in self.client.botrepo.get_labels()]
+		tags = [tag.name for tag in self.client.botrepo.get_labels()]
+		return [AC.Choice(name=name, value=name) for name in tags if current.lower() in name.lower()]
 	
 	@issue.autocomplete("label2")
 	async def issue_label2(self, itr:Itr, current:str):
-		return [AC.Choice(name=tag.name, value=tag.name) for tag in self.client.botrepo.get_labels()]
+		tags = [tag.name for tag in self.client.botrepo.get_labels()]
+		return [AC.Choice(name=name, value=name) for name in tags if current.lower() in name.lower()]
 
 	async def _uwuify(self, itr:Itr, message:discord.Message):
 		endings = [";;w;;", ";w;", "UwU", "OwO", ":3", "X3", "^_^", "\\* *sweats* *", "\\* *screams* *", "\\* *huggles tightly* *"]
