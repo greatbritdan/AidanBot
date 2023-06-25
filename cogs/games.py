@@ -37,9 +37,9 @@ class GamesCog(CM.Cog):
 	async def defaultUsers(self, itr:Itr, user1:discord.Member=None, user2:discord.Member=None):
 		if user1 and user2:
 			return user1, user2
-		elif user1:
+		elif user1 and user1.id != itr.user.id:
 			return user1, itr.user
-		elif user2:
+		elif user2 and user2.id != itr.user.id:
 			return itr.user, user2
 		else:
 			return itr.user, await itr.guild.fetch_member(itr.client.user.id)
@@ -87,9 +87,10 @@ class GamesCog(CM.Cog):
 
 		embed, view = getRPSEmbed()
 		await itr.response.send_message(embed=embed, view=view)
+		MSG = await itr.original_response()
 		
 		def check(checkitr:Itr):
-			return (((checkitr.user.id == player1.id and player1.pick == "") or (checkitr.user.id == player2.id and player2.pick == "")))
+			return (checkitr.message.id == MSG.id and ((checkitr.user.id == player1.id and player1.pick == "") or (checkitr.user.id == player2.id and player2.pick == "")))
 
 		if (player1.bot and player2.bot):
 			await asyncio.sleep(1.5)
@@ -97,10 +98,10 @@ class GamesCog(CM.Cog):
 			while True:
 				try:
 					butitr:Itr = await self.client.wait_for("interaction", timeout=30, check=check)
-					if butitr.user.id == player1.id:
+					if butitr.user.id == player1.id and player1.pick == "":
 						player1.pick = butitr.data["custom_id"]
 						await butitr.response.send_message(f"Pick set to {player1.getEmoji}!", ephemeral=True)
-					elif butitr.user.id == player2.id:
+					elif butitr.user.id == player2.id and player2.pick == "":
 						player2.pick = butitr.data["custom_id"]
 						await butitr.response.send_message(f"Pick set to {player2.getEmoji}!", ephemeral=True)
 					if player1.pick != "" and player2.pick != "":
@@ -108,7 +109,8 @@ class GamesCog(CM.Cog):
 				except asyncio.TimeoutError:
 					embed, view = getRPSEmbed(True)
 					await itr.edit_original_response(embed=embed, view=view)
-
+					return
+				
 		state = "Something broke lol, i'm gonna blame you. <:AidanSmug:837001740947161168>"
 		if player1.pick == player2.pick:
 			state = "Same result, draw."
