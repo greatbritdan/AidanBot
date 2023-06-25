@@ -3,22 +3,17 @@ import discord.ext.commands as CM
 import discord.app_commands as AC
 from discord import Interaction as Itr
 
-import datetime, re
+import re
 from github.Issue import Issue
-from discord.utils import format_dt
 
 from aidanbot import AidanBot
 from utils.config import ConfigManager
 from utils.functions import getComEmbed
 from utils.checks import ab_check, ab_check_slient, permission_check
-from bot import getCONnames, getUCONnames, getGithubtags
 
 import time, asyncio
 from random import choice, randint
 from typing import Literal
-
-CONvalues = getCONnames()
-UCONvalues = getUCONnames()
 
 def replaceWord(text, find, replace):
 	return re.sub(r"\b" + find + r"\b", replace, text)
@@ -53,7 +48,7 @@ async def permissionStates(itr:Itr, client:AidanBot):
 		"add_reactions","manage_threads","send_tts_messages","use_application_commands","manage_events","administrator"
 	]
 	clientmember = await itr.guild.fetch_member(client.user.id)
-
+	
 	rtxt = ""
 	for perm in requiredperms:
 		if not permission_check(clientmember, itr.channel, perm):
@@ -202,12 +197,12 @@ class CoreCog(CM.Cog):
 	@issue.autocomplete("label1")
 	async def issue_label1(self, itr:Itr, current:str):
 		tags = [tag.name for tag in self.client.botrepo.get_labels()]
-		return [AC.Choice(name=name, value=name) for name in tags if current.lower() in name.lower()]
+		return [AC.Choice(name=name, value=name) for name in tags if current.lower() in name.lower()][:25]
 	
 	@issue.autocomplete("label2")
 	async def issue_label2(self, itr:Itr, current:str):
 		tags = [tag.name for tag in self.client.botrepo.get_labels()]
-		return [AC.Choice(name=name, value=name) for name in tags if current.lower() in name.lower()]
+		return [AC.Choice(name=name, value=name) for name in tags if current.lower() in name.lower()][:25]
 
 	async def _uwuify(self, itr:Itr, message:discord.Message):
 		endings = [";;w;;", ";w;", "UwU", "OwO", ":3", "X3", "^_^", "\\* *sweats* *", "\\* *screams* *", "\\* *huggles tightly* *"]
@@ -281,19 +276,33 @@ class CoreCog(CM.Cog):
 		else:
 			await itr.response.send_message(f"```'{action}' is not a valid action```")
 
+	###
+
 	configgroup = AC.Group(name="config", description="Commands to do with configeration.")
 	
 	@configgroup.command(name="guild", description="Guild configerations.")
 	@AC.describe(action="Config action.", name="Variable you're performing action on.", value="New value for this variable.")
-	async def guildconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw"], name:CONvalues=None, value:str=None):
+	async def guildconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw"], name:str=None, value:str=None):
 		if not await ab_check(itr, self.client, is_guild=True, has_mod_role=True):
 			return
+		if name and name not in self.client.CON.valid_values:
+			name = False
 		await self.config_command(itr, self.client.CON, itr.guild, action, name, value)
+
+	@guildconfig.autocomplete("name")
+	async def guildconfig_name(self, itr:Itr, current:str):
+		return [AC.Choice(name=val, value=val) for val in self.client.CON.valid_values if current.lower() in val.lower()][:25]
 
 	@configgroup.command(name="user", description="User configerations.")
 	@AC.describe(action="Config action.", name="Variable you're performing action on.", value="New value for this variable.")
-	async def userconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw"], name:UCONvalues=None, value:str=None):
+	async def userconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Getraw"], name:str=None, value:str=None):
+		if name and name not in self.client.UCON.valid_values:
+			name = False
 		await self.config_command(itr, self.client.UCON, itr.user, action, name, value)
+
+	@userconfig.autocomplete("name")
+	async def userconfig_name(self, itr:Itr, current:str):
+		return [AC.Choice(name=val, value=val) for val in self.client.UCON.valid_values if current.lower() in val.lower()][:25]
 	
 	async def config_command(self, itr:Itr, CON:ConfigManager, obj, action="List", name:str=None, value=None):
 		values = CON.get_group(obj)
@@ -337,7 +346,7 @@ class CoreCog(CM.Cog):
 				val = CON.get_value(obj, name, itr.guild)
 				embed = getComEmbed(str(itr.user), self.client, content=f"Set {name} to {CON.display_value(name, val)}!")
 		else:
-			return await itr.response.send_message("Seems like you're missing some arguments. Try again.")
+			return await itr.response.send_message("Seems like you're missing some arguments, or inputed an incorrect one. Try again.")
 		await itr.response.send_message(embed=embed)
 
 async def setup(client:AidanBot):
