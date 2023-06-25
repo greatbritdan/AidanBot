@@ -112,8 +112,15 @@ def getBar(value, maxvalue, size, hashalf=False, color="blue"):
 	return bar
 
 def dateToStr(day, month):
-	months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-	m, d = months[month-1], day
+	months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Out-Of-Rangeary"]
+	
+	m = month
+	try:
+		m = months[month-1]
+	except IndexError:
+		m = month[12]
+
+	d = day
 	if day == 1 or day == 21 or day == 31:
 		d = f"{d}st"
 	elif day == 2 or day == 22:
