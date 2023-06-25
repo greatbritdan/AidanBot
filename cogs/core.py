@@ -17,7 +17,6 @@ import time, asyncio
 from random import choice, randint
 from typing import Literal
 
-githublabels = getGithubtags()
 CONvalues = getCONnames()
 UCONvalues = getUCONnames()
 
@@ -186,18 +185,27 @@ class CoreCog(CM.Cog):
 			await itr.edit_original_response(content="Sent!")
 
 	@AC.command(name="issue", description="Create an issue on GitHub.")
-	@AC.describe(title="Title of the post.", body="Body of the embed.", label1="Tag to insert into the post.", label2="Tag to insert into the post.", label3="Tag to insert into the post.")
-	async def issue(self, itr:Itr, title:str, body:str, label1:githublabels=None, label2:githublabels=None, label3:githublabels=None):
+	@AC.describe(title="Title of the post.", body="Body of the embed.", label1="Tag to insert into the post, must be a valid tag.", label2="Tag to insert into the post, must be a valid tag.")
+	async def issue(self, itr:Itr, title:str, body:str, label1:str=None, label2:str=None):
+		labels = [i for i in [label1, label2] if i and i in self.client.botrepo.get_labels()]
+		body += f"\n\n[ Submitted by {str(itr.user)} via /issue ]"
+		
 		if len(title) >= 200: return await itr.response.send_message("Title must be 200 characters or fewer.", ephemeral=True)
 		if len(body) >= 1000: return await itr.response.send_message("Body must be 1000 characters or fewer.", ephemeral=True)
 
-		body += f"\n\n[ Submitted by {str(itr.user)} via /issue ]"
-		labels = [i for i in [label1, label2, label3] if i]
 		if len(labels) > 0:
 			issue:Issue = self.client.botrepo.create_issue(title=title, body=body, labels=labels)
 		else:
 			issue:Issue = self.client.botrepo.create_issue(title=title, body=body)
 		await itr.response.send_message(f"Submitted!\n\n{issue.html_url}")
+
+	@issue.autocomplete("label1")
+	async def issue_label1(self, itr:Itr, current:str):
+		return [AC.Choice(name=tag.name, value=tag.name) for tag in self.client.botrepo.get_labels()]
+	
+	@issue.autocomplete("label2")
+	async def issue_label2(self, itr:Itr, current:str):
+		return [AC.Choice(name=tag.name, value=tag.name) for tag in self.client.botrepo.get_labels()]
 
 	async def _uwuify(self, itr:Itr, message:discord.Message):
 		endings = [";;w;;", ";w;", "UwU", "OwO", ":3", "X3", "^_^", "\\* *sweats* *", "\\* *screams* *", "\\* *huggles tightly* *"]
