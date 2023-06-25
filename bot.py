@@ -73,18 +73,3 @@ Slash Command Hierarchy!
 	(user) Info -           Get info on a user.
 
 '''
-
-def getnames(path):
-	names = []
-	with open(f'./data/{path}.json') as file:
-		list = json.load(file)
-		for val in list:
-			if "restricted" not in list[val]:
-				names.append(val)
-	return Literal[tuple(names)]
-def getCONnames():
-	return getnames("values")
-def getUCONnames():
-	return getnames("uservalues")
-def getGithubtags():
-	return Literal[tuple([tag.name for tag in githubrepo.get_labels()])]
