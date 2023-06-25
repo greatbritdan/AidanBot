@@ -118,7 +118,7 @@ def dateToStr(day, month):
 	try:
 		m = months[month-1]
 	except IndexError:
-		m = month[12]
+		m = months[12]
 
 	d = day
 	if day == 1 or day == 21 or day == 31:
