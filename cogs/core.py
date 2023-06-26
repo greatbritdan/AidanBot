@@ -311,7 +311,7 @@ class CoreCog(CM.Cog):
 			txt = ""
 			for name in values:
 				if CON.is_restricted(name) != True:
-					txt += f"\n**- {name}:** {CON.display_value(name, CON.get_value(obj, name, itr.guild))}"
+					txt += f"\n**\\- {name}:** {CON.display_value(name, CON.get_value(obj, name, itr.guild))}"
 			embed = getComEmbed(str(itr.user), self.client, f"All values for {obj.name}:", txt)
 		elif action == "Info" and name:
 			truename = name.split("_")
