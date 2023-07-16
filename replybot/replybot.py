@@ -304,7 +304,7 @@ Ignore Max Time:  {self.ignoremaxtime}
 
         txt = txt.format(**data)
 
-        if txt[-1] not in self.punctuationcheck:
+        if txt != "" and txt[-1] not in self.punctuationcheck:
             if isinstance(s.punctuation, dict):
                 if g.mood in s.punctuation:
                     txt = f"{txt}{choice(s.punctuation[g.mood])}"
