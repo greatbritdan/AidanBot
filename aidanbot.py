@@ -145,8 +145,9 @@ class AidanBot(commands.Bot):
 		if not chan:
 			chan = find(lambda m: "talk" in m.name, guild.text_channels)
 		if not chan:
+			clientmember = await guild.fetch_member(self.user.id)
 			for channel in guild.text_channels:
-				if channel.can_send():
+				if channel.permissions_for(clientmember).send_messages:
 					chan = channel
 		if chan:
 			info = f"I'm {self.name}, a dumb bot made by **{self.ownername}**. I'm a general bot that has many features and prides myself on not having premium or selling NFT's! From fun and useless commands like /opinion and /games, to more useful features using /config. I'll make a great addition to the server!!!\n\nBefore we get started, you might want to read my:\n- [Terms of service]({self.terms})\n- [Privacy Policy]({self.privacy})\n\n> **For aditional info on commands or permissions run /info!**"
