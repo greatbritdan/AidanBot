@@ -182,7 +182,9 @@ class CoreCog(CM.Cog):
 	@AC.command(name="issue", description="Create an issue on GitHub.")
 	@AC.describe(title="Title of the post.", body="Body of the embed.", label1="Tag to insert into the post, must be a valid tag.", label2="Tag to insert into the post, must be a valid tag.")
 	async def issue(self, itr:Itr, title:str, body:str, label1:str=None, label2:str=None):
-		labels = [i for i in [label1, label2] if i and i in self.client.botrepo.get_labels()]
+		glabels = [i.name for i in self.client.botrepo.get_labels()]
+		labels = [i for i in [label1, label2] if i and i in glabels]
+		dbody = body
 		body += f"\n\n[ Submitted by {str(itr.user)} via /issue ]"
 		
 		if len(title) >= 200: return await itr.response.send_message("Title must be 200 characters or fewer.", ephemeral=True)
@@ -192,7 +194,11 @@ class CoreCog(CM.Cog):
 			issue:Issue = self.client.botrepo.create_issue(title=title, body=body, labels=labels)
 		else:
 			issue:Issue = self.client.botrepo.create_issue(title=title, body=body)
-		await itr.response.send_message(f"Submitted!\n\n{issue.html_url}")
+
+		dbody = (dbody[:100] + "...") if len(dbody) > 100 else dbody
+		embed = getComEmbed(str(itr.user), self.client, f"Submitted - {issue.title} #{issue.number}", f"```{dbody}```\n[View Issue]({issue.html_url})")
+		embed.set_image(url=f"https://opengraph.githubassets.com/38d571ceec6df9de6f4fce604edf337d9ffc782aa7f123aaaae74c9fbe824428/Aid0nModder/AidanBot/issues/{issue.number}")
+		await itr.response.send_message(embed=embed)
 
 	@issue.autocomplete("label1")
 	async def issue_label1(self, itr:Itr, current:str):
