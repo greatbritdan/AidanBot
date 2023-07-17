@@ -174,7 +174,7 @@ class OpinionCog(CM.Cog):
 		opts = [i.strip() for i in options.split(",") if i]
 		options = []
 		for opt in opts:
-			emoji = em.core.distinct_emoji_lis(opt)
+			emoji = em.core.distinct_emoji_list(opt)
 			if len(emoji) > 0:
 				options.append(emoji[0])
 			else:
