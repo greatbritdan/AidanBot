@@ -304,5 +304,4 @@ def divide_chunks(l, n):
 		yield l[i:i + n]
 
 async def setup(client:AidanBot):
-	guilds = [g.id for g in client.guilds if g.id != 836936601824788520]
-	await client.add_cog(QOTDCog(client), guilds=guilds)
+	await client.add_cog(QOTDCog(client), guilds=client.debug_guilds)
