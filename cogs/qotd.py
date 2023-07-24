@@ -277,7 +277,7 @@ class QOTDCog(CM.Cog):
 			typee = "Classic"
 			questions.append({"question": question, "author": itr.user.id, "id": qid, "type": "classic"})
 		await self.client.CON.set_value(itr.guild, "questions", questions)
-		await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Added question!", f"> **'{question}**'Type    : {typee}{plus}```"), ephemeral=True)
+		await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Added question!", f"> **'{question}**'\nType    : {typee}{plus}```"), ephemeral=True)
 
 	@qotdgroup.command(name="remove", description="Remove a question from qotd, you can only remove your own unless you are a mod.")
 	@AC.describe(question="The question to be removed, remember you can only remove your own unless you are a mod.")
