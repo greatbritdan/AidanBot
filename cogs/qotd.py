@@ -233,20 +233,6 @@ class QOTDCog(CM.Cog):
 			await self.createQuestion(itr.guild, bool(noping), bool(nosave))
 			await itr.response.send_message("Asked'd... yea...", ephemeral=True)
 
-	@qotdgroup.command(name="embed", description="New qotd embed instructions.")
-	async def embed(self, itr:Itr):
-		if not await ab_check(itr, self.client, is_owner=True):
-			return
-		fields = [
-			["Classic", "Classic is the one we know and ''love'', just speak your mind."],
-			["Choice", "Choice adds a twist to the classic question, the embed will be joined by some fancy buttons, 2 to 5 of them, and you get to choose which one you prefer or agree with, there is no correcy answer."],
-			["Quiz", "Quiz is the same as choice but there is a correct answer, you have to try and guess which is correct."]
-		]
-		embed = getComEmbed(str(itr.user), self.client, "Welcome to the new Question Of The Day!!!", "There has been a massive overhaul to the entire system and you get to be on of the first to test run it. In short, we have 3 question formats now, and the second 2 have more meaning that the classic format.\n\nFind any issues with the new system? Make an issue on the github using /issue, No account needed.", fields=fields)
-		channel = self.client.CON.get_value(itr.guild, "qotd_channel", guild=itr.guild)
-		if channel:
-			await channel.send(embed=embed)
-
 	@qotdgroup.command(name="ask", description="Add a question to qotd.")
 	@AC.describe(
 		question="The question you are asking.", options="The options members will pick from, leave blank for a normal question, only 2 to 5 options allowed.",
@@ -321,6 +307,9 @@ class QOTDCog(CM.Cog):
 			return await itr.response.send_message("Question Of The Day is not setup in this server.", ephemeral=True)
 
 		questions = self.client.CON.get_value(itr.guild, "questions")
+		if len(questions) == 0:
+			return await itr.response.send_message("There are currently no questions, be one of the first with /qotd ask!", ephemeral=True)
+		
 		questiondata = questions[0]
 		def getEmbed(timeout=False):
 			data = ""
