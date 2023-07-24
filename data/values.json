@@ -87,6 +87,12 @@
         "type":"array",
         "restricted":true
     },
+    "lastquestion": {
+        "default":false,
+        "help":"The details about the last question.",
+        "type":"array",
+        "restricted":true
+    },
 
     "replybot_channel": {
         "default":false,
