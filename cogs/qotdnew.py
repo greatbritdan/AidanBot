@@ -389,4 +389,4 @@ def getQuestionFromID(questions, qid, ismod=True, itr=False):
 	return False
 
 async def setup(client:AidanBot):
-	await client.add_cog(QOTDNewCog(client), guilds=[836936601824788520])
+	await client.add_cog(QOTDNewCog(client), guilds=[discord.Object(836936601824788520)])
