@@ -95,6 +95,7 @@ class QOTDCog(CM.Cog):
 	###		
 
 	async def optionUsed(self, itr:Itr, id:str):
+		print(id)
 		optid = int(id.split(":")[2][2])-1
 		last = self.client.CON.get_value(itr.guild, "lastquestion")
 
