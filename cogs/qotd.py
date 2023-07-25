@@ -155,7 +155,11 @@ class QOTDCog(CM.Cog):
 				options, votes, voters = q["options"], [0 for o in q["options"]], {}
 			if "correct" in q:
 				correct = q["correct"]
-			await self.client.CON.set_value(guild, "lastquestion", {"messageid": channel.last_message_id, "id": q["id"], "options": options, "correct": correct, "votes": votes, "voters": voters})
+			await self.client.CON.set_value(guild, "lastquestion", {
+				"messageid": channel.last_message_id, "id": q["id"], "type": q["type"],
+				"question": question, "author": q["author"], "options": options, "correct": correct,
+				"votes": votes, "voters": voters
+			})
 
 			if not nosave:
 				try:
