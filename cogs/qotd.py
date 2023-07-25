@@ -170,15 +170,13 @@ class QOTDCog(CM.Cog):
 		lastquestion = self.client.CON.get_value(guild, "lastquestion")
 		lastmessage = await channel.fetch_message(lastquestion["messageid"])
 
-		q = getQuestionFromID(questions, lastquestion["id"])
-		if q:
-			question, author = q["question"], get(guild.members, id=q["author"])
-			if "options" in q:
-				embed = self.getQuestionEmbed(question, author.name, len(questions)-1, sum(lastquestion["votes"]))
-				await lastmessage.edit(embed=embed)
-			else:
-				embed = self.getQuestionEmbed(question, author.name, len(questions)-1)
-				await lastmessage.edit(embed=embed)
+		question, author = lastquestion["question"], get(guild.members, id=lastquestion["author"])
+		if "options" in lastquestion:
+			embed = self.getQuestionEmbed(question, author.name, len(questions)-1, sum(lastquestion["votes"]))
+			await lastmessage.edit(embed=embed)
+		else:
+			embed = self.getQuestionEmbed(question, author.name, len(questions)-1)
+			await lastmessage.edit(embed=embed)
 
 	async def createQuestionResults(self, guild:discord.Guild, nosave:bool=False):
 		channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
