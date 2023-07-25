@@ -45,7 +45,7 @@ class QOTDView(discord.ui.View):
 		optid = 0
 		for opt in options:
 			optid += 1
-			self.add_item(discord.ui.Button(label=opt, style=discord.ButtonStyle.gray, custom_id=f"qotdview:{self.guild}:op{optid}"))
+			self.add_item(discord.ui.Button(label=opt, style=discord.ButtonStyle.gray, custom_id=f"qotdview:{self.guild.id}:op{optid}"))
 
 	async def interaction_check(self, itr:Itr):
 		await self.cog.optionUsed(itr, itr.data["custom_id"])
