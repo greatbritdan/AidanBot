@@ -57,9 +57,9 @@ class QOTDCog(CM.Cog):
 
 	async def ready(self):
 		for guild in await self.client.CON.loopdata():
-			data = self.client.CON.get_value(guild, "lastquestion", guild=guild)
-			if data and "options" in data:
-				self.client.add_view(QOTDView(self, guild, data['options']))
+			lastquestion = self.client.CON.get_value(guild, "lastquestion", guild=guild)
+			if lastquestion and "options" in lastquestion:
+				self.client.add_view(QOTDView(self, guild, lastquestion['options']))
 
 		if self.client.isbeta:
 			return
@@ -97,6 +97,9 @@ class QOTDCog(CM.Cog):
 	async def optionUsed(self, itr:Itr, id:str):
 		optid = int(id.split(":")[2][2])-1
 		last = self.client.CON.get_value(itr.guild, "lastquestion")
+		if not last:
+			itr.response.send_message(f"Error: question has corrupted, result wasn't tallied!", ephemeral=True)
+			return
 
 		if str(itr.user.id) in last["voters"]:
 			last["votes"][last["voters"][str(itr.user.id)]] -= 1
@@ -120,12 +123,11 @@ class QOTDCog(CM.Cog):
 		embed.set_footer(text=footer)
 		return embed
 
-	async def createQuestion(self, guild:discord.Guild, noping:bool=False, nosave:bool=False):
+	async def createQuestion(self, guild:discord.Guild, noping:bool=False, nosave:bool=False, noupdate:bool=False):
 		channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
 		questions = self.client.CON.get_value(guild, "questions")
 
-		lastquestion = self.client.CON.get_value(guild, "lastquestion")
-		if lastquestion and "options" in lastquestion:
+		if not noupdate:
 			await self.createQuestionResults(guild, nosave)
 		
 		if len(questions) == 0:
@@ -172,9 +174,12 @@ class QOTDCog(CM.Cog):
 					await sendCustomError(self.client, "QOTD Error", "Questions was unable to save, please manualy remove question!")
 
 	async def updateQuestion(self, guild:discord.Guild):
+		lastquestion = self.client.CON.get_value(guild, "lastquestion")
+		if not lastquestion:
+			return
+				
 		channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
 		questions = self.client.CON.get_value(guild, "questions")
-		lastquestion = self.client.CON.get_value(guild, "lastquestion")
 		lastmessage = await channel.fetch_message(lastquestion["messageid"])
 
 		question, author = lastquestion["question"], get(guild.members, id=lastquestion["author"])
@@ -186,8 +191,11 @@ class QOTDCog(CM.Cog):
 			await lastmessage.edit(embed=embed)
 
 	async def createQuestionResults(self, guild:discord.Guild, nosave:bool=False):
-		channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
 		lastquestion = self.client.CON.get_value(guild, "lastquestion")
+		if not (lastquestion and "options" in lastquestion):
+			return
+	
+		channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
 		lastmessage = await channel.fetch_message(lastquestion["messageid"])
 		votes, total = lastquestion["votes"], sum(lastquestion["votes"])
 
@@ -228,16 +236,19 @@ class QOTDCog(CM.Cog):
 	qotdgroup = AC.Group(name="qotd", description="Question Of The Day commands.")
 
 	@qotdgroup.command(name="test", description="Test qotd.")
-	async def test(self, itr:Itr, noping:Literal["True","False"]="True", nosave:Literal["True","False"]="True", results:Literal["True","False"]="False"):
+	async def test(self, itr:Itr, noping:Literal["True","False"]="True", nosave:Literal["True","False"]="True", typee:Literal["Question","Results","Both"]="False"):
 		if not await ab_check(itr, self.client, has_mod_role=True):
 			return
 		if self.client.isbeta or not await ab_check_slient(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return await itr.response.send_message("Question Of The Day is not setup in this server.", ephemeral=True)
-		if results == "True":
+		if typee == "Both":
+			await self.createQuestion(itr.guild, bool(noping), bool(nosave))
+			await itr.response.send_message("Asked'd & Result'd... yea...", ephemeral=True)
+		elif typee == "Results":
 			await self.createQuestionResults(itr.guild, bool(nosave))
 			await itr.response.send_message("Result'd... yea...", ephemeral=True)
 		else:
-			await self.createQuestion(itr.guild, bool(noping), bool(nosave))
+			await self.createQuestion(itr.guild, bool(noping), bool(nosave), True)
 			await itr.response.send_message("Asked'd... yea...", ephemeral=True)
 
 	@qotdgroup.command(name="ask", description="Add a question to qotd.")
