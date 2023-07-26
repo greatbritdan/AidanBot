@@ -211,7 +211,8 @@ class QOTDCog(CM.Cog):
 			bar = getBar(percent, 100, 10, True, color)
 			body += f"`{opt}:` {bar}{extra} **({str(percent)}%) ({votes[i]} votes)**\n"
 
-		embed = getComEmbed(None, self.client, content=body, command="Question Of The Day > Results", footer=f"{total} Votes")
+		embed = getComEmbed(None, self.client, "Question Of The Day > Results", body)
+		embed.set_footer(text="{total} Votes")
 		await channel.send(embed=embed)
 
 		if not nosave:
