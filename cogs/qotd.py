@@ -149,13 +149,17 @@ class QOTDCog(CM.Cog):
 				embed = self.getQuestionEmbed(question, author.name, len(questions)-1)
 				await channel.send(txt, embed=embed, allowed_mentions=discord.AllowedMentions(roles=True))
 
+			type = "Classic (Legacy)"
+			if "type" in q:
+				type = q["type"]
+
 			options, correct, votes, voters = False, False, False, False
 			if "options" in q:
 				options, votes, voters = q["options"], [0 for o in q["options"]], {}
 			if "correct" in q:
 				correct = q["correct"]
 			await self.client.CON.set_value(guild, "lastquestion", {
-				"messageid": channel.last_message_id, "id": q["id"], "type": q["type"],
+				"messageid": channel.last_message_id, "id": q["id"], "type": type,
 				"question": question, "author": q["author"], "options": options, "correct": correct,
 				"votes": votes, "voters": voters
 			})
@@ -212,7 +216,7 @@ class QOTDCog(CM.Cog):
 			body += f"`{opt}:` {bar}{extra} **({str(percent)}%) ({votes[i]} votes)**\n"
 
 		embed = getComEmbed(None, self.client, "Question Of The Day > Results", body)
-		embed.set_footer(text="{total} Votes")
+		embed.set_footer(text=f"{total} Votes")
 		await channel.send(embed=embed)
 
 		if not nosave:
