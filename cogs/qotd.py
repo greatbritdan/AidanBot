@@ -225,7 +225,7 @@ class QOTDCog(CM.Cog):
 
 	@qotdgroup.command(name="test", description="Test qotd.")
 	async def test(self, itr:Itr, noping:Literal["True","False"]="True", nosave:Literal["True","False"]="True", results:Literal["True","False"]="False"):
-		if not await ab_check(itr, self.client, is_owner=True):
+		if not await ab_check(itr, self.client, has_mod_role=True):
 			return
 		if self.client.isbeta or not await ab_check_slient(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return await itr.response.send_message("Question Of The Day is not setup in this server.", ephemeral=True)
