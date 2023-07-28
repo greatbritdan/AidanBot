@@ -192,7 +192,7 @@ class QOTDCog(CM.Cog):
 
 	async def createQuestionResults(self, guild:discord.Guild, nosave:bool=False):
 		lastquestion = self.client.CON.get_value(guild, "lastquestion")
-		if not (lastquestion and "options" in lastquestion):
+		if not (lastquestion and "options" in lastquestion and lastquestion["options"] != False):
 			return
 	
 		channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
