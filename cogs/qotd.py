@@ -58,7 +58,7 @@ class QOTDCog(CM.Cog):
 	async def ready(self):
 		for guild in await self.client.CON.loopdata():
 			lastquestion = self.client.CON.get_value(guild, "lastquestion", guild=guild)
-			if lastquestion and "options" in lastquestion:
+			if lastquestion and "options" in lastquestion and lastquestion["options"] != False:
 				self.client.add_view(QOTDView(self, guild, lastquestion['options']))
 
 		if self.client.isbeta:
@@ -134,6 +134,12 @@ class QOTDCog(CM.Cog):
 			question = choice(defaultquestions)
 			embed = self.getQuestionEmbed(question, "AidanBot", 0)
 			await channel.send(embed=embed)
+
+			await self.client.CON.set_value(guild, "lastquestion", {
+				"messageid": channel.last_message_id, "id": False, "type": "Default",
+				"question": question, "author": self.client.user.id, "options": False, "correct": False,
+				"votes": False, "voters": False
+			})
 		else:
 			qidx = randint(0, len(questions)-1)
 			q = questions[qidx]
@@ -183,7 +189,7 @@ class QOTDCog(CM.Cog):
 		lastmessage = await channel.fetch_message(lastquestion["messageid"])
 
 		question, author = lastquestion["question"], get(guild.members, id=lastquestion["author"])
-		if "options" in lastquestion:
+		if "options" in lastquestion and lastquestion["options"] != False:
 			embed = self.getQuestionEmbed(question, author.name, len(questions), sum(lastquestion["votes"]))
 			await lastmessage.edit(embed=embed)
 		else:
