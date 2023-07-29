@@ -247,14 +247,15 @@ class QOTDCog(CM.Cog):
 			return
 		if self.client.isbeta or not await ab_check_slient(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return await itr.response.send_message("Question Of The Day is not setup in this server.", ephemeral=True)
+		noping, nosave = self.strtobool(noping), self.strtobool(nosave)
 		if typee == "Both":
-			await self.createQuestion(itr.guild, bool(noping), bool(nosave))
+			await self.createQuestion(itr.guild, noping, nosave)
 			await itr.response.send_message("Asked'd & Result'd... yea...", ephemeral=True)
 		elif typee == "Results":
-			await self.createQuestionResults(itr.guild, bool(nosave))
+			await self.createQuestionResults(itr.guild, nosave)
 			await itr.response.send_message("Result'd... yea...", ephemeral=True)
 		else:
-			await self.createQuestion(itr.guild, bool(noping), bool(nosave), True)
+			await self.createQuestion(itr.guild, noping, nosave, True)
 			await itr.response.send_message("Asked'd... yea...", ephemeral=True)
 
 	@qotdgroup.command(name="ask", description="Add a question to qotd.")
@@ -265,19 +266,23 @@ class QOTDCog(CM.Cog):
 	async def ask(self, itr:Itr, question:str, options:str=None, correct:str=None):
 		if self.client.isbeta or not await ab_check_slient(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return await itr.response.send_message("Question Of The Day is not setup in this server.", ephemeral=True)
+		if len(question) == 0:
+			return await itr.response.send_message("Questions Can't Be Blank.", ephemeral=True)
 		if len(question) > 250:
 			return await itr.response.send_message("Too many characters! Questions mustn't be more than 250 characters.", ephemeral=True)
 		
 		opts = None
 		if options:
 			opts = options.strip().split(",")
+			opts = [opt.strip() for opt in opts if len(opt.strip()) > 0]
 			if len(opts) < 2:
-				return await itr.response.send_message("At least 2 options are required.", ephemeral=True)
+				return await itr.response.send_message("At least 2 options are required, blank options are ignored.", ephemeral=True)
 			if len(opts) > 5:
 				return await itr.response.send_message("At most 5 options are allowed.", ephemeral=True)
 			for opt in opts:
 				if len(opt) > 75:
 					return await itr.response.send_message(f"Too many characters for `{opt}`! Options mustn't be more than 75 characters.", ephemeral=True)
+					
 		if correct:
 			if correct not in opts:
 				return await itr.response.send_message("The correct answer must exist in your options.", ephemeral=True)
