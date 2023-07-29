@@ -239,6 +239,11 @@ class QOTDCog(CM.Cog):
 
 	###
 
+	def strtobool(self, val):
+		if val == "True":
+			return True
+		return False
+
 	qotdgroup = AC.Group(name="qotd", description="Question Of The Day commands.")
 
 	@qotdgroup.command(name="test", description="Test qotd.")
