@@ -30,7 +30,7 @@ defaultquestions = [
 	"If you could have one superpower what would it be?",
 	"If you were a millionaire, what would you do with the money?",
 	"If laws didn't exist, what old laws would you break regularly?",
-	"If you had 24 hours left to live, how would you spend that time?"
+	"If you had 24 hours left to live, how would you spend that time?",
 	"Do you have a morning routine?",
 	"What's something small that makes you feel good?",
 	"If you could say something and everyone on earth could hear it what would you say?"
