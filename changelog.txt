@@ -1,6 +1,18 @@
 CHANGELOG!
 Some older changes are lost to time! But most majour updates are accounted for:
 
+10th August 2023 - VERSION 3.5 (SLASH)
+- Added /fact
+- Improved QOTD - 3 types, options and correct answer added
+- Improved Embeds - New design and formatting changes on some commands
+- Renamed /info to /botinfo
+- Renamed /userinfo and /guildinfo to /info user and /info guild
+- Fixed /info user - Doesn't crash with nickname when discord.User is returned
+- Fixed severak bugs
+- Removed qotd_time and timezone
+- Removed UwU
+- Small tweaks and improvements
+
 19th July 2023 - VERSION 3.1 (SLASH)
 - Improved /userinfo - Added new username structure and a new option to make the embed smaller.
 - Improved /guildinfo - Shows number of categories.

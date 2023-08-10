@@ -7,9 +7,9 @@ from github.Repository import Repository
 from replybot.replybot import replyBot
 from utils.config import ConfigManager
 from utils.checks import ab_check_slient
-from utils.functions import SendDM, sendError, sendCustomError, getComEmbed, sendComError, getErrorEmbed
+from utils.functions import sendError, sendCustomError, getComEmbed, sendComError, getErrorEmbed
 
-import json, os, traceback, sys, re, asyncio
+import json, os, traceback, sys, re
 from random import choice, randint
 
 # My Son.
@@ -65,11 +65,13 @@ class AidanBot(commands.Bot):
 
 		with open('./data/profiles.json') as file:
 			profiles = json.load(file)
-			self.name = profiles[profile]["name"]
-			self.pfp = profiles[profile]["pfp"]
-			self.isbeta = profiles[profile]["isbeta"]
-			self.info = profiles[profile]["info"]
-
+			self.name =            profiles[profile]["name"]
+			self.pfp =             profiles[profile]["pfp"]
+			self.isbeta =          profiles[profile]["isbeta"]
+			self.info =            profiles[profile]["info"]
+			self.embedcolor =      profiles[profile]["embedcolor"]
+			self.embedcolorerror = profiles[profile]["embedcolorerror"]
+			
 		with open('./data/info.json') as file:
 			info = json.load(file)
 			self.version     = info["version"]
@@ -97,7 +99,7 @@ class AidanBot(commands.Bot):
 		await sendError(self, event, sys.exc_info())
 
 	async def on_command_error(self, ctx:commands.Context, error):
-		await ctx.send(embed=getErrorEmbed(ctx, self, str(error)))
+		await ctx.send(embed=getErrorEmbed(self, str(error)))
 		if self.isbeta:
 			print('Ignoring exception in command {}:'.format(ctx.command), file=sys.stderr)
 			traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
@@ -137,10 +139,8 @@ class AidanBot(commands.Bot):
 				await member.add_roles(role)
 
 	async def on_guild_join(self, guild:discord.Guild):
-		if self.isbeta:
-			return
-		await SendDM(self, "SOMEONE DID WHAT?!?!", f"Added to {guild.name}!")
-		
+		if self.isbeta: return
+
 		chan = find(lambda m: "general" in m.name, guild.text_channels)
 		if not chan:
 			chan = find(lambda m: "talk" in m.name, guild.text_channels)
@@ -151,7 +151,7 @@ class AidanBot(commands.Bot):
 					chan = channel
 		if chan:
 			info = f"I'm {self.name}, a dumb bot made by **{self.ownername}**. I'm a general bot that has many features and prides myself on not having premium or selling NFT's! From fun and useless commands like /opinion and /games, to more useful features using /config. I'll make a great addition to the server!!!\n\nBefore we get started, you might want to read my:\n- [Terms of service]({self.terms})\n- [Privacy Policy]({self.privacy})\n\n> **For aditional info on commands or permissions run /info!**"
-			emb = getComEmbed(None, self, f"Hello world!.. oh uhh i meant {guild.name}!", info)
+			emb = getComEmbed(self, f"Hello world!.. oh uhh i meant {guild.name}!", info)
 			await chan.send(embed=emb)
 
 	async def on_guild_remove(self, guild:discord.Guild):
@@ -213,6 +213,11 @@ class AidanBot(commands.Bot):
 				await msg.delete()
 				return True
 		return False
+	
+	async def getStorageChannel(self):
+		guild = await self.fetch_guild(879063875469860874)
+		channel = await guild.fetch_channel(1131265454699188395)
+		return channel
 
 	async def attachmentsToFiles(self, attachments:list[discord.Attachment]):
 		for f in os.listdir("./nitrontfiles"): # clear old items
