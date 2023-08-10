@@ -1,9 +1,8 @@
 import discord, json, os
+from dotenv import load_dotenv
 
 from aidanbot import AidanBot
 from github import Github
-
-from dotenv import load_dotenv
 
 #load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
@@ -23,15 +22,16 @@ if __name__ == '__main__':
 Slash Command Hierarchy!
 ( Think of it as a diet coke help command )
 
-	/info -      Bot info.
-	/ping -      Get bots latency.
-	/echo -      Make the bot say something.
-	/clone -     Say something as another user.
-	/issue -     Create an issue on github.
-	/role -      Add/Remove a [r] role to/from yourself or any role to/from anyone if you have manage roles. (GUILD ONLY)
+	/botinfo -  Bot info.
+	/ping -     Get bots latency.
+	/echo -     Make the bot say something.
+	/clone -    Say something as another user.
+	/issue -    Create an issue on github.
+	/role -     Add/Remove a [r] role to/from yourself or any role to/from anyone if you have manage roles. (GUILD ONLY)
 
-	/userinfo -  Get info on a user.
-	/guildinfo - Get info on the guild.
+	/info
+	-	/info user -   Get info on a user.
+	-	/info guild -  Get info on the guild.
 
 	/config
 	-	/config guild -  Edit guild configeration. (GUILD ONLY) (REQUIRES KICK MEMBERS)
@@ -45,6 +45,7 @@ Slash Command Hierarchy!
 	-	/opinion tierlist -  AidanBot will make a very cool tier list.
 	-	/opinion poll -      Create a poll.
 	-	/opinion 8ball -     AidanBot will shake a magic 8 ball on yur behalf.
+	
 	/games
 	-	/games rps -           Rock, paper, sissors.
 	-	/games fight -         Fight people or bots.
@@ -55,20 +56,16 @@ Slash Command Hierarchy!
 	-	/birthday upcoming -  See upcoming birthdays.
 
 	/qotd (MUST HAVE 'qotd_channel' CONFIG SETUP!)
-	-	/qotd list -    List all questions.
-	-	/qotd ask -     Ask a question.
-	-	/qotd remove -  Remove a question.
-	-	/qotd edit -    Edit a question.
-	-	/qotd reroll -  Resend a questionm if the old one wasn't good.
+	-	/qotd view -    View questions.
+	-	/qotd ask -     Ask a new question.
+	-	/qotd remove -  Remove a question, can only remove your own unless you're a mod.
+	-	/qotd test -    Test a question, can only use if you're a mod.
 
 	/suggestbot
 	-	/suggestbot info     -  Info about suggestionbot.
 	-	/suggestbot generate -  Generates random suggestions.
 
-	(message) UwU -         /rpsifys a message. :3
 	(message) Eval -        Eval dat text. (OWNER ONLY)
 	(message) Eval-rerun -  Eval dat text but you can rerun it. (OWNER ONLY)
-	
-	(user) Info -           Get info on a user.
 
 '''
