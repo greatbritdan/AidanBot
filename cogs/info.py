@@ -47,20 +47,13 @@ class InfoCog(CM.Cog):
 		if isinstance(user, discord.User):
 			inguild = False
 
-		name = user.name
-		if user.global_name:
-			name = user.global_name
-		if user.nick:
-			name = user.nick
-		title = f"Info on {name}"
+		sname = user.global_name
+		if isinstance(user, discord.Member) and user.nick:
+			sname = user.nick
+		
+		title = f"Info on {sname} (@{user.name})"
 
 		desc = ""
-		if user.nick:
-			desc = f"**aka {user.global_name} | @{user.name}**"
-		else:
-			desc = f"**@{user.name}**"
-		desc += "\n\n"
-
 		if full:
 			if not inguild:
 				desc += "**[ This User isn't in the server so details are minimal ]**\n"
