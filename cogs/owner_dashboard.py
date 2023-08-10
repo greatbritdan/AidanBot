@@ -22,7 +22,7 @@ class DashCog(CM.Cog):
 			return
 		c = self.client
 		if not function:
-			emb = getComEmbed(str(itr.user), c, "- Owner Dashboard -", "Hello Boss, all systems running as intended!", fields=[["Average Latency:", f"{c.latency:.2f} Seconds."],["Memory:", f"Total Commands: N/A\nTotal Cogs: {len(c.cogs)}\n---\nTotal Guilds: {len(c.guilds)}\nCached Emojis: {len(c.emojis)}\nCached Stickers: {len(c.stickers)}\nCached Members: {len(c.users)}"]])
+			emb = getComEmbed(c, content="Hello Boss, all systems running as intended!", command="Owner Dashboard", fields=[["Average Latency:", f"{c.latency:.2f} Seconds."],["Memory:", f"Total Commands: N/A\nTotal Cogs: {len(c.cogs)}\n---\nTotal Guilds: {len(c.guilds)}\nCached Emojis: {len(c.emojis)}\nCached Stickers: {len(c.stickers)}\nCached Members: {len(c.users)}"]])
 			await itr.response.send_message(embed=emb)
 			return
 
@@ -37,7 +37,7 @@ class DashCog(CM.Cog):
 			await c.UCON.values_msgupdate("load")
 			output = "Reloaded user config"
 
-		emb = getComEmbed(str(itr.user), c, f"- Owner Dashboard > {function} -", output, fields=outputfields)
+		emb = getComEmbed(c, content=output, command=f"Owner Dashboard > {function}", fields=outputfields)
 		await itr.response.send_message(embed=emb)
 		return
 

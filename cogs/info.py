@@ -22,25 +22,15 @@ class InfoCog(CM.Cog):
 			"939228285106286702": "An Authentic AidanBot <:AidanBotBruh:861643332241457162>",
 			"836936601824788520": "Offical Support Server 🎫"
 		}
+	
+	infogroup = AC.Group(name="info", description="Info commands.")
 
-		self.uinfo = AC.ContextMenu(name="Info", callback=self.appuserinfo)
-		self.client.tree.add_command(self.uinfo, guilds=self.client.debug_guilds)
-
-	async def cog_unload(self):
-		self.client.tree.remove_command(self.uinfo.name, type=self.uinfo.type)
-		
-	async def appuserinfo(self, itr:Itr, user:discord.Member|discord.User):
-		await self.userinfo(itr, user, "Full")
-
-	@AC.command(name="userinfo", description="Get info on a user in the server.")
+	@infogroup.command(name="user", description="Get info on a user in the server.")
 	@AC.describe(
 		user="User to get info on, you can use an id for users not in server.",
 		display="If the embed will display the full data or only the essensial data. Reduces space and time"
 	)
-	async def slashuserinfo(self, itr:Itr, user:discord.Member|discord.User, display:Literal["Full","Simple"]="Full"):
-		await self.userinfo(itr, user, display)
-
-	async def userinfo(self, itr:Itr, user:discord.Member|discord.User, display:str):	
+	async def userinfo(self, itr:Itr, user:discord.Member|discord.User, display:Literal["Full","Simple"]="Full"):	
 		full = True if display == "Full" else False
 		user = user or itr.user
 		inguild = True
@@ -110,7 +100,7 @@ class InfoCog(CM.Cog):
 			first = False
 			desc += f" [Banner]({ruser.banner.url})"
 			
-		color = discord.Color.from_rgb(20, 29, 37)
+		color = None
 		if user.colour.value:
 			color = user.colour
 
@@ -141,7 +131,7 @@ class InfoCog(CM.Cog):
 		else:
 			fields = []
 
-		embed = getComEmbed(str(itr.user), self.client, title, desc, color, fields=fields)
+		embed = getComEmbed(self.client, title, desc, color, command="User Info", fields=fields)
 		if user.avatar:
 			embed.set_thumbnail(url=user.avatar)
 		elif user.default_avatar:
@@ -154,13 +144,11 @@ class InfoCog(CM.Cog):
 		else:
 			await itr.response.send_message(embed=embed)
 
-	@AC.command(name="guildinfo", description="Get info on the server/guild.")
-	async def slashguildinfo(self, itr:Itr):
+	@infogroup.command(name="guild", description="Get info on the server/guild.")
+	async def guildinfo(self, itr:Itr):
 		if not await ab_check(itr, self.client, is_guild=True):
 			return
-		await self.guildinfo(itr)
-
-	async def guildinfo(self, itr:Itr):	
+		
 		guild = itr.guild
 		today = datetime.datetime.now()
 
@@ -228,7 +216,7 @@ class InfoCog(CM.Cog):
 			fields.append(["Channels",channeltxt])
 		fields.append(["Roles",roletxt])
 
-		embed = getComEmbed(str(itr.user), self.client, title, desc, fields=fields)
+		embed = getComEmbed(self.client, title, desc, command="Guild Info", fields=fields)
 		if guild.icon:
 			embed.set_thumbnail(url=guild.icon)
 		if guild.splash:

@@ -30,7 +30,7 @@ defaultquestions = [
 	"If you could have one superpower what would it be?",
 	"If you were a millionaire, what would you do with the money?",
 	"If laws didn't exist, what old laws would you break regularly?",
-	"If you had 24 hours left to live, how would you spend that time?",
+	"If you had 24 hours left to live, how would you spend that time?"
 	"Do you have a morning routine?",
 	"What's something small that makes you feel good?",
 	"If you could say something and everyone on earth could hear it what would you say?"
@@ -45,7 +45,7 @@ class QOTDView(discord.ui.View):
 		optid = 0
 		for opt in options:
 			optid += 1
-			self.add_item(discord.ui.Button(label=opt, style=discord.ButtonStyle.gray, custom_id=f"qotdview:{self.guild.id}:op{optid}"))
+			self.add_item(discord.ui.Button(label=opt, style=discord.ButtonStyle.gray, custom_id=f"qotdview:{self.guild}:op{optid}"))
 
 	async def interaction_check(self, itr:Itr):
 		await self.cog.optionUsed(itr, itr.data["custom_id"])
@@ -119,8 +119,7 @@ class QOTDCog(CM.Cog):
 			footer = f"Submitted by {user} • {votes} Votes • {left} question{s} left!"
 		else:
 			footer = f"Submitted by {user} • {left} question{s} left!"
-		embed = getComEmbed(None, self.client, question)
-		embed.set_footer(text=footer)
+		embed = getComEmbed(self.client, question, command="Question Of The Day", footer=footer)
 		return embed
 
 	async def createQuestion(self, guild:discord.Guild, noping:bool=False, nosave:bool=False, noupdate:bool=False):
@@ -134,7 +133,7 @@ class QOTDCog(CM.Cog):
 			question = choice(defaultquestions)
 			embed = self.getQuestionEmbed(question, "AidanBot", 0)
 			await channel.send(embed=embed)
-
+			
 			await self.client.CON.set_value(guild, "lastquestion", {
 				"messageid": channel.last_message_id, "id": False, "type": "Default",
 				"question": question, "author": self.client.user.id, "options": False, "correct": False,
@@ -187,13 +186,13 @@ class QOTDCog(CM.Cog):
 		channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
 		questions = self.client.CON.get_value(guild, "questions")
 		lastmessage = await channel.fetch_message(lastquestion["messageid"])
-
+	
 		question, author = lastquestion["question"], get(guild.members, id=lastquestion["author"])
 		if "options" in lastquestion and lastquestion["options"] != False:
-			embed = self.getQuestionEmbed(question, author.name, len(questions), sum(lastquestion["votes"]))
+			embed = self.getQuestionEmbed(question, author.name, len(questions)-1, sum(lastquestion["votes"]))
 			await lastmessage.edit(embed=embed)
 		else:
-			embed = self.getQuestionEmbed(question, author.name, len(questions))
+			embed = self.getQuestionEmbed(question, author.name, len(questions)-1)
 			await lastmessage.edit(embed=embed)
 
 	async def createQuestionResults(self, guild:discord.Guild, nosave:bool=False):
@@ -229,13 +228,11 @@ class QOTDCog(CM.Cog):
 			bar = getBar(percent, 100, 10, True, color)
 			body += f"`{opt}:` {bar}{extra} **({str(percent)}%) ({votes[i]} votes)**\n"
 
-		embed = getComEmbed(None, self.client, "Question Of The Day > Results", body)
-		embed.set_footer(text=f"{total} Votes")
+		embed = getComEmbed(self.client, content=body, command="Question Of The Day > Results", footer=f"{total} Votes")
 		await channel.send(embed=embed)
 
 		if not nosave:
 			await lastmessage.edit(view=None)
-			await self.client.CON.set_value(guild, "lastquestion", False)
 
 	###
 
@@ -263,6 +260,15 @@ class QOTDCog(CM.Cog):
 			await self.createQuestion(itr.guild, noping, nosave, True)
 			await itr.response.send_message("Asked'd... yea...", ephemeral=True)
 
+	@qotdgroup.command(name="repair", description="Attempts to repair if qotd breaks.")
+	async def repair(self, itr:Itr, results:str, question:str):
+		if not await ab_check(itr, self.client, has_mod_role=True):
+			return
+		
+		lastquestion = self.client.CON.get_value(itr.guild, "lastquestion")
+		if not lastquestion:
+			return itr.response.send_message(f"Last message could not be found, I am unable to repair automatically.\n\nReach out to {self.client.ownername} with...\n```- last qotd embed id\n- question content\n- id of the author of the question\n- (for ones with options) options and correct answer```\nThe question will be manually fixed.", ephemeral=True)
+	
 	@qotdgroup.command(name="ask", description="Add a question to qotd.")
 	@AC.describe(
 		question="The question you are asking.", options="The options members will pick from, leave blank for a normal question, only 2 to 5 options allowed.",
@@ -287,7 +293,7 @@ class QOTDCog(CM.Cog):
 			for opt in opts:
 				if len(opt) > 75:
 					return await itr.response.send_message(f"Too many characters for `{opt}`! Options mustn't be more than 75 characters.", ephemeral=True)
-					
+				
 		if correct:
 			if correct not in opts:
 				return await itr.response.send_message("The correct answer must exist in your options.", ephemeral=True)
@@ -311,7 +317,7 @@ class QOTDCog(CM.Cog):
 			typee = "Classic"
 			questions.append({"question": question, "author": itr.user.id, "id": qid, "type": "classic"})
 		await self.client.CON.set_value(itr.guild, "questions", questions)
-		await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Added question!", f"> **'{question}**'\nType    : {typee}{plus}```"), ephemeral=True)
+		await itr.response.send_message(embed=getComEmbed(self.client, f"Added question (Private)!", f"> **'{question}**'\n```Type    : {typee}{plus}```", command="QOTD > Ask"), ephemeral=True)
 
 	@qotdgroup.command(name="remove", description="Remove a question from qotd, you can only remove your own unless you are a mod.")
 	@AC.describe(question="The question to be removed, remember you can only remove your own unless you are a mod.")
@@ -327,7 +333,7 @@ class QOTDCog(CM.Cog):
 
 		questions = [q for q in questions if q["id"] != question]
 		await self.client.CON.set_value(itr.guild, "questions", questions)
-		await itr.response.send_message(embed=getComEmbed(str(itr.user), self.client, f"Removed question!", f"> **'{questiondata['question']}'**"), ephemeral=True)
+		await itr.response.send_message(embed=getComEmbed(self.client, f"Removed question!", f"> **'{questiondata['question']}'**", command="QOTD > Remove"), ephemeral=True)
 
 	@remove.autocomplete("question")
 	async def remove_question(self, itr:Itr, current:str):
@@ -368,7 +374,7 @@ class QOTDCog(CM.Cog):
 
 			datamember = get(itr.guild.members, id=questiondata["author"])
 
-			embed = getComEmbed(str(itr.user), self.client, f"'{questiondata['question']}'", f"**Submitted by:** {datamember.mention}\n```{data}```")
+			embed = getComEmbed(self.client, f"'{questiondata['question']}'", f"**Submitted by:** {datamember.mention}\n```{data}```", command="QOTD > View")
 			view = discord.ui.View(timeout=None)
 			view.add_item(discord.ui.Select(placeholder="Choose Question", min_values=1, max_values=1, options=choicequestions, disabled=timeout, custom_id="select"))
 			return embed, view
@@ -397,6 +403,65 @@ class QOTDCog(CM.Cog):
 			except asyncio.TimeoutError:
 				embed, view = getEmbed(True)
 				return await itr.edit_original_response(embed=embed, view=view)
+			
+	@qotdgroup.command(name="reroll", description="Post a new question if the last one wasn't that good.")
+	@AC.describe(instant="If the reroll should have no vote (Mods only).")
+	async def reroll(self, itr:Itr, instant:Literal["Yes","No"]):
+		if self.client.isbeta or not await ab_check_slient(itr, self.client, is_guild=True, has_value="qotd_channel"):
+			return await itr.response.send_message("Question Of The Day is not setup in this server.", ephemeral=True)
+		
+		if instant == "Yes" and ab_check_slient(itr, self.client, has_mod_role=True):
+			await self.createQuestion(itr.guild, True)
+			await itr.response.send_message("Instant rerolled!", ephemeral=True)
+			return
+
+		votes = 1
+		voters = [itr.user.id]
+		threshold = self.client.CON.get_value(itr.guild, "qotd_reroll_threshold", guild=itr.guild)
+
+		def getEmbed():
+			view = discord.ui.View(timeout=None)
+			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree"))
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} is requesting a reroll, press here to agree!", f"Votes: {votes}/{threshold}"), view
+		def getTimeoutEmbed():
+			view = discord.ui.View(timeout=None)
+			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, not enough votes!", f"Votes: {votes}/{threshold}"), view
+		def getSuccessEmbed():
+			view = discord.ui.View(timeout=None)
+			view.add_item(discord.ui.Button(style=discord.ButtonStyle.blurple, label="Agree", custom_id="agree", disabled=True))
+			return getComEmbed(str(itr.user), self.client, f"{itr.user.name} requested a reroll, got enough votes and rerolled!", f"Votes: {votes}/{threshold}"), view
+
+		embed, view = getEmbed()
+		await itr.response.send_message(embed=embed, view=view)
+		MSG = await itr.original_response()
+
+		def check(checkitr:Itr):
+			try:
+				return (checkitr.message.id == MSG.id)
+			except:
+				return False
+		while True:
+			try:
+				butitr:Itr = await self.client.wait_for("interaction", timeout=150, check=check)
+				await butitr.response.defer()
+				if butitr.data["custom_id"] == "agree" and butitr.user.id not in voters:
+					votes += 1
+					voters.append(butitr.user.id)
+			
+				if votes >= threshold:
+					embed, view = getSuccessEmbed()
+					await itr.edit_original_response(embed=embed, view=view)
+					break
+				else:
+					embed, view = getEmbed()
+					await itr.edit_original_response(embed=embed, view=view)
+			except asyncio.TimeoutError:
+				embed, view = getTimeoutEmbed()
+				await itr.edit_original_response(embed=embed, view=view)
+				return
+		
+		await self.createQuestion(itr.guild, True)
 
 def generateID(questions):
 	questionids = [q["id"] for q in questions]

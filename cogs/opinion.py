@@ -62,7 +62,7 @@ class OpinionCog(CM.Cog):
 		r = responses[str(score)]
 		response = choice(responses[r]) if type(r) == str else choice(r)
 
-		embed = getComEmbed(str(itr.user), self.client, response.format(thing), f"**Score:** `{score}/10`")
+		embed = getComEmbed(self.client, response.format(thing), f"**Score:** `{score}/10`", command="Opinion > Rate")
 		await itr.response.send_message(embed=embed)
 
 	@opiniongroup.command(name="percent", description="I will say what part of something is something.")
@@ -75,9 +75,9 @@ class OpinionCog(CM.Cog):
 		end = getBar(score, 100, 10, True)
 		embed = False
 		if someone == "False":
-			embed = getComEmbed(str(itr.user), self.client, f"You are **{str(score)}%** {something}.", end)
+			embed = getComEmbed(self.client, f"You are **{str(score)}%** {something}.", end, command="Opinion > Percent")
 		else:
-			embed = getComEmbed(str(itr.user), self.client, f"{someone} is **{str(score)}%** {something}.", end)
+			embed = getComEmbed(self.client, f"{someone} is **{str(score)}%** {something}.", end, command="Opinion > Percent")
 		await itr.response.send_message(embed=embed)
 
 	@opiniongroup.command(name="ask", description="I will answer your burning questions.")
@@ -120,14 +120,14 @@ class OpinionCog(CM.Cog):
 		fullans = start + answer
 		allbutone = len(fullans)-1
 		fullans = fullans[:-allbutone].capitalize() + fullans[1:]
-		embed = getComEmbed(str(itr.user), self.client, fields=[["Question:", question], ["Answer:", fullans]])
+		embed = getComEmbed(self.client, command="Opinion > Ask", fields=[["Question:", question], ["Answer:", fullans]])
 		await itr.response.send_message(embed=embed)
 
 	@opiniongroup.command(name="decide", description="I will decide on something for you.")
 	@AC.describe(options="All the options sepperated by commas.")
 	async def decide(self, itr:Itr, options:str):
 		options = [i.strip() for i in options.split(",") if i]
-		embed = getComEmbed(str(itr.user), self.client, f"I choose... {choice(options)}")
+		embed = getComEmbed(self.client, f"I choose... {choice(options)}", command="Opinion > Decide")
 		await itr.response.send_message(embed=embed)
 
 	@opiniongroup.command(name="8ball", description="I will be your personal magic 8 ball.")
@@ -138,7 +138,7 @@ class OpinionCog(CM.Cog):
 			"Reply hazy, try again.","Ask again later.","Better not tell you now.","Cannot predict now.","Concentrate and ask again.","Don't count on it.","My reply is no.","My sources say no.",
 			"Outlook not so good.","Very doubtful."
 	    ]
-		embed = getComEmbed(str(itr.user), self.client, question, choice(options))
+		embed = getComEmbed(self.client, question, choice(options), command="Opinion > 8 Ball")
 		await itr.response.send_message(embed=embed)	
 
 	@opiniongroup.command(name="tierlist", description="I will make a tier list to annoy you lol.")
@@ -207,8 +207,8 @@ class OpinionCog(CM.Cog):
 				tier = (-limitLikeness(getLikeness(em.core.demojize(option).lower()),tiercount))+tiercount
 			tierlists[tieremojisidx[tier]].append(option)
 		
-		emb = getComEmbed(str(itr.user), self.client, "Tier List", makeTierList())
-		await itr.response.send_message(embed=emb)
+		embed = getComEmbed(self.client, content=makeTierList(), command="Opinion > Tier List")
+		await itr.response.send_message(embed=embed)
 
 	@opiniongroup.command(name="poll", description="Create a poll for people to vote on.")
 	@AC.describe(question="The question you are asking.", answers="LAll the answers sepperated by commas.", duration="The timelimit of the poll.")
@@ -240,7 +240,7 @@ class OpinionCog(CM.Cog):
 				ans = answers[i]
 				while len(ans) < strmax:
 					ans += " "
-
+					
 				percent = 0
 				if totalvotes > 0:
 					percent = round((100/totalvotes)*votes[i])
@@ -260,7 +260,7 @@ class OpinionCog(CM.Cog):
 			else:
 				txt = txt + f"\n**Total Votes**: {totalvotes}\n**Time Remaining**: {format_dt(endtime,'R')}"
 
-			embed = getComEmbed(str(itr.user), self.client, quest, txt)
+			embed = getComEmbed(self.client, quest, txt, command="Opinion > Poll")
 			return embed, view
 
 		embed, view = getPollEmbed()
@@ -275,7 +275,7 @@ class OpinionCog(CM.Cog):
 		start = now()
 		while True:
 			try:
-				seconds = ((start+datetime.timedelta(seconds=duration))-now()).seconds # but hacky but it works
+				seconds = ((start+datetime.timedelta(seconds=duration))-now()).seconds # bit hacky but it works
 				butitr:Itr = await self.client.wait_for("interaction", timeout=seconds, check=check)
 
 				await butitr.response.defer()
@@ -306,7 +306,7 @@ class OpinionCog(CM.Cog):
 			except asyncio.TimeoutError:
 				embed, view = getPollEmbed(True)
 				await itr.edit_original_response(embed=embed, view=view)
-				
+	
 def str_time_prop(start, end, time_format):
 	stime = time.mktime(time.strptime(start, time_format))
 	etime = time.mktime(time.strptime(end, time_format))

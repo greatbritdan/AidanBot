@@ -4,10 +4,10 @@ import discord.app_commands as AC
 from discord import Interaction as Itr
 from discord.ext import tasks
 
-import datetime, asyncio
+import datetime, zoneinfo, asyncio
 
 from aidanbot import AidanBot
-from utils.functions import getComEmbed, dateToStr
+from utils.functions import getComEmbed, dateToStr, sendCustomError
 from utils.checks import ab_check_slient
 
 class BirthdayCog(CM.Cog):
@@ -16,10 +16,12 @@ class BirthdayCog(CM.Cog):
 
 	async def ready(self):
 		self.borths = await self.getBirthdays()
-		self.birthtask.start()
+		if not self.birthtask.is_running():
+			self.birthtask.start()
 
 	def cog_unload(self):
-		self.birthtask.cancel()
+		if self.birthtask.is_running():
+			self.birthtask.cancel()
 	
 	async def getBirthdays(self):
 		borths = []
@@ -122,7 +124,7 @@ class BirthdayCog(CM.Cog):
 			content = "Other Birthdays:"
 			if first:
 				content = "🎊🎊🎊 Upcoming Birthdays:"
-			return getComEmbed(str(itr.user), self.client, content, "Is your birthday coming soon? Use /birthday set to add yours!", fields=fields)
+			return getComEmbed(self.client, content, "Is your birthday coming soon? Use /birthday set to add yours!", fields=fields)
 
 		page = 0
 		pages = []

@@ -73,9 +73,9 @@ class GamesCog(CM.Cog):
 		def getRPSEmbed(timeout=None, finish=None):
 			embed = ""
 			if finish:
-				embed = getComEmbed(str(itr.user), self.client, finish, f"{player1.name}: `{player1.getEmoji}`   |   {player2.name}: `{player2.getEmoji}`")
+				embed = getComEmbed(self.client, finish, f"{player1.name}: `{player1.getEmoji}`   |   {player2.name}: `{player2.getEmoji}`", command="Rock Paper Scissors")
 			else:
-				embed = getComEmbed(str(itr.user), self.client, "Choose your choice.", f"{player1.name}: `?`   |   {player2.name}: `?`")
+				embed = getComEmbed(self.client, "Choose your choice.", f"{player1.name}: `?`   |   {player2.name}: `?`", command="Rock Paper Scissors")
 
 			if (player1.bot and player2.bot):
 				timeout = True
@@ -89,12 +89,14 @@ class GamesCog(CM.Cog):
 		await itr.response.send_message(embed=embed, view=view)
 		MSG = await itr.original_response()
 		
-		def check(checkitr:Itr):
-			return (checkitr.message.id == MSG.id and ((checkitr.user.id == player1.id and player1.pick == "") or (checkitr.user.id == player2.id and player2.pick == "")))
-
 		if (player1.bot and player2.bot):
 			await asyncio.sleep(1.5)
 		else:
+			def check(checkitr:Itr):
+				try:
+					return (checkitr.message.id == MSG.id)
+				except:
+					return False
 			while True:
 				try:
 					butitr:Itr = await self.client.wait_for("interaction", timeout=30, check=check)
@@ -104,6 +106,8 @@ class GamesCog(CM.Cog):
 					elif butitr.user.id == player2.id and player2.pick == "":
 						player2.pick = butitr.data["custom_id"]
 						await butitr.response.send_message(f"Pick set to {player2.getEmoji}!", ephemeral=True)
+					elif butitr.user.id != player1.id and butitr.user.id != player2.id:
+						await butitr.response.send_message(self.client.itrFail(), ephemeral=True)
 					if player1.pick != "" and player2.pick != "":
 						break
 				except asyncio.TimeoutError:

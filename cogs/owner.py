@@ -59,9 +59,9 @@ class OwnerCog(CM.Cog):
 			result = "".join(format_exception(e, e, e.__traceback__))
 
 		if result == "":
-			return getComEmbed(str(itr.user), self.client, title=title, content=f"Code: ```py\n{code}\n```")
+			return getComEmbed(self.client, title=title, content=f"Code: ```py\n{code}\n```", command="Eval")
 		else:
-			return getComEmbed(str(itr.user), self.client, title=title, content=f"Code: ```py\n{code}\n```\nResults: ```\n{str(result)}\n```")
+			return getComEmbed(self.client, title=title, content=f"Code: ```py\n{code}\n```\nResults: ```\n{str(result)}\n```", command="Eval")
 
 	async def _evalr(self, itr:Itr, message:discord.Message):
 		if not await ab_check(itr, self.client, is_owner=True):
