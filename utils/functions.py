@@ -16,51 +16,56 @@ def getEmbed(title, content, color, fields):
 			emb.add_field(name=f[0], value=f[1], inline=inline)
 	return emb
 
-def getComEmbed(user:str=None, client:commands.Bot=None, title=None, content=None, color=Color.from_rgb(20, 29, 37), fields=None):
+def getComEmbed(client:commands.Bot=None, title=None, content=None, color=False, command=None, footer=None, fields=None):
+	if color and isinstance(color, str):
+		color = Color.from_str(color)
+	elif color and isinstance(color, discord.Color):
+		color = color # COLOR IS COLOR
+	elif client:
+		if color == "error":
+			color = Color.from_str(client.embedcolorerror)
+		else:
+			color = Color.from_str(client.embedcolor)
+
 	emb = getEmbed(title, content, color, fields)
-	emb.timestamp = datetime.datetime.utcnow()
-	emb.set_author(name=f"{client.name} > Version: {client.version}", icon_url=client.pfp)
-	if user:
-		emb.set_footer(text=f"Requested by {user}")
+	if command:
+		emb.set_author(name=f"{client.name} > {command}", icon_url=client.pfp)
+	else:
+		emb.set_author(name=f"{client.name}", icon_url=client.pfp)
+	if footer:
+		emb.set_footer(text=f"{footer} • {client.version}")
+	else:
+		emb.set_footer(text=f"{client.version}")
 	return emb
 	
-def getCheckEmbed(user, client:commands.Bot, details):
-	emb = getComEmbed(user, client, f"Such a naughty! Checks failed!", f"```{details}```", Color.from_rgb(120, 29, 37))
+def getCheckEmbed(client:commands.Bot, details):
+	emb = getComEmbed(client, content=f"```{details}```", color="error", command="Checks failed!")
 	emb.remove_footer()
 	return emb
 
-def getCooldownEmbed(ctx:commands.Context, client:commands.Bot, retryafter):
-	emb = getComEmbed(str(ctx.author), client, f"Gotta go slow!", f"```Command is currently on cooldown, try again in {retryafter:.2f} seconds!```", Color.from_rgb(120, 29, 37))
+def getErrorEmbed(client:commands.Bot, error="error not passed"):
+	emb = getComEmbed(client, content=f"```{error}```", color="error", command=f"{client.name} error'd!")
 	emb.remove_footer()
 	return emb
-
-def getErrorEmbed(ctx:commands.Context, client:commands.Bot, error="ha"):
-	emb = getComEmbed(str(ctx.author), client, f"Oh noes! {client.name} ran into an error:", f"```{error}```", Color.from_rgb(220, 29, 37))
-	emb.remove_footer()
-	return emb
-
-async def SendDM(client:commands.Bot, title, description):
-	aidan = await client.fetch_user(384439774972215296) # is me :]
-	await aidan.send(embed=getComEmbed(None, client, title, description, Color.from_rgb(70, 29, 37)))
 
 async def sendComError(client:commands.Bot, ctx:commands.Context, error):
 	guild = get(client.guilds, id=879063875469860874)
 	channel = get(guild.channels, name="error-logs")
 	err = traceback.format_exception_only(error)[0]
 	trac = '\n'.join(traceback.format_exception(error))
-	await channel.send(embed=getComEmbed(None, client, f"Command Error received [/{ctx.command.qualified_name}]:", f"**Error:** `{err}`\n**Traceback:** ```\n{trac}\n```", Color.from_rgb(220, 29, 37)))
+	await channel.send(embed=getComEmbed(client, f"Command Error received [/{ctx.command.qualified_name}]:", f"**Error:** `{err}`\n**Traceback:** ```\n{trac}\n```", color="error", command=f"{client.name} error'd!"))
 
 async def sendError(client:commands.Bot, event, error):
 	guild = get(client.guilds, id=879063875469860874)
 	channel = get(guild.channels, name="error-logs")
 	err = traceback.format_exception_only(error[1])[0]
 	trac = '\n'.join(traceback.format_exception(error[1]))
-	await channel.send(embed=getComEmbed(None, client, f"Event Error received [{event}]:", f"**Error:** `{err}`\n**Traceback:** ```\n{trac}\n```", Color.from_rgb(220, 29, 37)))
+	await channel.send(embed=getComEmbed(client, f"Event Error received [{event}]:", f"**Error:** `{err}`\n**Traceback:** ```\n{trac}\n```", color="error", command=f"{client.name} error'd!"))
 
 async def sendCustomError(client:commands.Bot, event, error):
 	guild = get(client.guilds, id=879063875469860874)
 	channel = get(guild.channels, name="error-logs")
-	await channel.send(embed=getComEmbed(None, client, f"Custom Error received [{event}]:", f"**Error:**\n```{error}```", Color.from_rgb(220, 29, 37)))
+	await channel.send(embed=getComEmbed(client, f"Custom Error received [{event}]:", f"**Error:**\n```{error}```", color="error", command=f"{client.name} error'd!"))
 
 async def userPostedRecently(channel:discord.TextChannel, user:discord.Member, limit):
 	async for msg in channel.history(limit=limit):
@@ -113,7 +118,7 @@ def getBar(value, maxvalue, size, hashalf=False, color="blue"):
 
 def dateToStr(day, month):
 	months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December", "Out-Of-Rangeary"]
-	
+
 	m = month
 	try:
 		m = months[month-1]

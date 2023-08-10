@@ -60,7 +60,7 @@ async def ab_check(itr:discord.Interaction, client:CM.Bot=None, user=None, guild
 		channel = channel or itr.channel
 	result = await _command_checks(client, user, guild, channel, is_guild, is_owner, has_value, has_permission, bot_has_permission, has_mod_role)
 	if result:
-		await itr.response.send_message(embed=getCheckEmbed(str(user), client, result), ephemeral=True)
+		await itr.response.send_message(embed=getCheckEmbed(client, result), ephemeral=True)
 		return False
 	return True
 
@@ -71,6 +71,6 @@ async def ab_check_ctx(ctx:CM.Context, client:CM.Bot=None, user=None, guild=None
 		channel = channel or ctx.channel
 	result = await _command_checks(client, user, guild, channel, is_guild, is_owner, has_value, has_permission, bot_has_permission, has_mod_role)
 	if result:
-		await ctx.reply(embed=getCheckEmbed(str(user), client, result), mention_author=False)
+		await ctx.reply(embed=getCheckEmbed(client, result), mention_author=False)
 		return False
 	return True
