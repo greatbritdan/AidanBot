@@ -3,18 +3,16 @@
         "name": "AidanBot",
         "pfp": "https://cdn.discordapp.com/attachments/832364164336975902/1091797599209656482/pfp_bot_big.png",
         "isbeta": false,
-        "info": "I am a small Discord Bot created by [{ownername}](https://discordapp.com/users/{ownerid}/) for his server that now anyone can use!"
+        "info": "I am a small Discord Bot created by [{ownername}](https://discordapp.com/users/{ownerid}/) for his server that now anyone can use!",
+        "embedcolor": "#753940",
+        "embedcolorerror": "#BF2F2F"
     },
     "beta": {
         "name": "AidanBetaBot",
         "pfp": "https://cdn.discordapp.com/attachments/832364164336975902/1091797598970597387/pfp_beta_big.png",
         "isbeta": true,
-        "info": "I am a small test Discord Bot created by [{ownername}](https://discordapp.com/users/{ownerid}/) to test features before being launched to the main!"
-    },
-    "alpha": {
-        "name": "AidanBetaBot",
-        "pfp": "https://cdn.discordapp.com/attachments/832364164336975902/1091797599448743976/pfp_alpha_big.png",
-        "isbeta": true,
-        "info": "You'll never see this!"
+        "info": "I am a small test Discord Bot created by [{ownername}](https://discordapp.com/users/{ownerid}/) to test features before being launched to the main!",
+        "embedcolor": "#3C7645",
+        "embedcolorerror": "#BF2F2F"
     }
 }
