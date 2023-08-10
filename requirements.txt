@@ -5,3 +5,4 @@ emoji==1.7.0
 PyGithub==1.55
 python-youtube==0.9.0
 python-dotenv==1.0.0
+randfacts==0.20.2
