@@ -243,8 +243,8 @@ class QOTDCog(CM.Cog):
 
 	qotdgroup = AC.Group(name="qotd", description="Question Of The Day commands.")
 
-	@qotdgroup.command(name="test", description="Test qotd.")
-	async def test(self, itr:Itr, noping:Literal["True","False"]="True", nosave:Literal["True","False"]="True", typee:Literal["Question","Results","Both"]="False"):
+	@qotdgroup.command(name="fix", description="Use if qotd fails to send.")
+	async def fix(self, itr:Itr, noping:Literal["True","False"]="True", nosave:Literal["True","False"]="True", typee:Literal["Question","Results","Both"]="False"):
 		if not await ab_check(itr, self.client, has_mod_role=True):
 			return
 		if self.client.isbeta or not await ab_check_slient(itr, self.client, is_guild=True, has_value="qotd_channel"):
@@ -260,15 +260,6 @@ class QOTDCog(CM.Cog):
 			await self.createQuestion(itr.guild, noping, nosave, True)
 			await itr.response.send_message("Asked'd... yea...", ephemeral=True)
 
-	@qotdgroup.command(name="repair", description="Attempts to repair if qotd breaks.")
-	async def repair(self, itr:Itr, results:str, question:str):
-		if not await ab_check(itr, self.client, has_mod_role=True):
-			return
-		
-		lastquestion = self.client.CON.get_value(itr.guild, "lastquestion")
-		if not lastquestion:
-			return itr.response.send_message(f"Last message could not be found, I am unable to repair automatically.\n\nReach out to {self.client.ownername} with...\n```- last qotd embed id\n- question content\n- id of the author of the question\n- (for ones with options) options and correct answer```\nThe question will be manually fixed.", ephemeral=True)
-	
 	@qotdgroup.command(name="ask", description="Add a question to qotd.")
 	@AC.describe(
 		question="The question you are asking.", options="The options members will pick from, leave blank for a normal question, only 2 to 5 options allowed.",
