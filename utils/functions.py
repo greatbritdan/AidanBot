@@ -17,7 +17,7 @@ def getEmbed(title, content, color, fields):
 	return emb
 
 def getComEmbed(client:commands.Bot=None, title=None, content=None, color=False, command=None, footer=None, fields=None):
-	if color and isinstance(color, str):
+	if color and isinstance(color, str) and color[0] == "#":
 		color = Color.from_str(color)
 	elif color and isinstance(color, discord.Color):
 		color = color # COLOR IS COLOR
