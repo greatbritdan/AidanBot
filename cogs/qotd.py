@@ -401,7 +401,7 @@ class QOTDCog(CM.Cog):
 		if self.client.isbeta or not await ab_check_slient(itr, self.client, is_guild=True, has_value="qotd_channel"):
 			return await itr.response.send_message("Question Of The Day is not setup in this server.", ephemeral=True)
 		
-		if instant == "Yes" and ab_check_slient(itr, self.client, has_mod_role=True):
+		if instant == "Yes" and await ab_check_slient(itr, self.client, has_mod_role=True):
 			await self.createQuestion(itr.guild, True)
 			await itr.response.send_message("Instant rerolled!", ephemeral=True)
 			return
