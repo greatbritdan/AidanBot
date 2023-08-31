@@ -189,10 +189,10 @@ class QOTDCog(CM.Cog):
 	
 		question, author = lastquestion["question"], get(guild.members, id=lastquestion["author"])
 		if "options" in lastquestion and lastquestion["options"] != False:
-			embed = self.getQuestionEmbed(question, author.name, len(questions)-1, sum(lastquestion["votes"]))
+			embed = self.getQuestionEmbed(question, author.name, len(questions), sum(lastquestion["votes"]))
 			await lastmessage.edit(embed=embed)
 		else:
-			embed = self.getQuestionEmbed(question, author.name, len(questions)-1)
+			embed = self.getQuestionEmbed(question, author.name, len(questions))
 			await lastmessage.edit(embed=embed)
 
 	async def createQuestionResults(self, guild:discord.Guild, nosave:bool=False):
