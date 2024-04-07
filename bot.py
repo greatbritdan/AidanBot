@@ -7,7 +7,7 @@ from github import Github
 #load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 github = Github(os.getenv("GITHUB_TOKEN"))
-githubrepo = github.get_repo("Aid0nModder/AidanBot")
+githubrepo = github.get_repo("greatbritdan/AidanBot")
 
 debug_guilds = False #[discord.Object(760987756985843733), discord.Object(836936601824788520), discord.Object(879063875469860874), discord.Object(1041821214777278464)]
 
