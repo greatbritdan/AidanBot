@@ -267,7 +267,7 @@ class AidanBot(commands.Bot):
 
 	@tasks.loop(minutes=10)
 	async def statusloop(self):
-		status = {
+		'''status = {
 			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "a very dangerous game...", "One Word Story", "Aidan's videos on repeat", "badbot",
 				    "Polish Grass Simulator", "IT IS FOCKEN MINGING", "/games fight" ],
 			"watching": [ "the world fall apart...", "out for Waluigi!", "Aidan sleep", "the Bucket Wars", "Aidan rewrite me for the {nthtime} time", "people stop using me :(",
@@ -276,9 +276,13 @@ class AidanBot(commands.Bot):
 			"streaming": [ "Polish Grass in 4K", "absolutely nothing", "the screams of my victims", "1's and 0's across the interwebs", "something... but you'll never know :)", "and screaming" ],
 			"listening_to": [ "Aidan's nonexistant future lol", "my servers overheating", "Aidan complain about bots for the {nthtime} time", "everyone complain...", "Never Gonna Give You Up!" ],
 			"competing_in": [ "an arm pit fart contest", "stuff with my brothers", "War Crimes Simulator!", "being better than Aidans Bots!", "a stupid bot contest (I'm winning)" ],
-		}
-		activity_type, group = choice(list(status.items()))
+		}'''
 
+		status = {
+			"playing": [ "SHUTING OFF SOON, READ BIO!" ],
+		}
+		
+		activity_type, group = choice(list(status.items()))
 		if activity_type == "playing": activity_type = discord.ActivityType.playing
 		if activity_type == "watching": activity_type = discord.ActivityType.watching
 		if activity_type == "streaming": activity_type = discord.ActivityType.streaming
