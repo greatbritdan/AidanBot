@@ -2,8 +2,6 @@ import discord
 from discord.ext import commands, tasks
 from discord.utils import find, get
 
-from github.Repository import Repository
-
 from replybot.replybot import replyBot
 from utils.config import ConfigManager
 from utils.checks import ab_check_slient
@@ -19,9 +17,8 @@ class AidanBot(commands.Bot):
 	def __getitem__(self, key):
 		return getattr(self, key)
 	
-	def __init__(self, debug_guilds, githubrepo:Repository=False, offline=False):
+	def __init__(self, debug_guilds, offline=False):
 		self.offline = offline
-		self.botrepo = githubrepo
 
 		self.isbeta = True
 		self.settingup = True
@@ -30,10 +27,6 @@ class AidanBot(commands.Bot):
 		else:
 			self.debug_guilds = []
 		super().__init__(command_prefix="$",intents=discord.Intents.all())
-
-		if not self.offline:
-			with open("./data/times.json") as file:
-				self.timetable = json.load(file)
 
 		self.statuslooperrors = 0
 
@@ -92,7 +85,6 @@ class AidanBot(commands.Bot):
 
 		await self.CON.ready()
 		await self.UCON.ready()
-		await dict(self.cogs)["BirthdayCog"].ready()
 		await dict(self.cogs)["QOTDCog"].ready()
 
 	async def on_error(self, event, *args, **kwargs):
@@ -213,11 +205,6 @@ class AidanBot(commands.Bot):
 				await msg.delete()
 				return True
 		return False
-	
-	async def getStorageChannel(self):
-		guild = await self.fetch_guild(879063875469860874)
-		channel = await guild.fetch_channel(1131265454699188395)
-		return channel
 
 	async def attachmentsToFiles(self, attachments:list[discord.Attachment]):
 		for f in os.listdir("./nitrontfiles"): # clear old items
@@ -267,22 +254,16 @@ class AidanBot(commands.Bot):
 
 	@tasks.loop(minutes=10)
 	async def statusloop(self):
-		'''status = {
-			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "a very dangerous game...", "One Word Story", "Aidan's videos on repeat", "badbot",
-				    "Polish Grass Simulator", "IT IS FOCKEN MINGING", "/games fight" ],
+		status = {
+			"playing": [ "/info for info", "$help for help", "Mari0: Alesan's Entities", "a very dangerous game...", "One Word Story", "Aidan's videos on repeat", "badbot", "Polish Grass Simulator" ],
 			"watching": [ "the world fall apart...", "out for Waluigi!", "Aidan sleep", "the Bucket Wars", "Aidan rewrite me for the {nthtime} time", "people stop using me :(",
-				"{servercount} Servers!", "{membercount} Members!", "One Word Story: The Movie", "other bots suck!", "Pip0n's Palace crumble lol", "@britdan on Tumblr",
-				"pip0n commit arson for the {nthtime} time" ],
+				"{servercount} Servers!", "{membercount} Members!", "One Word Story: The Movie", "other bots suck!", "Pip0n's Palace crumble lol" ],
 			"streaming": [ "Polish Grass in 4K", "absolutely nothing", "the screams of my victims", "1's and 0's across the interwebs", "something... but you'll never know :)", "and screaming" ],
 			"listening_to": [ "Aidan's nonexistant future lol", "my servers overheating", "Aidan complain about bots for the {nthtime} time", "everyone complain...", "Never Gonna Give You Up!" ],
 			"competing_in": [ "an arm pit fart contest", "stuff with my brothers", "War Crimes Simulator!", "being better than Aidans Bots!", "a stupid bot contest (I'm winning)" ],
-		}'''
-
-		status = {
-			"playing": [ "SHUTING OFF SOON, READ BIO!" ],
 		}
-		
 		activity_type, group = choice(list(status.items()))
+
 		if activity_type == "playing": activity_type = discord.ActivityType.playing
 		if activity_type == "watching": activity_type = discord.ActivityType.watching
 		if activity_type == "streaming": activity_type = discord.ActivityType.streaming
@@ -311,7 +292,7 @@ class AidanBot(commands.Bot):
 	def itrFail(self):
 		if randint(1,6) == 1:
 			comebacks = [
-				"Did you try to poke my buttons? Sheeeeeesshh.", "Not your buttons! What a bruh moment.", "Sorry, you can't press this butt-on! :smirk:", "D-don't touch me user-san! O///O",
+				"Did you try to poke my buttons? Sheeeeeesshh.", "Not your buttons! What a bruh moment.", "Sorry, you can't press this butt-on! :smirk:", "D-don't touch me user-san! >///<",
 				"This button can't be hit.\nDespite the fact it's lit.\nYou try and fail,\nTo make it sail,\nBut I do not give a shit.", "It takes like, 10 seconds to just run your own command."
 			]
 			return choice(comebacks)

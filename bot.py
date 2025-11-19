@@ -1,23 +1,20 @@
-import discord, json, os
+import discord, os
 from dotenv import load_dotenv
 
 from aidanbot import AidanBot
-from github import Github
 
-#load_dotenv()
+load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
-github = Github(os.getenv("GITHUB_TOKEN"))
-githubrepo = github.get_repo("greatbritdan/AidanBot")
 
-debug_guilds = False #[discord.Object(760987756985843733), discord.Object(836936601824788520), discord.Object(879063875469860874), discord.Object(1041821214777278464)]
+debug_guilds = [discord.Object(760987756985843733)] #, discord.Object(836936601824788520), discord.Object(879063875469860874), discord.Object(1041821214777278464)]
 
 def main():
-	client = AidanBot(debug_guilds, githubrepo)
+	client = AidanBot(debug_guilds)
 	client.run(token)
 	
 if __name__ == '__main__':
 	main()
-
+	
 '''
 Slash Command Hierarchy!
 ( Think of it as a diet coke help command )
@@ -26,8 +23,6 @@ Slash Command Hierarchy!
 	/ping -     Get bots latency.
 	/echo -     Make the bot say something.
 	/clone -    Say something as another user.
-	/issue -    Create an issue on github.
-	/role -     Add/Remove a [r] role to/from yourself or any role to/from anyone if you have manage roles. (GUILD ONLY)
 
 	/info
 	-	/info user -   Get info on a user.
@@ -50,10 +45,6 @@ Slash Command Hierarchy!
 	-	/games rps -           Rock, paper, sissors.
 	-	/games fight -         Fight people or bots.
 	-	/games fightclassic -  Fight people or bots, but classic.
-	
-	/birthday
-	-	/birthday change -    Set your birthday.
-	-	/birthday upcoming -  See upcoming birthdays.
 
 	/qotd (MUST HAVE 'qotd_channel' CONFIG SETUP!)
 	-	/qotd view -    View questions.

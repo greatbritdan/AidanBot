@@ -31,6 +31,10 @@ class InfoCog(CM.Cog):
 		display="If the embed will display the full data or only the essensial data. Reduces space and time"
 	)
 	async def userinfo(self, itr:Itr, user:discord.Member|discord.User, display:Literal["Full","Simple"]="Full"):	
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+
 		full = True if display == "Full" else False
 		user = user or itr.user
 		inguild = True
@@ -146,6 +150,10 @@ class InfoCog(CM.Cog):
 
 	@infogroup.command(name="guild", description="Get info on the server/guild.")
 	async def guildinfo(self, itr:Itr):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+			
 		if not await ab_check(itr, self.client, is_guild=True):
 			return
 		

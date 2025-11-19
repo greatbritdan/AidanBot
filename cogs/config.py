@@ -19,6 +19,10 @@ class ConfigCore(CM.Cog):
 	@configgroup.command(name="guild", description="Guild configerations.")
 	@AC.describe(action="Config action.", name="Variable you're performing action on.", value="New value for this variable.")
 	async def guildconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Raw"], name:str=None, value:str=None):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		if not await ab_check(itr, self.client, is_guild=True, has_mod_role=True):
 			return
 		if name and name not in self.client.CON.valid_values:
@@ -32,6 +36,10 @@ class ConfigCore(CM.Cog):
 	@configgroup.command(name="user", description="User configerations.")
 	@AC.describe(action="Config action.", name="Variable you're performing action on.", value="New value for this variable.")
 	async def userconfig(self, itr:Itr, action:Literal["List","Set","Reset","Info","Raw"], name:str=None, value:str=None):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		if name and name not in self.client.UCON.valid_values:
 			name = False
 		await self.config_command(itr, self.client.UCON, itr.user, action, name, value)

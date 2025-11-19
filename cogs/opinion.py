@@ -36,6 +36,10 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="rate", description="I will rate a thing.")
 	@AC.describe(thing="Thing I will rate.")
 	async def rate(self, itr:Itr, thing:str):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+
 		repwords = {
 			"your":"my","you":"me","yourself":"myself","my":"your","me":"you","i":"you","myself":"yourself","this":"that","these":"those","that":"this","those":"these",
 			"Your":"My","You":"Me","Yourself":"Myself","My":"Your","Me":"You","Myself":"Yourself","This":"That","These":"Those","That":"This","Those":"These",
@@ -68,6 +72,10 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="percent", description="I will say what part of something is something.")
 	@AC.describe(something="The something.", someone="The someone.")
 	async def percent(self, itr:Itr, something:str, someone:str="False"):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		if someone == "False":
 			score = getLikeness(something.lower() + ":" + itr.user.name.lower())
 		else:
@@ -83,6 +91,10 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="ask", description="I will answer your burning questions.")
 	@AC.describe(question="The question you ask.")
 	async def ask(self, itr:Itr, question:str):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		starts = []
 		answers = []
 		answer = ""
@@ -126,6 +138,10 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="decide", description="I will decide on something for you.")
 	@AC.describe(options="All the options sepperated by commas.")
 	async def decide(self, itr:Itr, options:str):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+
 		options = [i.strip() for i in options.split(",") if i]
 		embed = getComEmbed(self.client, f"I choose... {choice(options)}", command="Opinion > Decide")
 		await itr.response.send_message(embed=embed)
@@ -133,6 +149,10 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="8ball", description="I will be your personal magic 8 ball.")
 	@AC.describe(question="The question you ask.")
 	async def ball8(self, itr:Itr, question:str):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		options = [
 			"It is certain.","It is decidedly so.","Without a doubt.","Yes definitely.","You may rely on it","As I see it, yes.","Most likely.","Outlook good.","Yes.","Signs point to yes",
 			"Reply hazy, try again.","Ask again later.","Better not tell you now.","Cannot predict now.","Concentrate and ask again.","Don't count on it.","My reply is no.","My sources say no.",
@@ -144,6 +164,10 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="tierlist", description="I will make a tier list to annoy you lol.")
 	@AC.describe(options="All the options sepperated by commas.", tiers="List of tier names/emojis (CAN'T HAVE BOTH) sepperated by commas.")
 	async def tierlist(self, itr:Itr, options:str, tiers:str=None):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		allemoji = True
 		if tiers:
 			tieremojisidx = []
@@ -213,6 +237,10 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="poll", description="Create a poll for people to vote on.")
 	@AC.describe(question="The question you are asking.", answers="LAll the answers sepperated by commas.", duration="The timelimit of the poll.")
 	async def poll(self, itr:Itr, question:str, answers:str, duration:AC.Range[int,30,1500]):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		answers = [i.strip() for i in answers.split(",")]
 		if (len(answers) < 2 or len(answers) > 10) and (not self.client.ownerid == itr.user.id):
 			return await itr.response.send_message("Invalid number of answers! There must be at least 2 and no more than 10!")

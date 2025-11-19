@@ -80,6 +80,10 @@ class CoreCog(CM.Cog):
 
 	@AC.command(name="botinfo", description="Get info about the bot.")
 	async def list(self, itr:Itr):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		permstats = await permissionStates(itr, self.client)
 		configstats = [["This server has lower limits, get **40** or more members to unlock larger config values!", "```String length limit: 250\nNumber length limit: 5\nStackable objects limit: 10```"]]
 		if itr.guild.member_count >= 40:
@@ -140,6 +144,10 @@ class CoreCog(CM.Cog):
 
 	@AC.command(name="ping", description="Check the Bot and API latency.")
 	async def ping(self, itr:Itr):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		start_time = time.time()
 		embed = getComEmbed(self.client, "Testing Ping...", command="Ping")
 		await itr.response.send_message(embed=embed, ephemeral=True)
@@ -150,6 +158,10 @@ class CoreCog(CM.Cog):
 	@AC.command(name="echo", description="Say something as me.")
 	@AC.describe(message="What I will say.", attachment="What attachment to attach.")
 	async def echo(self, itr:Itr, message:str, attachment:discord.Attachment=None):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		if len(message) >= 1000:
 			return await itr.response.send_message("Message must be 1000 characters or fewer, try again!", ephemeral=True)
 		await itr.response.defer(ephemeral=True)
@@ -163,6 +175,10 @@ class CoreCog(CM.Cog):
 	@AC.command(name="clone", description="Say something as another user.")
 	@AC.describe(user="User you want to clone.", message="Message you want to send as them.", attachment="What attachment to attach.")
 	async def clone(self, itr:Itr, user:discord.Member, message:str, attachment:discord.Attachment=None):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		if len(message) >= 1000:
 			return await itr.response.send_message("Message must be 1000 characters or fewer, try again!", ephemeral=True)
 
@@ -177,76 +193,12 @@ class CoreCog(CM.Cog):
 			await self.client.sendWebhook(itr.channel, f"{user.display_name} (Cloned by {str(itr.user)})", user.display_avatar, message, files)
 			await itr.edit_original_response(content="Sent!")
 
-	@AC.command(name="issue", description="Create an issue on GitHub.")
-	@AC.describe(title="Title of the post.", body="Body of the embed.", label1="Tag to insert into the post, must be a valid tag.",
-	    label2="Tag to insert into the post, must be a valid tag.", attachment="What attachment to attach.")
-	async def issue(self, itr:Itr, title:str, body:str, label1:str=None, label2:str=None, attachment:discord.Attachment=None):
-		glabels = [i.name for i in self.client.botrepo.get_labels()]
-		labels = [i for i in [label1, label2] if i and i in glabels]
-
-		dbody = body
-		body += f"\n\n[ Submitted by {str(itr.user)} via /issue ]"
-		
-		if len(title) >= 200: return await itr.response.send_message("Title must be 200 characters or fewer.", ephemeral=True)
-		if len(body) >= 1000: return await itr.response.send_message("Body must be 1000 characters or fewer.", ephemeral=True)
-
-		if len(labels) > 0:
-			issue:Issue = self.client.botrepo.create_issue(title=title, body=body, labels=labels)
-		else:
-			issue:Issue = self.client.botrepo.create_issue(title=title, body=body)
-
-		dbody = (dbody[:100] + "...") if len(dbody) > 100 else dbody
-		embed = getComEmbed(self.client, f"Submitted - {issue.title} #{issue.number}", f"```{dbody}```\n[View Issue]({issue.html_url})", command="Issue")
-		embed.set_image(url=f"https://opengraph.githubassets.com/38d571ceec6df9de6f4fce604edf337d9ffc782aa7f123aaaae74c9fbe824428/Aid0nModder/AidanBot/issues/{issue.number}")
-		await itr.response.send_message(embed=embed)
-
-	@issue.autocomplete("label1")
-	async def issue_label1(self, itr:Itr, current:str):
-		tags = [tag.name for tag in self.client.botrepo.get_labels()]
-		return [AC.Choice(name=name, value=name) for name in tags if current.lower() in name.lower()][:25]
-	
-	@issue.autocomplete("label2")
-	async def issue_label2(self, itr:Itr, current:str):
-		tags = [tag.name for tag in self.client.botrepo.get_labels()]
-		return [AC.Choice(name=name, value=name) for name in tags if current.lower() in name.lower()][:25]
-
-	@AC.command(name="role", description="Add a role to you or someone. Can only add [r] roles to yourself without manage_roles.")
-	@AC.describe(action="If you want to add or remove a role.", role="Role to add/remove to yourself.", user="User to add/remove the role to.")
-	async def role(self, itr:Itr, action:Literal["Add","Remove"], role:discord.Role, user:discord.Member):
-		if not await ab_check(itr, self.client, is_guild=True, bot_has_permission="manage_roles"):
-			return
-		t = "give"
-		if action == "Remove":
-			t = "take"
-
-		if ((user and user != itr.user) or (not role.name.startswith("[r]"))) and (not itr.channel.permissions_for(itr.user).manage_roles):
-			return await itr.response.send_message("Sorry kid, that's for mods only, maybe one day...")
-		if role.is_default():
-			return await itr.response.send_message(f"I'm sorry... did you- did- did you just try to {t} the @everyone role, I don't know how I'd even do that so I wont.")
-		if role.is_premium_subscriber():
-			return await itr.response.send_message(f"Sorry, can't {t} roles that are exclusive to server boosters.")
-		if role.is_integration():
-			return await itr.response.send_message(f"Sorry, can't {t} roles that are integration managed.")
-		if role.is_bot_managed():
-			return await itr.response.send_message(f"Sorry, can't {t} roles that are bot managed.")
-		
-		clientmember = await itr.guild.fetch_member(self.client.user.id)
-		if role.position >= clientmember.top_role.position:
-			return await itr.response.send_message(f"Sorry, can't {t} roles above my top role.")
-		if role.position >= itr.user.top_role.position:
-			return await itr.response.send_message(f"Sorry, can't {t} roles above your top role.")
-		user = user or itr.user
-		if action == "Add":
-			await user.add_roles(role)
-			await itr.response.send_message(f"Added {role.mention} to {user.mention}!")
-		elif action == "Remove":
-			await user.remove_roles(role)
-			await itr.response.send_message(f"Removed {role.mention} from {user.mention}!")
-		else:
-			await itr.response.send_message(f"'{action}' is not a valid action")
-
 	@AC.command(name="fact", description="Get a random fact.")
 	async def fact(self, itr:Itr):
+		if itr.guild.id != 836936601824788520:
+			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
+			return
+		
 		fact = getFact()
 		await itr.response.send_message(f"Did you know? {fact}")
 

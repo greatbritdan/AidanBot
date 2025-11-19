@@ -174,9 +174,9 @@ class FightManager():
 			fields.append(self.actions)
 		if not timeout:
 			fields.append([f"{turn.name}'s Turn:", "> Select an action below"])
-		return getComEmbed(str(itr.user), client, title, fields=fields), self.moves.getView(timeout)
+		return getComEmbed(client, title, command="Fight!", fields=fields), self.moves.getView(timeout)
 	def getWinEmbed(self, itr:Itr, client:AidanBot, move:str, turn:FightPlayer, turnt:FightPlayer):
-		return getComEmbed(str(itr.user), client, f"{turn.name} won! Tough luck {turnt.name}", self.moves.getDeath(move).format(turn=turn.name, turnt=turnt.name)), self.moves.getView(True)
+		return getComEmbed(client, f"{turn.name} won! Tough luck {turnt.name}", self.moves.getDeath(move).format(turn=turn.name, turnt=turnt.name), command="Fight!"), self.moves.getView(True)
 
 	def getActionsPlayer(self, actiontxt, player:FightPlayer, playerbefore, playerafter):
 		for name in playerbefore.keys():
