@@ -7,7 +7,7 @@ load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
 revival_guild = 836936601824788520
-debug_guilds = #[discord.Object(836936601824788520)]
+debug_guilds = [] #[discord.Object(836936601824788520)]
 
 def main():
 	client = AidanBot(debug_guilds,revival_guild)
@@ -62,4 +62,5 @@ Slash Command Hierarchy!
 
 
 '''
+
 
