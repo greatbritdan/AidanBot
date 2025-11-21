@@ -102,7 +102,10 @@ class AidanBot(commands.Bot):
 	async def on_message(self, message:discord.Message):
 		if self.settingup or message.author.bot or message.webhook_id:
 			return
-		if message.guild:
+		if message.guild and message.guild.id == self.revival_guild:
+			if "<:GentleGoomba:798327849412853760>" in message.content:
+				# In memory of Gentle Goombot...
+				return await message.channel.send("<:GentleGoomba:798327849412853760>")
 			if self.isbeta:
 				if message.channel.name == "aidanbetabot-talk":
 					return await self.replybot.on_message(message)
@@ -300,3 +303,4 @@ class AidanBot(commands.Bot):
 		else:
 
 			return "Sorry, you can't press this button!"
+
