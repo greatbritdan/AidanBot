@@ -88,7 +88,7 @@ class QOTDCog(CM.Cog):
 	@tasks.loop(time=datetime.time(15, 0, 0, 0, datetime.datetime.now().astimezone().tzinfo))
 	async def qotdtask(self):
 		for guild in await self.client.CON.loopdata():
-			if guild.id == 836936601824788520:
+			if guild.id == self.client.revival_guild:
 				channel = self.client.CON.get_value(guild, "qotd_channel", guild=guild)
 				if channel:
 					await self.createQuestion(guild)
@@ -190,10 +190,10 @@ class QOTDCog(CM.Cog):
 	
 		question, author = lastquestion["question"], get(guild.members, id=lastquestion["author"])
 		if "options" in lastquestion and lastquestion["options"] != False:
-			embed = self.getQuestionEmbed(question, author.name, len(questions)-1, sum(lastquestion["votes"]))
+			embed = self.getQuestionEmbed(question, author.name, len(questions), sum(lastquestion["votes"]))
 			await lastmessage.edit(embed=embed)
 		else:
-			embed = self.getQuestionEmbed(question, author.name, len(questions)-1)
+			embed = self.getQuestionEmbed(question, author.name, len(questions))
 			await lastmessage.edit(embed=embed)
 
 	async def createQuestionResults(self, guild:discord.Guild, nosave:bool=False):
@@ -246,7 +246,7 @@ class QOTDCog(CM.Cog):
 
 	@qotdgroup.command(name="fix", description="Use if qotd fails to send.")
 	async def fix(self, itr:Itr, noping:Literal["True","False"]="True", nosave:Literal["True","False"]="True", typee:Literal["Question","Results","Both"]="False"):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -271,7 +271,7 @@ class QOTDCog(CM.Cog):
 		correct="The correct answer, requires options and for the correct answer to be in the options, leave blank for a normal poll."
 	)
 	async def ask(self, itr:Itr, question:str, options:str=None, correct:str=None):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -322,7 +322,7 @@ class QOTDCog(CM.Cog):
 	@qotdgroup.command(name="remove", description="Remove a question from qotd, you can only remove your own unless you are a mod.")
 	@AC.describe(question="The question to be removed, remember you can only remove your own unless you are a mod.")
 	async def remove(self, itr:Itr, question:str):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -347,7 +347,7 @@ class QOTDCog(CM.Cog):
 	
 	@qotdgroup.command(name="view", description="Look at all the questions.")
 	async def view(self, itr:Itr):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 			
@@ -415,7 +415,7 @@ class QOTDCog(CM.Cog):
 	@qotdgroup.command(name="reroll", description="Post a new question if the last one wasn't that good.")
 	@AC.describe(instant="If the reroll should have no vote (Mods only).")
 	async def reroll(self, itr:Itr, instant:Literal["Yes","No"]):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 

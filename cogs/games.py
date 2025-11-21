@@ -65,7 +65,7 @@ class GamesCog(CM.Cog):
 	@gamesgroup.command(name="rps", description="Rock, paper, scissors!")
 	@AC.describe(user1="The first player.", user2="The second player.")
 	async def rps(self, itr:Itr, user1:discord.Member=None, user2:discord.Member=None):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -219,7 +219,7 @@ class GamesCog(CM.Cog):
 	async def fight_normal(self, itr:Itr, user1:discord.Member=None, user2:discord.Member=None,
 		ailevel:Literal["dead","random","easy","medium","hard"]="medium", ailevel1:Literal["dead","random","easy","medium","hard"]=None, ailevel2:Literal["dead","random","easy","medium","hard"]=None
 	):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -236,7 +236,7 @@ class GamesCog(CM.Cog):
 	async def fight_classic(self, itr:Itr, user1:discord.Member=None, user2:discord.Member=None,
 		ailevel:Literal["dead","random","easy","hard"]="easy", ailevel1:Literal["dead","random","easy","hard"]=None, ailevel2:Literal["dead","random","easy","hard"]=None
 	):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -251,7 +251,7 @@ class GamesCog(CM.Cog):
 	@gamesgroup.command(name="fight-replay", description="Replay a fight from a fightlog file!")
 	@AC.describe(logfile="The fightlog file to read from.")
 	async def fight_replay_slash(self, itr:Itr, logfile:discord.Attachment):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 			

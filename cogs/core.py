@@ -30,7 +30,6 @@ requiredperms = {
 	"read_message_history": "Needed to see past messages for /info"
 }
 optionalperms = {
-	"manage_roles":"If disabled /role and birthday_role will no longer be avalable",
 	"manage_guild":"If disabled guild invites wont be ignored if remove_invites is enabled",
 	"mention_everyone":"If disabled qotd_role will not work",
 	"attach_files":"If disabled /echo, /clone and nitron't will not have attachment support",
@@ -39,7 +38,7 @@ optionalperms = {
 unnecessaryperms = [
 	"manage_channels","manage_emojis_and_stickers","view_audit_log","view_guild_insights","create_instant_invite",
 	"change_nickname","manage_nicknames","kick_members","ban_members","moderate_members","create_public_threads","create_private_threads",
-	"add_reactions","manage_threads","send_tts_messages","use_application_commands","manage_events","administrator"
+	"add_reactions","manage_threads","send_tts_messages","use_application_commands","manage_events","administrator","manage_roles"
 ]
 
 def replaceWord(text, find, replace):
@@ -80,7 +79,7 @@ class CoreCog(CM.Cog):
 
 	@AC.command(name="botinfo", description="Get info about the bot.")
 	async def list(self, itr:Itr):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -144,7 +143,7 @@ class CoreCog(CM.Cog):
 
 	@AC.command(name="ping", description="Check the Bot and API latency.")
 	async def ping(self, itr:Itr):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -158,7 +157,7 @@ class CoreCog(CM.Cog):
 	@AC.command(name="echo", description="Say something as me.")
 	@AC.describe(message="What I will say.", attachment="What attachment to attach.")
 	async def echo(self, itr:Itr, message:str, attachment:discord.Attachment=None):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -175,7 +174,7 @@ class CoreCog(CM.Cog):
 	@AC.command(name="clone", description="Say something as another user.")
 	@AC.describe(user="User you want to clone.", message="Message you want to send as them.", attachment="What attachment to attach.")
 	async def clone(self, itr:Itr, user:discord.Member, message:str, attachment:discord.Attachment=None):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -195,7 +194,7 @@ class CoreCog(CM.Cog):
 
 	@AC.command(name="fact", description="Get a random fact.")
 	async def fact(self, itr:Itr):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		

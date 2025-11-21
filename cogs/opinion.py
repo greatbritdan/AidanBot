@@ -36,7 +36,7 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="rate", description="I will rate a thing.")
 	@AC.describe(thing="Thing I will rate.")
 	async def rate(self, itr:Itr, thing:str):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 
@@ -72,7 +72,7 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="percent", description="I will say what part of something is something.")
 	@AC.describe(something="The something.", someone="The someone.")
 	async def percent(self, itr:Itr, something:str, someone:str="False"):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -91,7 +91,7 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="ask", description="I will answer your burning questions.")
 	@AC.describe(question="The question you ask.")
 	async def ask(self, itr:Itr, question:str):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -138,7 +138,7 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="decide", description="I will decide on something for you.")
 	@AC.describe(options="All the options sepperated by commas.")
 	async def decide(self, itr:Itr, options:str):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 
@@ -149,7 +149,7 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="8ball", description="I will be your personal magic 8 ball.")
 	@AC.describe(question="The question you ask.")
 	async def ball8(self, itr:Itr, question:str):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -164,7 +164,7 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="tierlist", description="I will make a tier list to annoy you lol.")
 	@AC.describe(options="All the options sepperated by commas.", tiers="List of tier names/emojis (CAN'T HAVE BOTH) sepperated by commas.")
 	async def tierlist(self, itr:Itr, options:str, tiers:str=None):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
@@ -237,7 +237,7 @@ class OpinionCog(CM.Cog):
 	@opiniongroup.command(name="poll", description="Create a poll for people to vote on.")
 	@AC.describe(question="The question you are asking.", answers="LAll the answers sepperated by commas.", duration="The timelimit of the poll.")
 	async def poll(self, itr:Itr, question:str, answers:str, duration:AC.Range[int,30,1500]):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		

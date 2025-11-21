@@ -20,6 +20,8 @@ class InfoCog(CM.Cog):
 			"804319602292949013": "An Authentic AidanBot <:AidanBotBruh:861643332241457162>",
 			"861571290132643850": "An Authentic AidanBot <:AidanBotBruh:861643332241457162>",
 			"939228285106286702": "An Authentic AidanBot <:AidanBotBruh:861643332241457162>",
+			"443344216798527499": "Offical Susketeer! :fire_extinguisher:",
+			"605519830216343564": "Offical Susketeer! :fire_extinguisher:",
 			"836936601824788520": "Offical Support Server 🎫"
 		}
 	
@@ -31,7 +33,7 @@ class InfoCog(CM.Cog):
 		display="If the embed will display the full data or only the essensial data. Reduces space and time"
 	)
 	async def userinfo(self, itr:Itr, user:discord.Member|discord.User, display:Literal["Full","Simple"]="Full"):	
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 
@@ -150,7 +152,7 @@ class InfoCog(CM.Cog):
 
 	@infogroup.command(name="guild", description="Get info on the server/guild.")
 	async def guildinfo(self, itr:Itr):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 			

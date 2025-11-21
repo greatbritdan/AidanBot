@@ -17,11 +17,12 @@ class AidanBot(commands.Bot):
 	def __getitem__(self, key):
 		return getattr(self, key)
 	
-	def __init__(self, debug_guilds, offline=False):
+	def __init__(self, debug_guilds, revival_guild, offline=False):
 		self.offline = offline
 
-		self.isbeta = True
+		self.isbeta = False
 		self.settingup = True
+		self.revival_guild = revival_guild
 		if debug_guilds:
 			self.debug_guilds = debug_guilds
 		else:
@@ -53,8 +54,8 @@ class AidanBot(commands.Bot):
 			return
 
 		profile = "main"
-		if self.user.id == 861571290132643850:
-			profile = "beta"
+		#if self.user.id == 861571290132643850:
+		#	profile = "beta"
 
 		with open('./data/profiles.json') as file:
 			profiles = json.load(file)

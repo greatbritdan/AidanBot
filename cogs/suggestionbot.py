@@ -18,16 +18,16 @@ class SuggestCog(CM.Cog):
 
 	@suggestgroup.command(name="info", description="Information about suggestbot.")
 	async def info(self, itr:Itr):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 			
-		await itr.response.send_message(embed=getComEmbed(self.client, "What is suggestbot?", "Suggestbot is a remake of the [Mari0 Suggestion Bot](https://twitter.com/Mari0AE_Bot) from twitter made by NH1507#5915 but for discord, it creates fake and silly suggestions for the game.", command="Suggestion Bot > Info"))
+		await itr.response.send_message(embed=getComEmbed(self.client, "What is suggestbot?", "Suggestbot is a remake of the [Mari0 Suggestion Bot](https://twitter.com/Mari0AE_Bot) from twitter made by <@581560073030205460> but for discord, it creates fake and silly suggestions for the game.", command="Suggestion Bot > Info"))
 	
 	@suggestgroup.command(name="generate", description="Generate some Mari0 AE suggestions.")
 	@AC.describe(logs="If older suggestions are saved to a thread.",)
 	async def generate(self, itr:Itr, logs:Literal["Enabled", "Disabled"]="Enabled"):
-		if itr.guild.id != 836936601824788520:
+		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
 		
