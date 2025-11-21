@@ -6,8 +6,8 @@ from aidanbot import AidanBot
 load_dotenv()
 token = os.getenv("DISCORD_TOKEN")
 
-revival_guild = 760987756985843733 #836936601824788520
-debug_guilds = [discord.Object(760987756985843733)] #[discord.Object(836936601824788520)]
+revival_guild = 836936601824788520
+debug_guilds = [discord.Object(836936601824788520)]
 
 def main():
 	client = AidanBot(debug_guilds,revival_guild)
@@ -59,5 +59,6 @@ Slash Command Hierarchy!
 
 	(message) Eval -        Eval dat text. (OWNER ONLY)
 	(message) Eval-rerun -  Eval dat text but you can rerun it. (OWNER ONLY)
+
 
 '''
