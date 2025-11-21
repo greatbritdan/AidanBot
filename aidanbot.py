@@ -20,7 +20,7 @@ class AidanBot(commands.Bot):
 	def __init__(self, debug_guilds, revival_guild, offline=False):
 		self.offline = offline
 
-		self.isbeta = False
+		self.isbeta = True
 		self.settingup = True
 		self.revival_guild = revival_guild
 		if debug_guilds:
@@ -54,8 +54,8 @@ class AidanBot(commands.Bot):
 			return
 
 		profile = "main"
-		#if self.user.id == 861571290132643850:
-		#	profile = "beta"
+		if self.user.id == 861571290132643850:
+			profile = "beta"
 
 		with open('./data/profiles.json') as file:
 			profiles = json.load(file)
@@ -298,4 +298,5 @@ class AidanBot(commands.Bot):
 			]
 			return choice(comebacks)
 		else:
+
 			return "Sorry, you can't press this button!"
