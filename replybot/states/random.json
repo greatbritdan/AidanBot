@@ -11,5 +11,10 @@
     "replyendchance": 3,
     "replyend": [ "{emoji}" ],
 
+    "customformat": {
+        "game": [ "Polish Grass Simulator","Cyberpunk 2077","Minecraft","Rock Paper Scissors","Fight","Being Dead" ]
+    },
+    
     "punctuation": [ ".",".",".","!" ]
+
 }
