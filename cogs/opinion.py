@@ -12,6 +12,8 @@ from aidanbot import AidanBot
 from utils.functions import getComEmbed, getBar
 
 def getLikeness(string):
+	if string == "AidanBot":
+		return 100
 	days = datetime.date.today() - datetime.date(2022,6,28)
 	num = int(hashlib.sha512(string.encode()).hexdigest(), 16)+days.days
 	seed(num)
@@ -240,6 +242,9 @@ class OpinionCog(CM.Cog):
 		if itr.guild.id != self.client.revival_guild:
 			await itr.response.send_message(ephemeral=True,content="I have only come back online for the celebration of Pip0n's Palace before it's shutdown, I am very much still deprecated and have not returned. Thank you for keeping me around!")
 			return
+		
+		await itr.response.send_message(ephemeral=True,content="Poll has been disabled as Discord has added a replacement.")
+		return
 		
 		answers = [i.strip() for i in answers.split(",")]
 		if (len(answers) < 2 or len(answers) > 10) and (not self.client.ownerid == itr.user.id):
